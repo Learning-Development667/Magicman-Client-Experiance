@@ -1218,18 +1218,22 @@
     100% { transform: scale(9);   opacity: 0; }
   }
 
-  /* MARV materialises from small to full size with a wasabi glow */
-  .kb-marv-sprite {
+  /* MARV's silent welcome video, in place of the sprite, materialises from
+     small to full size with a wasabi glow. */
+  .kb-marv-video {
     position: relative;
     z-index: 2;
-    width: 220px;
+    display: block;
+    width: 320px;
+    max-width: 78vw;
     height: auto;
+    border-radius: 16px;
     transform: scale(0.3);
     opacity: 0;
     filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
   }
 
-  .kb-marv-stage.show .kb-marv-sprite {
+  .kb-marv-stage.show .kb-marv-video {
     animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
   }
 
@@ -1447,11 +1451,12 @@
     </div>
   </div>
 
-  <!-- Post-cinematic: MARV materialises and introduces the next step -->
+  <!-- Post-cinematic: wasabi pulse, then MARV's silent welcome video -->
   <div id="kb-marv-stage" class="kb-stage kb-marv-stage">
     <span class="kb-pulse"></span>
     <span class="kb-pulse kb-pulse-delay"></span>
-    <img id="kb-marv-sprite" class="kb-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV">
+    <video id="kb-marv-video" class="kb-marv-video" muted playsinline preload="auto"
+           src="../assets/video/marv_welcome_video.mp4"></video>
     <div id="kb-marv-bubble" class="kb-marv-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
     <div id="kb-showme" class="kb-showme">
       <button type="button" id="kb-showme-btn" class="btn-primary">Show me &nbsp;&rarr;</button>
@@ -2158,90 +2163,71 @@ window.addEventListener('load', () => {
     setTimeout(advance, hold);
   }
 
-  // --- Post-cinematic: customer video, MARV reveal, then MARV welcome video ---
+  // --- Post-cinematic: customer video, then MARV's silent welcome video ---
   var ctaStage   = document.getElementById('kb-cta');
   var ctaBtn     = document.getElementById('kb-cta-btn');
   var videoStage = document.getElementById('kb-video-stage');
   var videoCard  = document.getElementById('kb-video-card');
   var video      = document.getElementById('kb-video');
   var marvStage  = document.getElementById('kb-marv-stage');
+  var marvVideo  = document.getElementById('kb-marv-video');
   var marvBubble = document.getElementById('kb-marv-bubble');
   var showMe     = document.getElementById('kb-showme');
   var showMeBtn  = document.getElementById('kb-showme-btn');
-
-  var MARV_VIDEO_SRC = '../assets/video/marv_welcome_video.mp4';
-
-  // Whichever sequence step is currently driving the shared video element
-  // registers what should happen when that clip finishes.
-  var videoEndHandler = null;
 
   // Hold on navy and invite the user to hear from a customer.
   function showCustomerCta() {
     if (ctaStage) { ctaStage.classList.add('show'); }
   }
 
-  function playVideo() {
-    if (!video) { return; }
-    video.currentTime = 0;
-    var pv = video.play();
-    if (pv && pv.catch) { pv.catch(function () {}); }
-  }
-
   if (ctaBtn) {
     ctaBtn.addEventListener('click', function () {
-      // This first click is the user gesture that grants audio permission.
-      // It carries through to the MARV welcome clip played later.
+      // This click is the user gesture that permits the customer video audio.
       if (ctaStage) { ctaStage.classList.remove('show'); }
-      videoEndHandler = onCustomerVideoEnd;
       if (videoStage) { videoStage.classList.add('show'); }
-      playVideo();
+      if (video) {
+        video.currentTime = 0;
+        var pv = video.play();
+        if (pv && pv.catch) { pv.catch(function () {}); }
+      }
     });
   }
 
   if (video) {
     video.addEventListener('ended', function () {
-      if (typeof videoEndHandler === 'function') { videoEndHandler(); }
+      // Fade the customer clip out to navy over 800ms, then reveal MARV.
+      if (videoCard) { videoCard.classList.add('kb-faded'); }
+      setTimeout(function () {
+        if (videoStage) { videoStage.classList.remove('show'); }
+        revealMarv();
+      }, 800);
     });
   }
 
-  // Customer clip ends: fade to the navy backdrop over 800ms, then bring MARV in.
-  function onCustomerVideoEnd() {
-    if (videoCard) { videoCard.classList.add('kb-faded'); }
-    setTimeout(function () {
-      if (videoStage) { videoStage.classList.remove('show'); }
-      revealMarv();
-    }, 800);
-  }
-
-  // Showing the stage fires the radial pulse and MARV materialise (both CSS).
+  // The pulse fires, MARV's silent welcome video materialises in the sprite's
+  // place, then the speech bubble and Show me button appear.
   function revealMarv() {
     if (marvStage) { marvStage.classList.add('show'); }
-    // Speech bubble after 600ms, then the Show me button.
+    if (marvVideo) {
+      marvVideo.currentTime = 0;
+      // The clip is muted, so it plays without needing a user gesture.
+      var pm = marvVideo.play();
+      if (pm && pm.catch) { pm.catch(function () {}); }
+    }
     setTimeout(function () { if (marvBubble) { marvBubble.classList.add('show'); } }, 600);
     setTimeout(function () { if (showMe) { showMe.classList.add('show'); } }, 1200);
   }
 
   if (showMeBtn) {
     showMeBtn.addEventListener('click', function () {
-      // Play the MARV welcome clip in the same card. Audio is already permitted
-      // from the first click, so this plays with sound.
-      if (marvStage) { marvStage.classList.remove('show'); }
-      if (videoCard) { videoCard.classList.remove('kb-faded'); }
-      videoEndHandler = onMarvVideoEnd;
-      if (video) { video.src = MARV_VIDEO_SRC; }
-      if (videoStage) { videoStage.classList.add('show'); }
-      playVideo();
+      // Claims UI fades in as the navy overlay fades out, then we tear it down.
+      overlay.classList.add('kb-fade-out');
+      setTimeout(function () {
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+      }, 800);
     });
-  }
-
-  // MARV welcome clip ends: claims UI fades in as the overlay fades out.
-  function onMarvVideoEnd() {
-    overlay.classList.add('kb-fade-out');
-    setTimeout(function () {
-      if (overlay && overlay.parentNode) {
-        overlay.parentNode.removeChild(overlay);
-      }
-    }, 800);
   }
 
   // --- Start gate ---
