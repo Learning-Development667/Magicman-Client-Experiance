@@ -1101,6 +1101,44 @@
     overflow: hidden;
   }
 
+  /* Start gate - cinematic and music begin on this click (a user gesture,
+     which satisfies the browser autoplay policy for the audio track). */
+  .kb-start {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: #0d0d0d;
+    transition: opacity 0.6s ease;
+  }
+
+  .kb-start.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .kb-start-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+  }
+
+  .kb-start-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #AED284;
+    margin-bottom: 32px;
+  }
+
   .kb-panel {
     position: absolute;
     inset: 0;
@@ -1946,8 +1984,39 @@ window.addEventListener('load', () => {
     current++;
     setTimeout(advance, hold);
   }
-  startMusic();
-  advance();
+
+  // --- Start gate ---
+  // The cinematic and the ambient music both begin on this button click.
+  // A click is a user gesture, so the browser permits the audio to play.
+  var startScreen = document.createElement('div');
+  startScreen.className = 'kb-start';
+
+  var startTitle = document.createElement('div');
+  startTitle.className = 'kb-start-title';
+  startTitle.textContent = 'The Repair Journey';
+
+  var startSub = document.createElement('div');
+  startSub.className = 'kb-start-sub';
+  startSub.textContent = 'Sound on for the full experience';
+
+  var beginBtn = document.createElement('button');
+  beginBtn.type = 'button';
+  beginBtn.className = 'btn-primary';
+  beginBtn.innerHTML = 'Begin the journey &nbsp;&rarr;';
+
+  beginBtn.addEventListener('click', function () {
+    startMusic();
+    startScreen.classList.add('hide');
+    setTimeout(function () {
+      if (startScreen.parentNode) { startScreen.parentNode.removeChild(startScreen); }
+    }, 600);
+    advance();
+  });
+
+  startScreen.appendChild(startTitle);
+  startScreen.appendChild(startSub);
+  startScreen.appendChild(beginBtn);
+  overlay.appendChild(startScreen);
 })();
 </script>
 
