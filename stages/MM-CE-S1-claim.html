@@ -1007,157 +1007,85 @@
   }
 
   /* Positioning context so the handler thought bubble floats over the claims screen */
-  /* ---- MAGICMAN WEBSITE REPLICA (after Ask MARV) ---- */
-  .mm-site {
-    background: #ffffff;
-    min-height: 520px;
-    font-family: 'Open Sans', sans-serif;
-    display: flex;
-    flex-direction: column;
+  /* ---- MAGICMAN WEBSITE SCREENSHOTS (after Ask MARV) ---- */
+  /* Two stacked views; only the active one shows, with a fade between them. */
+  .mm-view {
+    display: none;
+    opacity: 0;
+    position: relative;
+    transition: opacity 0.45s ease;
+  }
+  .mm-view.active { display: block; }
+  .mm-view.shown { opacity: 1; }
+
+  .mm-shot {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
-  .mm-site-step { display: none; }
-  .mm-site-step.active { display: block; }
-
-  .mm-topbar {
-    background: #13294B;
-    color: #ffffff;
-    font-size: 12px;
-    padding: 7px 24px;
-    display: flex;
-    gap: 22px;
-    align-items: center;
-  }
-  .mm-topbar span { opacity: 0.85; }
-
-  .mm-header {
-    background: #13294B;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .mm-logo { flex-shrink: 0; display: block; }
-
-  .mm-nav {
-    display: flex;
-    gap: 22px;
-    flex: 1;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .mm-nav a {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: default;
-  }
-
-  .mm-estimate-btn {
-    background: #AED284;
-    color: #1A1A2E;
-    border: none;
-    border-radius: 22px;
-    padding: 10px 22px;
-    font-size: 14px;
-    font-weight: 800;
-    font-family: 'Open Sans', sans-serif;
+  /* Transparent pulsing highlight on top of the screenshot. It marks the
+     clickable area without hiding the content underneath. */
+  .mm-overlay {
+    position: absolute;
+    border: 2px solid rgba(174,210,132,0.85);
+    border-radius: 8px;
+    background: rgba(174,210,132,0.12);
     cursor: pointer;
-    flex-shrink: 0;
-    transition: transform 0.15s ease;
-  }
-  .mm-estimate-btn:hover { transform: translateY(-1px); }
-  .mm-estimate-btn.pulse {
-    animation: mm-glow-pulse 1.8s ease-in-out infinite;
+    z-index: 5;
+    animation: mm-overlay-pulse 1.6s ease-in-out infinite;
   }
 
-  @keyframes mm-glow-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(174,210,132,0.5); }
-    50%      { box-shadow: 0 0 18px 6px rgba(174,210,132,0.85); }
+  @keyframes mm-overlay-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(174,210,132,0.45);
+      border-color: rgba(174,210,132,0.7);
+    }
+    50% {
+      box-shadow: 0 0 22px 7px rgba(174,210,132,0.85);
+      border-color: rgba(174,210,132,1);
+    }
   }
 
-  .mm-hero {
-    background: #13294B;
-    color: #ffffff;
-    padding: 72px 24px 92px;
-    text-align: center;
-  }
-  .mm-hero h1 {
-    font-size: 46px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 16px;
-  }
-  .mm-hero p {
-    font-size: 17px;
-    color: rgba(255,255,255,0.82);
-    font-weight: 600;
+  /* ===========================================================
+     OVERLAY POSITIONS - tune these after first render.
+     Values are percentages of the screenshot, so they track the
+     image at any render size. Adjust top / left / width / height.
+     =========================================================== */
+
+  /* View 1: Online Estimate button (top right of homepage) */
+  .mm-overlay--estimate {
+    top: 3.5%;
+    left: 80%;
+    width: 16%;
+    height: 7%;
   }
 
-  .mm-estimate-page {
-    background: #f4f6f8;
-    padding: 40px 24px 60px;
-    min-height: 360px;
-    text-align: center;
+  /* View 2: Client Enquiry card */
+  .mm-overlay--client {
+    top: 42%;
+    left: 52%;
+    width: 30%;
+    height: 26%;
   }
-  .mm-estimate-page h2 {
-    color: #13294B;
+
+  /* Animated pointer drawing attention to the Client Enquiry card */
+  .mm-pointer {
+    position: absolute;
+    left: 50%;
+    bottom: -44px;
     font-size: 30px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-  .mm-step-indicator {
-    color: #6b7785;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 32px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    animation: mm-point-bob 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
   }
 
-  .mm-cards {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 620px;
-    margin: 0 auto;
+  @keyframes mm-point-bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-10px); }
   }
-  .mm-card {
-    width: 260px;
-    border-radius: 12px;
-    padding: 28px 22px;
-    text-align: center;
-  }
-  .mm-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-  .mm-card p { font-size: 13px; line-height: 1.5; }
 
-  .mm-card--disabled {
-    background: #e9ecef;
-    border: 1px solid #dde1e6;
-    color: #aab1ba;
-    cursor: not-allowed;
-  }
-  .mm-card--disabled h3 { color: #aab1ba; }
-
-  .mm-card--active {
-    background: #AED284;
-    color: #1A1A2E;
-    border: 1px solid #9ec070;
-    cursor: pointer;
-    animation: mm-glow-pulse 1.8s ease-in-out infinite;
-    transition: transform 0.15s ease;
-  }
-  .mm-card--active:hover { transform: translateY(-2px); }
-  .mm-card--active h3 { color: #1A1A2E; }
-
-  .mm-marv-label {
-    margin-top: 14px;
-    font-size: 12px;
-    color: #5a6b52;
-    font-weight: 700;
-  }
 
   #scene-website {
     background: #1A1A1A;
@@ -1342,57 +1270,22 @@
           <div class="tb-url" id="mm-url">magicman.co.uk</div>
         </div>
 
-        <!-- Magicman website -->
-        <div class="mm-site">
+        <!-- Magicman website screenshots -->
+        <div class="mm-views">
 
-          <!-- Contact top bar -->
-          <div class="mm-topbar">
-            <span>&#9742;&nbsp; 0345 458 1010</span>
-            <span>&#9993;&nbsp; enquiries@magicman.co.uk</span>
+          <!-- VIEW 1: Homepage screenshot -->
+          <div class="mm-view active shown" id="mm-view-home">
+            <img class="mm-shot" src="../assets/images/magicman-site-home.jpg" alt="Magicman homepage">
+            <!-- Overlay highlights the Online Estimate button (top right) -->
+            <div class="mm-overlay mm-overlay--estimate" onclick="goToEstimate()" role="button" tabindex="0" aria-label="Online Estimate"></div>
           </div>
 
-          <!-- Main header (shared across both steps) -->
-          <div class="mm-header">
-            <svg class="mm-logo" width="156" height="30" viewBox="0 0 156 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Magicman">
-              <text x="0" y="23" font-family="'Open Sans', sans-serif" font-size="25" font-weight="800" fill="#ffffff">magicman</text>
-              <path d="M142 3 l1.9 3.9 4.3 0.6 -3.1 3 0.7 4.3 -3.8 -2 -3.8 2 0.7 -4.3 -3.1 -3 4.3 -0.6 z" fill="#AED284"/>
-            </svg>
-            <nav class="mm-nav">
-              <a>Our Repairs</a>
-              <a>Industries</a>
-              <a>About</a>
-              <a>Repair Examples</a>
-              <a>Sustainability</a>
-            </nav>
-            <button class="mm-estimate-btn pulse" onclick="goToEstimate()" type="button">Online Estimate</button>
-          </div>
-
-          <!-- STEP 1: Homepage hero -->
-          <div class="mm-site-step active" id="site-step-home">
-            <div class="mm-hero">
-              <h1>repair, renew, restore</h1>
-              <p>UK's Leading Surface Repair Specialists - Since 1993</p>
-            </div>
-          </div>
-
-          <!-- STEP 2: Online Estimate page -->
-          <div class="mm-site-step" id="site-step-estimate">
-            <div class="mm-estimate-page">
-              <h2>Get a Free Online Estimate</h2>
-              <div class="mm-step-indicator">Step 1 of 6 - Your Details</div>
-              <div class="mm-cards">
-                <div class="mm-card mm-card--disabled" aria-disabled="true">
-                  <h3>Personal Enquiry</h3>
-                  <p>For homeowners and individuals</p>
-                </div>
-                <div>
-                  <div class="mm-card mm-card--active" onclick="selectClientEnquiry()" role="button" tabindex="0">
-                    <h3>Client Enquiry</h3>
-                    <p>For trade, insurance and business partners</p>
-                  </div>
-                  <div class="mm-marv-label">Powered by MARV - Magicman AI Repair Validator</div>
-                </div>
-              </div>
+          <!-- VIEW 2: Online Estimate screenshot -->
+          <div class="mm-view" id="mm-view-estimate">
+            <img class="mm-shot" src="../assets/images/magicman-site-estimate.jpg" alt="Online Estimate page">
+            <!-- Overlay highlights the Client Enquiry card -->
+            <div class="mm-overlay mm-overlay--client" onclick="selectClientEnquiry()" role="button" tabindex="0" aria-label="Client Enquiry">
+              <div class="mm-pointer">&#128070;</div>
             </div>
           </div>
 
@@ -1621,27 +1514,42 @@ function activateMarv() {
   btn.disabled = true;
   btn.style.opacity = '0.7';
 
-  // The teal claims UI fades back and the Magicman website loads in the same browser frame
+  // The teal claims UI fades back and the Magicman homepage screenshot loads in the same browser frame
   setTimeout(() => {
-    showSiteStep('site-step-home');
+    showSiteView('mm-view-home');
     const url = document.getElementById('mm-url');
     if (url) { url.textContent = 'magicman.co.uk'; }
     showScene('scene-website');
   }, 400);
 }
 
-function showSiteStep(stepId) {
-  document.querySelectorAll('.mm-site-step').forEach(s => s.classList.remove('active'));
-  const step = document.getElementById(stepId);
-  if (step) { step.classList.add('active'); }
+function showSiteView(viewId) {
+  document.querySelectorAll('.mm-view').forEach(v => v.classList.remove('active', 'shown'));
+  const view = document.getElementById(viewId);
+  if (!view) { return; }
+  view.classList.add('active');
+  void view.offsetWidth;
+  view.classList.add('shown');
 }
 
 function goToEstimate() {
   initAudio();
   playButtonClick();
   const url = document.getElementById('mm-url');
-  if (url) { url.textContent = 'magicman.co.uk/online-estimate'; }
-  showSiteStep('site-step-estimate');
+  if (url) { url.textContent = 'magicman.co.uk/online-estimate/'; }
+
+  // Fade View 1 out, then fade View 2 in
+  const home = document.getElementById('mm-view-home');
+  const estimate = document.getElementById('mm-view-estimate');
+  if (home) { home.classList.remove('shown'); }
+  setTimeout(() => {
+    if (home) { home.classList.remove('active'); }
+    if (estimate) {
+      estimate.classList.add('active');
+      void estimate.offsetWidth;
+      estimate.classList.add('shown');
+    }
+  }, 450);
 }
 
 function selectClientEnquiry() {
