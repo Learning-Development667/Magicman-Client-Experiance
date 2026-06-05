@@ -1099,6 +1099,13 @@
     z-index: 1000;
     background: #000;
     overflow: hidden;
+    transition: opacity 0.8s ease;
+  }
+
+  /* Final teardown - the claims UI fades in as this overlay fades out */
+  .kb-overlay.kb-fade-out {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* Start gate - cinematic and music begin on this click (a user gesture,
@@ -1137,6 +1144,147 @@
     letter-spacing: 1px;
     color: #AED284;
     margin-bottom: 32px;
+  }
+
+  /* Post-cinematic stages (customer video, then MARV) - full-screen navy
+     layers that fade in and out over the top of the cinematic panels. */
+  .kb-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: var(--navy);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .kb-stage.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Customer video, held in a rounded navy card */
+  .kb-video-card {
+    width: 92%;
+    max-width: 960px;
+    background: var(--navy);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    transition: opacity 0.8s ease;
+  }
+
+  .kb-video-card.kb-faded {
+    opacity: 0;
+  }
+
+  .kb-video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* MARV reveal - radial wasabi pulse rings expanding from centre */
+  .kb-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    border: 3px solid var(--wasabi);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .kb-marv-stage.show .kb-pulse {
+    animation: kb-pulse-ring 1.7s ease-out forwards;
+  }
+
+  .kb-marv-stage.show .kb-pulse-delay {
+    animation-delay: 0.35s;
+  }
+
+  @keyframes kb-pulse-ring {
+    0%   { transform: scale(0.3); opacity: 0.85; }
+    100% { transform: scale(9);   opacity: 0; }
+  }
+
+  /* MARV materialises from small to full size with a wasabi glow */
+  .kb-marv-sprite {
+    position: relative;
+    z-index: 2;
+    width: 220px;
+    height: auto;
+    transform: scale(0.3);
+    opacity: 0;
+    filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
+  }
+
+  .kb-marv-stage.show .kb-marv-sprite {
+    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
+  }
+
+  @keyframes kb-marv-materialise {
+    from { transform: scale(0.3); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .kb-marv-bubble {
+    position: relative;
+    z-index: 2;
+    margin-top: 30px;
+    max-width: 580px;
+    background: #FFFFFF;
+    color: var(--navy);
+    border-radius: 16px;
+    padding: 18px 26px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.45;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .kb-marv-bubble::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    margin-left: -10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #FFFFFF;
+  }
+
+  .kb-marv-bubble.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .kb-showme {
+    position: relative;
+    z-index: 2;
+    margin-top: 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .kb-showme.show {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .kb-panel {
@@ -1284,7 +1432,33 @@
 <body>
 
 <!-- KEN BURNS OPENING SEQUENCE (built and run by script, then removed) -->
-<div id="kb-overlay" class="kb-overlay" aria-hidden="true"></div>
+<div id="kb-overlay" class="kb-overlay" aria-hidden="true">
+
+  <!-- Post-cinematic: invitation to hear from a customer -->
+  <div id="kb-cta" class="kb-stage">
+    <button type="button" id="kb-cta-btn" class="btn-primary">Hear from a customer &nbsp;&rarr;</button>
+  </div>
+
+  <!-- Post-cinematic: the customer video, in a navy card -->
+  <div id="kb-video-stage" class="kb-stage">
+    <div id="kb-video-card" class="kb-video-card">
+      <video id="kb-video" class="kb-video" playsinline preload="auto"
+             src="../assets/video/cusotmer_contractor_conversation.mp4"></video>
+    </div>
+  </div>
+
+  <!-- Post-cinematic: MARV materialises and introduces the next step -->
+  <div id="kb-marv-stage" class="kb-stage kb-marv-stage">
+    <span class="kb-pulse"></span>
+    <span class="kb-pulse kb-pulse-delay"></span>
+    <img id="kb-marv-sprite" class="kb-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV">
+    <div id="kb-marv-bubble" class="kb-marv-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
+    <div id="kb-showme" class="kb-showme">
+      <button type="button" id="kb-showme-btn" class="btn-primary">Show me &nbsp;&rarr;</button>
+    </div>
+  </div>
+
+</div>
 <audio id="kb-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
 
 <!-- PROGRESS BAR -->
@@ -1965,7 +2139,8 @@ window.addEventListener('load', () => {
   var current = 0;
   function advance() {
     if (current >= KB_PANELS.length) {
-      // All panels shown - run the title card, then remove the overlay
+      // All panels shown - run the title card, then hand off to the
+      // customer-video / MARV sequence (the overlay stays until "Show me").
       panelEls[panelEls.length - 1].classList.remove('active');
       titleCard.classList.add('show');
       setTimeout(function () {
@@ -1973,9 +2148,7 @@ window.addEventListener('load', () => {
         stopMusic();
       }, 3800);
       setTimeout(function () {
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
-        }
+        showCustomerCta();
       }, 4600);
       return;
     }
@@ -1983,6 +2156,66 @@ window.addEventListener('load', () => {
     var hold = panelDuration(current);
     current++;
     setTimeout(advance, hold);
+  }
+
+  // --- Post-cinematic: customer video, then MARV reveal ---
+  var ctaStage   = document.getElementById('kb-cta');
+  var ctaBtn     = document.getElementById('kb-cta-btn');
+  var videoStage = document.getElementById('kb-video-stage');
+  var videoCard  = document.getElementById('kb-video-card');
+  var video      = document.getElementById('kb-video');
+  var marvStage  = document.getElementById('kb-marv-stage');
+  var marvBubble = document.getElementById('kb-marv-bubble');
+  var showMe     = document.getElementById('kb-showme');
+  var showMeBtn  = document.getElementById('kb-showme-btn');
+
+  // Hold on navy and invite the user to hear from a customer.
+  function showCustomerCta() {
+    if (ctaStage) { ctaStage.classList.add('show'); }
+  }
+
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', function () {
+      // This click is the user gesture that permits the video audio to play.
+      if (ctaStage) { ctaStage.classList.remove('show'); }
+      if (videoStage) { videoStage.classList.add('show'); }
+      if (video) {
+        video.currentTime = 0;
+        var pv = video.play();
+        if (pv && pv.catch) { pv.catch(function () {}); }
+      }
+    });
+  }
+
+  if (video) {
+    video.addEventListener('ended', function () {
+      // Fade the video out to the navy backdrop over 800ms, then bring MARV in.
+      if (videoCard) { videoCard.classList.add('kb-faded'); }
+      setTimeout(function () {
+        if (videoStage) { videoStage.classList.remove('show'); }
+        revealMarv();
+      }, 800);
+    });
+  }
+
+  // Showing the stage fires the radial pulse and MARV materialise (both CSS).
+  function revealMarv() {
+    if (marvStage) { marvStage.classList.add('show'); }
+    // Speech bubble after 600ms, then the Show me button.
+    setTimeout(function () { if (marvBubble) { marvBubble.classList.add('show'); } }, 600);
+    setTimeout(function () { if (showMe) { showMe.classList.add('show'); } }, 1200);
+  }
+
+  if (showMeBtn) {
+    showMeBtn.addEventListener('click', function () {
+      // Claims UI fades in as the navy overlay fades out, then we tear it down.
+      overlay.classList.add('kb-fade-out');
+      setTimeout(function () {
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+      }, 800);
+    });
   }
 
   // --- Start gate ---
