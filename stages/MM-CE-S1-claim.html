@@ -1461,6 +1461,29 @@
     .kb-title-sub { font-size: 22px; }
   }
 
+  /* ============================================================
+     TEST ONLY - dev skip button. Remove this rule, the #test-skip
+     markup, and the testSkip() function for the final build.
+     ============================================================ */
+  .test-skip {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 999999;
+    background: rgba(0,0,0,0.65);
+    color: #AED284;
+    border: 1px solid #AED284;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    opacity: 0.85;
+  }
+  .test-skip:hover { opacity: 1; }
+
 </style>
 </head>
 <body>
@@ -2305,7 +2328,112 @@ window.addEventListener('load', () => {
   startScreen.appendChild(beginBtn);
   overlay.appendChild(startScreen);
 })();
+
+/* =====================================================================
+   TEST ONLY - dev skip button handler. Remove this whole function, the
+   .test-skip CSS rule, and the #test-skip button markup for the final
+   build. It jumps to the next action button so testers can bypass the
+   timed cinematic, the videos and the scene intros. Each press advances
+   one checkpoint. It works purely by cancelling pending timers and
+   setting the next state, so it touches none of the sequence code above.
+   ===================================================================== */
+function testSkip() {
+  // Cancel every pending timer so no queued animation step fires after we jump.
+  var maxId = setTimeout(function () {}, 0);
+  for (var i = 0; i <= maxId; i++) { clearTimeout(i); }
+
+  var overlay = document.getElementById('kb-overlay');
+  if (overlay) {
+    var cta    = document.getElementById('kb-cta');
+    var vstage = document.getElementById('kb-video-stage');
+    var vid    = document.getElementById('kb-video');
+    var mstage = document.getElementById('kb-marv-stage');
+    var mvid   = document.getElementById('kb-marv-video');
+    var bubble = document.getElementById('kb-marv-bubble');
+    var showme = document.getElementById('kb-showme');
+    var music  = document.getElementById('kb-music');
+    if (music) { try { music.pause(); } catch (e) {} }
+    if (vid)   { try { vid.pause(); } catch (e) {} }
+
+    var marvShown = mstage && mstage.classList.contains('show');
+    var showMeShown = showme && showme.classList.contains('show');
+
+    if (marvShown && showMeShown) {
+      // Final overlay step: fade out to the claims UI.
+      overlay.classList.add('kb-fade-out');
+      setTimeout(function () {
+        if (overlay && overlay.parentNode) { overlay.parentNode.removeChild(overlay); }
+      }, 400);
+      return;
+    }
+    if (marvShown) {
+      // Surface MARV's speech bubble and the Show me button immediately.
+      if (bubble) { bubble.classList.add('show'); }
+      if (showme) { showme.classList.add('show'); }
+      return;
+    }
+    if ((vstage && vstage.classList.contains('show')) || (cta && cta.classList.contains('show'))) {
+      // Skip the customer video: jump straight to MARV with the Show me button.
+      if (cta) { cta.classList.remove('show'); }
+      if (vstage) { vstage.classList.remove('show'); }
+      if (mstage) { mstage.classList.add('show'); }
+      if (mvid) { try { mvid.currentTime = 0; mvid.muted = true; var pm = mvid.play(); if (pm && pm.catch) { pm.catch(function () {}); } } catch (e) {} }
+      if (bubble) { bubble.classList.add('show'); }
+      if (showme) { showme.classList.add('show'); }
+      return;
+    }
+    // Start gate or cinematic running: jump to the customer CTA.
+    var panels = overlay.querySelectorAll('.kb-panel');
+    for (var p = 0; p < panels.length; p++) { panels[p].classList.remove('active'); }
+    var title = overlay.querySelector('.kb-title-card');
+    if (title) { title.classList.remove('show'); }
+    var start = overlay.querySelector('.kb-start');
+    if (start && start.parentNode) { start.parentNode.removeChild(start); }
+    if (cta) { cta.classList.add('show'); }
+    return;
+  }
+
+  // --- In the main scenes (overlay gone) ---
+  function revealFnolButton() {
+    var caption = document.getElementById('fnol-caption');
+    var toast   = document.getElementById('fnol-toast');
+    var buttons = document.getElementById('decision-buttons');
+    var thought = document.getElementById('handler-thought');
+    var panel   = document.getElementById('ask-marv-panel');
+    if (toast)   { toast.classList.remove('visible'); }
+    if (buttons) { buttons.style.display = 'none'; }
+    if (thought) { thought.style.display = 'none'; }
+    if (caption) { caption.classList.add('visible'); }
+    if (panel)   { panel.classList.remove('pre-reveal'); void panel.offsetWidth; panel.classList.add('revealed'); }
+  }
+
+  function revealMarvContinue() {
+    var cb = document.getElementById('continue-btn');
+    if (cb) { cb.classList.remove('btn-hidden'); cb.classList.add('btn-visible'); }
+  }
+
+  var active = document.querySelector('.scene.active');
+  if (!active) { return; }
+
+  if (active.id === 'scene-intro' || active.id === 'scene-fnol') {
+    if (active.id === 'scene-intro') { showScene('scene-fnol'); }
+    revealFnolButton();
+    return;
+  }
+  if (active.id === 'scene-website' || active.id === 'scene-transition') {
+    showScene('scene-marv');
+    revealMarvContinue();
+    return;
+  }
+  if (active.id === 'scene-marv') {
+    revealMarvContinue();
+    return;
+  }
+}
 </script>
+
+<!-- TEST ONLY: dev skip button - remove this for the final build -->
+<button type="button" id="test-skip" class="test-skip" onclick="testSkip()">SKIP &#9656;</button>
 
 </body>
 </html>
