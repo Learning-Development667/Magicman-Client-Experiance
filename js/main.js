@@ -30,7 +30,7 @@
      MARV - the guide character
      setMarv() is the single established pattern for all MARV state changes.
         emotion: string matching a sprite filename without extension,
-                 e.g. 'marvexcited' loads assets/marv/marvexcited.png
+                 e.g. 'marv-excited' loads assets/marv/marv-excited.png
         text:    string for the speech bubble
         style:   'default' (navy) | 'correct-reaction' (green) |
                  'wrong-reaction' (red)
@@ -146,7 +146,7 @@
   function init() {
     renderProgress();
     setMarv(
-      'marvexcited',
+      'marv-excited',
       'Hi, I am MARV. Let me walk you through the Magicman repair journey.',
       'default'
     );
