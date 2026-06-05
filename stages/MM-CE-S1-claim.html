@@ -806,9 +806,15 @@
     display: none;
   }
 
+  /* MARV panel manifestation - 3s entrance, then settles into a steady glow.
+     Step 1 (0-0.6s): darkness, nothing visible. Step 2 (0.6-1.4s): wasabi light
+     bleeds in from centre, border visible, content ghosted. Step 3 (1.4-2.2s):
+     a single heartbeat pulse. Step 4 (2.2-3.0s): content fades up while the glow
+     hands off to the gentle steady pulse. */
   .ask-marv-panel.revealed {
     opacity: 0;
-    animation: marv-materialise 1.3s ease-out forwards;
+    animation: marv-materialise 3s ease-out forwards,
+               marv-steady-glow 2s ease-in-out 3s infinite;
   }
 
   @keyframes marv-materialise {
@@ -816,48 +822,82 @@
       opacity: 0;
       box-shadow: 0 0 0 0 rgba(174,210,132,0);
     }
-    61% {
+    19.9% {
       opacity: 0;
-      box-shadow: 0 0 40px 20px rgba(174,210,132,0.6);
+      box-shadow: 0 0 0 0 rgba(174,210,132,0);
+    }
+    20% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(174,210,132,0.1);
+    }
+    46.67% {
+      opacity: 1;
+      box-shadow: 0 0 60px 30px rgba(174,210,132,0.7);
+    }
+    60% {
+      opacity: 1;
+      box-shadow: 0 0 100px 50px rgba(174,210,132,0.9);
+    }
+    73.33% {
+      opacity: 1;
+      box-shadow: 0 0 30px 12px rgba(174,210,132,0.5);
     }
     100% {
       opacity: 1;
-      box-shadow: 0 0 16px 4px rgba(174,210,132,0.3);
+      box-shadow: 0 0 20px 8px rgba(174,210,132,0.4);
     }
+  }
+
+  @keyframes marv-steady-glow {
+    0%, 100% { box-shadow: 0 0 20px 8px rgba(174,210,132,0.4); }
+    50%      { box-shadow: 0 0 8px 2px rgba(174,210,132,0.15); }
+  }
+
+  /* Panel content stays ghosted through the manifestation, then fades up in step 4 */
+  .ask-marv-panel.revealed > * {
+    opacity: 0.1;
+    animation: marv-content-reveal 3s ease-out forwards;
+  }
+
+  @keyframes marv-content-reveal {
+    0%     { opacity: 0.1; }
+    73.33% { opacity: 0.1; }
+    100%   { opacity: 1; }
   }
 
   /* ---- HANDLER THOUGHT BUBBLE (INTERMEDIATE STATE) ---- */
   .handler-thought {
     display: none;
     position: absolute;
-    top: 6px;
-    right: 24px;
+    top: -20px;
+    left: 50%;
     z-index: 60;
+    width: 65vw;
+    max-width: 700px;
     min-width: 320px;
-    max-width: 420px;
     background: var(--white);
     color: var(--navy);
-    border: 2px solid #13294B;
-    border-radius: 18px;
-    padding: 20px 24px;
+    border: 3px solid #13294B;
+    border-radius: 24px;
+    padding: 40px 48px;
     font-family: 'Open Sans', sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 28px;
     line-height: 1.4;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     opacity: 0;
-    transform: scale(0.8);
-    transform-origin: bottom left;
+    transform: translateX(-50%) scale(0.8);
+    transform-origin: bottom center;
   }
 
   .handler-thought::before {
     content: '';
     position: absolute;
-    left: 30px;
-    bottom: -16px;
+    left: 56px;
+    bottom: -28px;
     width: 0;
     height: 0;
-    border-width: 16px 18px 0 0;
+    border-width: 28px 28px 0 0;
     border-style: solid;
     border-color: #13294B transparent transparent transparent;
   }
@@ -865,11 +905,11 @@
   .handler-thought::after {
     content: '';
     position: absolute;
-    left: 32px;
-    bottom: -12px;
+    left: 59px;
+    bottom: -23px;
     width: 0;
     height: 0;
-    border-width: 12px 14px 0 0;
+    border-width: 23px 23px 0 0;
     border-style: solid;
     border-color: var(--white) transparent transparent transparent;
   }
@@ -883,13 +923,13 @@
   }
 
   @keyframes thought-pop {
-    0%   { opacity: 0; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.8); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
   }
 
   @keyframes thought-fade {
-    0%   { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.96); }
+    0%   { opacity: 1; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) scale(0.96); }
   }
 
   /* ---- FNOL TOAST NOTIFICATION ---- */
@@ -898,12 +938,12 @@
     top: 70px;
     right: 20px;
     z-index: 200;
-    width: 280px;
+    width: 360px;
     background: #13294B;
     border-left: 4px solid #AED284;
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    padding: 16px 20px;
     transform: translateX(120%);
     transition: transform 0.3s ease;
     pointer-events: none;
@@ -916,13 +956,13 @@
   .fnol-toast__title {
     color: var(--wasabi);
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     margin-bottom: 3px;
   }
 
   .fnol-toast__body {
     color: var(--white);
-    font-size: 12px;
+    font-size: 14px;
   }
 
   /* ---- SCENE CAPTION (NARRATOR) ---- */
@@ -1262,12 +1302,12 @@ function startJourney() {
     if (cap) { cap.classList.add('visible'); }
   }, 500);
 
-  // FNOL toast slides in from the top right, holds 3s, then slides out
+  // FNOL toast slides in from the top right, holds 5s, then slides out
   setTimeout(() => {
     const toast = document.getElementById('fnol-toast');
     if (toast) {
       toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 3000);
+      setTimeout(() => { toast.classList.remove('visible'); }, 5000);
     }
   }, 800);
 
