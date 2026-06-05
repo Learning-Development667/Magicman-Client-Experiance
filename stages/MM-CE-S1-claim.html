@@ -759,13 +759,32 @@
     gap: 12px;
     margin-top: 4px;
     flex-wrap: wrap;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.8s ease, transform 0.8s ease;
   }
 
   .decision-buttons.fade-out {
     opacity: 0;
     transform: translateY(-6px);
     pointer-events: none;
+  }
+
+  /* Buttons stay hidden until their staggered entrance is triggered */
+  .decision-buttons.pre-enter .decision-btn {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  /* Each button rises up from below, one after another */
+  .decision-buttons.arrive .decision-btn {
+    animation: decision-rise 0.4s ease both;
+  }
+  .decision-buttons.arrive .decision-btn--repair    { animation-delay: 0s; }
+  .decision-buttons.arrive .decision-btn--replace   { animation-delay: 0.15s; }
+  .decision-buttons.arrive .decision-btn--repudiate { animation-delay: 0.3s; }
+
+  @keyframes decision-rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .decision-btn {
@@ -919,7 +938,7 @@
   }
 
   .handler-thought.fade-away {
-    animation: thought-fade 0.3s ease forwards;
+    animation: thought-fade 0.5s ease forwards;
   }
 
   @keyframes thought-pop {
@@ -1115,7 +1134,7 @@
                 </div>
 
                 <!-- HANDLER DECISION BUTTONS (STATE 1) -->
-                <div class="decision-buttons" id="decision-buttons">
+                <div class="decision-buttons pre-enter" id="decision-buttons">
                   <button class="decision-btn decision-btn--repair" type="button">Authorise Repair</button>
                   <button class="decision-btn decision-btn--replace" type="button">Authorise Replacement</button>
                   <button class="decision-btn decision-btn--repudiate" type="button">Repudiate</button>
@@ -1294,61 +1313,65 @@ function startJourney() {
   initAudio();
   playButtonClick();
   showScene('scene-fnol');
-  setTimeout(() => playNotificationPing(), 800);
 
-  // narrator caption fades in at the bottom of the browser chrome
-  setTimeout(() => {
-    const cap = document.getElementById('fnol-caption');
-    if (cap) { cap.classList.add('visible'); }
-  }, 500);
-
-  // FNOL toast slides in from the top right, holds 5s, then slides out
-  setTimeout(() => {
-    const toast = document.getElementById('fnol-toast');
-    if (toast) {
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 5000);
-    }
-  }, 800);
-
-  // STATE 1 to STATE 2: the handler decision options give way to the Ask MARV integration
-  setTimeout(revealAskMarv, 2500);
-}
-
-function revealAskMarv() {
+  const caption = document.getElementById('fnol-caption');
+  const toast = document.getElementById('fnol-toast');
   const buttons = document.getElementById('decision-buttons');
   const thought = document.getElementById('handler-thought');
   const panel = document.getElementById('ask-marv-panel');
-  if (!buttons || !panel) { return; }
 
-  // 2.5s: the handler decision buttons fade out
-  buttons.classList.add('fade-out');
+  // 0s: scene loads, narrator caption fades in
+  setTimeout(() => { if (caption) { caption.classList.add('visible'); } }, 100);
 
-  // 2.7s: the handler thought bubble pops in where the buttons were
+  // 1.5s: FNOL toast slides in with its notification ping
   setTimeout(() => {
-    buttons.style.display = 'none';
+    if (toast) { toast.classList.add('visible'); }
+    playNotificationPing();
+  }, 1500);
+
+  // 2.0s: the three decision buttons rise up from below with a stagger
+  setTimeout(() => {
+    if (buttons) {
+      buttons.classList.remove('pre-enter');
+      buttons.classList.add('arrive');
+    }
+  }, 2000);
+
+  // 4.0s: toast slides out
+  setTimeout(() => { if (toast) { toast.classList.remove('visible'); } }, 4000);
+
+  // 6.0s: buttons have been visible for 4s, they fade out slowly over 0.8s
+  setTimeout(() => { if (buttons) { buttons.classList.add('fade-out'); } }, 6000);
+
+  // 6.8s: clear the faded buttons from the layout
+  setTimeout(() => { if (buttons) { buttons.style.display = 'none'; } }, 6800);
+
+  // 7.2s: the handler thought bubble pops in and holds for 4 seconds
+  setTimeout(() => {
     if (thought) {
       thought.style.display = 'block';
       void thought.offsetWidth;
       thought.classList.add('pop-in');
     }
-  }, 200);
+  }, 7200);
 
-  // 4.5s: the thought bubble fades out
+  // 11.2s: the thought bubble fades out over 0.5s
   setTimeout(() => {
     if (thought) {
       thought.classList.remove('pop-in');
       thought.classList.add('fade-away');
     }
-  }, 2000);
+  }, 11200);
 
-  // 4.8s: the Ask MARV panel materialises - wasabi glow bleeds in, then content
+  // 12.0s: the Ask MARV panel begins its 3s materialise sequence
   setTimeout(() => {
     if (thought) { thought.style.display = 'none'; }
-    panel.classList.remove('pre-reveal');
-    void panel.offsetWidth;
-    panel.classList.add('revealed');
-  }, 2300);
+    if (panel) {
+      panel.classList.remove('pre-reveal');
+      void panel.offsetWidth;
+      panel.classList.add('revealed');
+    }
+  }, 12000);
 }
 
 function activateMarv() {
