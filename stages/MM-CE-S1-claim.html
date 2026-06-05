@@ -1443,7 +1443,7 @@
   <div id="kb-video-stage" class="kb-stage">
     <div id="kb-video-card" class="kb-video-card">
       <video id="kb-video" class="kb-video" playsinline preload="auto"
-             src="../assets/video/cusotmer_contractor_conversation.mp4"></video>
+             src="../assets/video/customer_contractor_conversation.mp4"></video>
     </div>
   </div>
 
@@ -2158,7 +2158,7 @@ window.addEventListener('load', () => {
     setTimeout(advance, hold);
   }
 
-  // --- Post-cinematic: customer video, then MARV reveal ---
+  // --- Post-cinematic: customer video, MARV reveal, then MARV welcome video ---
   var ctaStage   = document.getElementById('kb-cta');
   var ctaBtn     = document.getElementById('kb-cta-btn');
   var videoStage = document.getElementById('kb-video-stage');
@@ -2169,33 +2169,48 @@ window.addEventListener('load', () => {
   var showMe     = document.getElementById('kb-showme');
   var showMeBtn  = document.getElementById('kb-showme-btn');
 
+  var MARV_VIDEO_SRC = '../assets/video/marv_welcome_video.mp4';
+
+  // Whichever sequence step is currently driving the shared video element
+  // registers what should happen when that clip finishes.
+  var videoEndHandler = null;
+
   // Hold on navy and invite the user to hear from a customer.
   function showCustomerCta() {
     if (ctaStage) { ctaStage.classList.add('show'); }
   }
 
+  function playVideo() {
+    if (!video) { return; }
+    video.currentTime = 0;
+    var pv = video.play();
+    if (pv && pv.catch) { pv.catch(function () {}); }
+  }
+
   if (ctaBtn) {
     ctaBtn.addEventListener('click', function () {
-      // This click is the user gesture that permits the video audio to play.
+      // This first click is the user gesture that grants audio permission.
+      // It carries through to the MARV welcome clip played later.
       if (ctaStage) { ctaStage.classList.remove('show'); }
+      videoEndHandler = onCustomerVideoEnd;
       if (videoStage) { videoStage.classList.add('show'); }
-      if (video) {
-        video.currentTime = 0;
-        var pv = video.play();
-        if (pv && pv.catch) { pv.catch(function () {}); }
-      }
+      playVideo();
     });
   }
 
   if (video) {
     video.addEventListener('ended', function () {
-      // Fade the video out to the navy backdrop over 800ms, then bring MARV in.
-      if (videoCard) { videoCard.classList.add('kb-faded'); }
-      setTimeout(function () {
-        if (videoStage) { videoStage.classList.remove('show'); }
-        revealMarv();
-      }, 800);
+      if (typeof videoEndHandler === 'function') { videoEndHandler(); }
     });
+  }
+
+  // Customer clip ends: fade to the navy backdrop over 800ms, then bring MARV in.
+  function onCustomerVideoEnd() {
+    if (videoCard) { videoCard.classList.add('kb-faded'); }
+    setTimeout(function () {
+      if (videoStage) { videoStage.classList.remove('show'); }
+      revealMarv();
+    }, 800);
   }
 
   // Showing the stage fires the radial pulse and MARV materialise (both CSS).
@@ -2208,14 +2223,25 @@ window.addEventListener('load', () => {
 
   if (showMeBtn) {
     showMeBtn.addEventListener('click', function () {
-      // Claims UI fades in as the navy overlay fades out, then we tear it down.
-      overlay.classList.add('kb-fade-out');
-      setTimeout(function () {
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
-        }
-      }, 800);
+      // Play the MARV welcome clip in the same card. Audio is already permitted
+      // from the first click, so this plays with sound.
+      if (marvStage) { marvStage.classList.remove('show'); }
+      if (videoCard) { videoCard.classList.remove('kb-faded'); }
+      videoEndHandler = onMarvVideoEnd;
+      if (video) { video.src = MARV_VIDEO_SRC; }
+      if (videoStage) { videoStage.classList.add('show'); }
+      playVideo();
     });
+  }
+
+  // MARV welcome clip ends: claims UI fades in as the overlay fades out.
+  function onMarvVideoEnd() {
+    overlay.classList.add('kb-fade-out');
+    setTimeout(function () {
+      if (overlay && overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+    }, 800);
   }
 
   // --- Start gate ---
