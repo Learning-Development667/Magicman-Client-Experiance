@@ -320,26 +320,20 @@ a {
   border-right-color: var(--navy);
 }
 
-/* correct - green background, dark text.
-   'correct' and 'correct-reaction' are treated as equivalent. */
-.marv-bubble.correct,
+/* correct-reaction - green background, dark text */
 .marv-bubble.correct-reaction {
   background-color: var(--reaction-correct);
   color: var(--dark-text);
 }
-.marv-bubble.correct::before,
 .marv-bubble.correct-reaction::before {
   border-right-color: var(--reaction-correct);
 }
 
-/* wrong - red background, white text.
-   'wrong' and 'wrong-reaction' are treated as equivalent. */
-.marv-bubble.wrong,
+/* wrong-reaction - red background, white text */
 .marv-bubble.wrong-reaction {
   background-color: var(--reaction-wrong);
   color: var(--white);
 }
-.marv-bubble.wrong::before,
 .marv-bubble.wrong-reaction::before {
   border-right-color: var(--reaction-wrong);
 }

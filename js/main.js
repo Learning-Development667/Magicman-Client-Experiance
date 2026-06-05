@@ -29,11 +29,11 @@
   /* ------------------------------------------------------------------------
      MARV - the guide character
      setMarv() is the single established pattern for all MARV state changes.
-        emotion: string matching a sprite filename without extension
+        emotion: string matching a sprite filename without extension,
+                 e.g. 'marvexcited' loads assets/marv/marvexcited.png
         text:    string for the speech bubble
-        style:   'default' (navy) | 'correct' (green) | 'wrong' (red)
-                 The reaction aliases 'correct-reaction' and 'wrong-reaction'
-                 are also accepted and map to the same styling.
+        style:   'default' (navy) | 'correct-reaction' (green) |
+                 'wrong-reaction' (red)
      ------------------------------------------------------------------------ */
   function setMarv(emotion, text, style) {
     var marvImg = document.getElementById('marv-sprite');
@@ -146,7 +146,7 @@
   function init() {
     renderProgress();
     setMarv(
-      'excited',
+      'marvexcited',
       'Hi, I am MARV. Let me walk you through the Magicman repair journey.',
       'default'
     );
