@@ -1173,25 +1173,6 @@
     animation: kb-fade-up 0.7s ease 0.5s forwards;
   }
 
-  .kb-text {
-    position: absolute;
-    left: 0; bottom: 0;
-    margin: 32px;
-    z-index: 2;
-    max-width: 640px;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1.35;
-    color: #FFFFFF;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-    opacity: 0;
-  }
-
-  .kb-panel.active .kb-text {
-    animation: kb-fade-up 0.7s ease 1s forwards;
-  }
-
   /* Centred incident report - styled as a system log entry, types out */
   .kb-report {
     position: absolute;
@@ -1256,7 +1237,6 @@
   }
 
   @media (max-width: 600px) {
-    .kb-text { font-size: 18px; }
     .kb-title-main { font-size: 34px; }
     .kb-title-sub { font-size: 22px; }
   }
@@ -1267,6 +1247,7 @@
 
 <!-- KEN BURNS OPENING SEQUENCE (built and run by script, then removed) -->
 <div id="kb-overlay" class="kb-overlay" aria-hidden="true"></div>
+<audio id="kb-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
 
 <!-- PROGRESS BAR -->
 <nav id="progress-bar">
@@ -1835,63 +1816,39 @@ window.addEventListener('load', () => {
   if (!overlay) { return; }
 
   var KB_PANELS = [
-    { img: '../assets/images/scorch_mark_burn.png',       label: 'Private residence, Manchester', text: 'A resident left a pan on the hob unattended. The worktop took the full heat.',
+    { img: '../assets/images/scorch_mark_burn.png',       label: 'Private residence, Manchester',
       report: 'Resident placed a hot pan directly onto an oak worktop. Circular scorch mark, approximately 15cm diameter. Surface charred through to the grain.' },
-    { img: '../assets/images/basin-before.png',           label: 'Student accommodation, Leeds',   text: 'A crack appears overnight. The tenant calls it in.',
+    { img: '../assets/images/basin-before.png',           label: 'Student accommodation, Leeds',
       report: 'Tenant reported a cracked pedestal basin. Impact cause unknown. Full crack visible from rim to base. Leaking at the pedestal joint.' },
-    { img: '../assets/images/lobby_floor_tile_scratch.png', label: 'Four-star hotel, Edinburgh',     text: 'A hotel guest dragged luggage across a polished lobby floor. The scratch was immediate.',
+    { img: '../assets/images/lobby_floor_tile_scratch.png', label: 'Four-star hotel, Edinburgh',
       report: 'Hotel guest dragged a wheeled suitcase across a polished marble lobby floor. Deep scratch track approximately 60cm in length. Surface polish destroyed.' },
-    { img: '../assets/images/tile-before.png',            label: 'Serviced apartment, London',     text: 'Renovation work leaves its mark.',
+    { img: '../assets/images/tile-before.png',            label: 'Serviced apartment, London',
       report: 'Contractor caught a tile edge during renovation works. Crack running diagonally across two tiles. Grout line displaced.' },
-    { img: '../assets/images/counter_chip.png',           label: 'Holiday let, Cornwall',          text: 'A marble worktop chipped at the edge.',
+    { img: '../assets/images/counter_chip.png',           label: 'Holiday let, Cornwall',
       report: 'Wine bottle dropped onto marble worktop edge during kitchen use. Corner chip approximately 3cm. Hairline crack extending from impact point.' },
-    { img: '../assets/images/marble-before.png',          label: 'Hotel, Birmingham',              text: 'Surface damage flagged on check-out.',
+    { img: '../assets/images/marble-before.png',          label: 'Hotel, Birmingham',
       report: 'Marble surface damage noted on guest check-out inspection. Origin unknown. Scoring across the surface consistent with abrasive contact.' },
-    { img: '../assets/images/door_frame_chip.png',        label: 'New build property, Bristol',    text: 'Heavy furniture. Tight doorway. Inevitable.',
+    { img: '../assets/images/door_frame_chip.png',        label: 'New build property, Bristol',
       report: 'Removal team caught door frame surround whilst manoeuvring furniture. Large paint and timber chip. Raw wood exposed.' },
-    { img: '../assets/images/cabinet-before.png',         label: 'Buy-to-let property, Glasgow',   text: 'A kitchen unit damaged during a tenancy.',
+    { img: '../assets/images/cabinet-before.png',         label: 'Buy-to-let property, Glasgow',
       report: 'Kitchen unit door damaged during tenancy. Impact mark and surface delamination to cabinet face. Hinge area affected.' }
   ];
 
-  // --- Subtle percussive thud, generated via the Web Audio API ---
-  var kbAudio = null;
-  try {
-    var Ctx = window.AudioContext || window.webkitAudioContext;
-    if (Ctx) { kbAudio = new Ctx(); }
-  } catch (e) { kbAudio = null; }
+  // --- Ambient music track (looped, plays for the duration of the sequence) ---
+  var kbMusic = document.getElementById('kb-music');
+  if (kbMusic) { kbMusic.volume = 0.3; }
 
-  function kbThud() {
-    if (!kbAudio) { return; }
-    try {
-      if (kbAudio.state === 'suspended') { kbAudio.resume(); }
-      var now = kbAudio.currentTime;
-      // Low body of the thud
-      var osc = kbAudio.createOscillator();
-      var g = kbAudio.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.exponentialRampToValueAtTime(50, now + 0.18);
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-      osc.connect(g); g.connect(kbAudio.destination);
-      osc.start(now); osc.stop(now + 0.32);
-      // Short filtered-noise crack for texture
-      var dur = 0.07;
-      var buffer = kbAudio.createBuffer(1, Math.floor(kbAudio.sampleRate * dur), kbAudio.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-      }
-      var noise = kbAudio.createBufferSource();
-      noise.buffer = buffer;
-      var hp = kbAudio.createBiquadFilter();
-      hp.type = 'highpass'; hp.frequency.value = 1400;
-      var ng = kbAudio.createGain();
-      ng.gain.value = 0.02;
-      noise.connect(hp); hp.connect(ng); ng.connect(kbAudio.destination);
-      noise.start(now);
-    } catch (e) {}
+  function startMusic() {
+    if (!kbMusic) { return; }
+    var p = kbMusic.play();
+    if (p && p.catch) { p.catch(function () {}); }
+  }
+
+  function stopMusic() {
+    if (!kbMusic) { return; }
+    kbMusic.pause();
+    if (kbMusic.parentNode) { kbMusic.parentNode.removeChild(kbMusic); }
+    kbMusic = null;
   }
 
   // --- Build the panels ---
@@ -1909,17 +1866,12 @@ window.addEventListener('load', () => {
     label.className = 'kb-label';
     label.textContent = p.label;
 
-    var text = document.createElement('div');
-    text.className = 'kb-text';
-    text.textContent = p.text;
-
     var report = document.createElement('div');
     report.className = 'kb-report';
     reportEls.push(report);
 
     panel.appendChild(img);
     panel.appendChild(label);
-    panel.appendChild(text);
     panel.appendChild(report);
     overlay.appendChild(panel);
     return panel;
@@ -1962,7 +1914,6 @@ window.addEventListener('load', () => {
   function showPanel(i) {
     if (i > 0) { panelEls[i - 1].classList.remove('active'); }
     panelEls[i].classList.add('active');
-    kbThud();
     var rep = reportEls[i];
     rep.textContent = '';
     rep.classList.remove('show');
@@ -1979,7 +1930,10 @@ window.addEventListener('load', () => {
       // All panels shown - run the title card, then remove the overlay
       panelEls[panelEls.length - 1].classList.remove('active');
       titleCard.classList.add('show');
-      setTimeout(function () { titleCard.classList.remove('show'); }, 3800);
+      setTimeout(function () {
+        titleCard.classList.remove('show');
+        stopMusic();
+      }, 3800);
       setTimeout(function () {
         if (overlay && overlay.parentNode) {
           overlay.parentNode.removeChild(overlay);
@@ -1992,6 +1946,7 @@ window.addEventListener('load', () => {
     current++;
     setTimeout(advance, hold);
   }
+  startMusic();
   advance();
 })();
 </script>
