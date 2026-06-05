@@ -660,6 +660,38 @@
     pointer-events: all;
   }
 
+  /* Secondary (Back) button - outlined and muted so it stays clearly
+     subordinate to the solid wasabi progression buttons. */
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.55);
+    color: var(--white);
+  }
+
+  /* Groups a Back button alongside the main progression button */
+  .scene-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
   /* ---- INTRO SCREEN ---- */
   #scene-intro {
     justify-content: center;
@@ -1198,9 +1230,14 @@
                     </div>
                     <div class="panel-sub">Powered by Magicman &bull; Instant surface repair assessment &bull; Integrated into your workflow</div>
                   </div>
-                  <button class="ask-marv-btn" onclick="activateMarv()" id="ask-marv-btn">
-                    Visit the Magicman Website &rarr;
-                  </button>
+                  <div class="scene-actions">
+                    <button class="btn-secondary" onclick="goBack('scene-intro')">
+                      &larr; Back
+                    </button>
+                    <button class="ask-marv-btn" onclick="activateMarv()" id="ask-marv-btn">
+                      Visit the Magicman Website &rarr;
+                    </button>
+                  </div>
                 </div>
 
               </div>
@@ -1311,9 +1348,14 @@
             </div>
           </div>
 
-          <button class="btn-primary btn-hidden" id="continue-btn" onclick="goToStage2()">
-            MARV, show me what happens next &nbsp;&rarr;
-          </button>
+          <div class="scene-actions">
+            <button class="btn-secondary" onclick="goBack('scene-website')">
+              &larr; Back
+            </button>
+            <button class="btn-primary btn-hidden" id="continue-btn" onclick="goToStage2()">
+              MARV, show me what happens next &nbsp;&rarr;
+            </button>
+          </div>
         </div>
 
       </div>
@@ -1399,6 +1441,14 @@ function showScene(id) {
     setTimeout(() => { target.style.opacity = 1; }, 50);
     currentScene = id;
   }
+}
+
+// Back navigation: returns the user to a previous scene. Additive only -
+// it reuses showScene and does not alter any existing forward progression.
+function goBack(targetSceneId) {
+  initAudio();
+  playButtonClick();
+  showScene(targetSceneId);
 }
 
 function startJourney() {
@@ -1536,7 +1586,9 @@ function runTransition() {
     label.classList.add('visible');
   }, 600);
 
-  // Move to MARV scene
+  // Move to MARV scene. Display duration doubled (was 2400ms) so the
+  // "35 years of craft" screen stays visible twice as long before
+  // transitioning. Animation speeds (shrink, fades) are unchanged.
   setTimeout(() => {
     showScene('scene-marv');
     setTimeout(() => {
@@ -1552,7 +1604,7 @@ function runTransition() {
       continuBtn.classList.remove('btn-hidden');
       continuBtn.classList.add('btn-visible');
     }, 7000);
-  }, 2400);
+  }, 4800);
 }
 
 // ---- MARV STATE ----
