@@ -1089,9 +1089,159 @@
     position: relative;
   }
 
+  /* =========================================================
+     KEN BURNS OPENING SEQUENCE
+     Full-screen intro that runs once, before Stage 1 begins.
+     ========================================================= */
+  .kb-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .kb-panel {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    overflow: hidden;
+  }
+
+  .kb-panel.active {
+    opacity: 1;
+  }
+
+  .kb-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.0);
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  /* Ken Burns zoom/pan - direction alternates between panels */
+  .kb-panel.active.kb-dir-a .kb-image {
+    animation: kb-zoom-a 4.5s ease-out forwards;
+  }
+
+  .kb-panel.active.kb-dir-b .kb-image {
+    animation: kb-zoom-b 4.5s ease-out forwards;
+  }
+
+  @keyframes kb-zoom-a {
+    from { transform: scale(1.0) translate(0, 0); }
+    to   { transform: scale(1.08) translate(-2%, -1.5%); }
+  }
+
+  @keyframes kb-zoom-b {
+    from { transform: scale(1.0) translate(0, 0); }
+    to   { transform: scale(1.08) translate(2%, 1.5%); }
+  }
+
+  /* Dark gradient behind the incident text for legibility */
+  .kb-panel::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 45%;
+    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .kb-label {
+    position: absolute;
+    top: 0; left: 0;
+    margin: 32px;
+    z-index: 2;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #AED284;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    opacity: 0;
+  }
+
+  .kb-panel.active .kb-label {
+    animation: kb-fade-up 0.7s ease 0.5s forwards;
+  }
+
+  .kb-text {
+    position: absolute;
+    left: 0; bottom: 0;
+    margin: 32px;
+    z-index: 2;
+    max-width: 500px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #FFFFFF;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+    opacity: 0;
+  }
+
+  .kb-panel.active .kb-text {
+    animation: kb-fade-up 0.7s ease 1s forwards;
+  }
+
+  @keyframes kb-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .kb-title-card {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #0d0d0d;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .kb-title-card.show {
+    opacity: 1;
+  }
+
+  .kb-title-main {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 54px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+  }
+
+  .kb-title-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #AED284;
+  }
+
+  @media (max-width: 600px) {
+    .kb-text { font-size: 18px; }
+    .kb-title-main { font-size: 34px; }
+    .kb-title-sub { font-size: 22px; }
+  }
+
 </style>
 </head>
 <body>
+
+<!-- KEN BURNS OPENING SEQUENCE (built and run by script, then removed) -->
+<div id="kb-overlay" class="kb-overlay" aria-hidden="true"></div>
 
 <!-- PROGRESS BAR -->
 <nav id="progress-bar">
@@ -1653,6 +1803,134 @@ window.addEventListener('load', () => {
     if (dot) dot.style.display = 'inline-block';
   }, 500);
 });
+
+// ---- KEN BURNS OPENING SEQUENCE ----
+(function () {
+  var overlay = document.getElementById('kb-overlay');
+  if (!overlay) { return; }
+
+  var PANEL_MS = 4500;
+  var KB_PANELS = [
+    { img: '../assets/images/scorch-mark.png',            label: 'Private residence, Manchester', text: 'A moment of distraction. A worktop ruined.' },
+    { img: '../assets/images/basin-before.png',           label: 'Student accommodation, Leeds',   text: 'A crack appears overnight. The tenant calls it in.' },
+    { img: '../assets/images/polished_stone_scratch.png', label: 'Four-star hotel, Edinburgh',     text: 'One piece of luggage. One very expensive floor.' },
+    { img: '../assets/images/tile-before.png',            label: 'Serviced apartment, London',     text: 'Renovation work leaves its mark.' },
+    { img: '../assets/images/counter_chip.png',           label: 'Holiday let, Cornwall',          text: 'A marble worktop chipped at the edge.' },
+    { img: '../assets/images/marble-before.png',          label: 'Hotel, Birmingham',              text: 'Surface damage flagged on check-out.' },
+    { img: '../assets/images/door_frame_chip.png',        label: 'New build property, Bristol',    text: 'Heavy furniture. Tight doorway. Inevitable.' },
+    { img: '../assets/images/cabinet-before.png',         label: 'Buy-to-let property, Glasgow',   text: 'A kitchen unit damaged during a tenancy.' }
+  ];
+
+  // --- Subtle percussive thud, generated via the Web Audio API ---
+  var kbAudio = null;
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) { kbAudio = new Ctx(); }
+  } catch (e) { kbAudio = null; }
+
+  function kbThud() {
+    if (!kbAudio) { return; }
+    try {
+      if (kbAudio.state === 'suspended') { kbAudio.resume(); }
+      var now = kbAudio.currentTime;
+      // Low body of the thud
+      var osc = kbAudio.createOscillator();
+      var g = kbAudio.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.18);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+      osc.connect(g); g.connect(kbAudio.destination);
+      osc.start(now); osc.stop(now + 0.32);
+      // Short filtered-noise crack for texture
+      var dur = 0.07;
+      var buffer = kbAudio.createBuffer(1, Math.floor(kbAudio.sampleRate * dur), kbAudio.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+      }
+      var noise = kbAudio.createBufferSource();
+      noise.buffer = buffer;
+      var hp = kbAudio.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 1400;
+      var ng = kbAudio.createGain();
+      ng.gain.value = 0.02;
+      noise.connect(hp); hp.connect(ng); ng.connect(kbAudio.destination);
+      noise.start(now);
+    } catch (e) {}
+  }
+
+  // --- Build the panels ---
+  var panelEls = KB_PANELS.map(function (p, i) {
+    var panel = document.createElement('div');
+    panel.className = 'kb-panel ' + (i % 2 === 0 ? 'kb-dir-a' : 'kb-dir-b');
+
+    var img = document.createElement('img');
+    img.className = 'kb-image';
+    img.src = p.img;
+    img.alt = '';
+
+    var label = document.createElement('div');
+    label.className = 'kb-label';
+    label.textContent = p.label;
+
+    var text = document.createElement('div');
+    text.className = 'kb-text';
+    text.textContent = p.text;
+
+    panel.appendChild(img);
+    panel.appendChild(label);
+    panel.appendChild(text);
+    overlay.appendChild(panel);
+    return panel;
+  });
+
+  // --- Title card ---
+  var titleCard = document.createElement('div');
+  titleCard.className = 'kb-title-card';
+  var titleMain = document.createElement('div');
+  titleMain.className = 'kb-title-main';
+  titleMain.textContent = 'Every day. Everywhere.';
+  var titleSub = document.createElement('div');
+  titleSub.className = 'kb-title-sub';
+  titleSub.textContent = 'A better answer exists.';
+  titleCard.appendChild(titleMain);
+  titleCard.appendChild(titleSub);
+  overlay.appendChild(titleCard);
+
+  // --- Run the sequence ---
+  function showPanel(i) {
+    if (i > 0) { panelEls[i - 1].classList.remove('active'); }
+    panelEls[i].classList.add('active');
+    kbThud();
+  }
+
+  KB_PANELS.forEach(function (p, i) {
+    setTimeout(function () { showPanel(i); }, i * PANEL_MS);
+  });
+
+  var fullDuration = KB_PANELS.length * PANEL_MS; // 8 x 4.5s = 36000ms
+
+  // Title card fades in after the final panel
+  setTimeout(function () {
+    panelEls[panelEls.length - 1].classList.remove('active');
+    titleCard.classList.add('show');
+  }, fullDuration);
+
+  // Hold ~3 seconds (after the 0.8s fade-in), then fade the title card out
+  setTimeout(function () {
+    titleCard.classList.remove('show');
+  }, fullDuration + 3800);
+
+  // Once faded out, remove the overlay entirely and reveal Stage 1
+  setTimeout(function () {
+    if (overlay && overlay.parentNode) {
+      overlay.parentNode.removeChild(overlay);
+    }
+  }, fullDuration + 4600);
+})();
 </script>
 
 </body>
