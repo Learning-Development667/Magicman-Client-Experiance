@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MM-CE Stage 1 - The Problem Lands</title>
+
+  <!-- Open Sans (Bold headings, Regular body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Global brand system. Path is stage-relative for standalone testing.
+       At final assembly this stage body is consolidated into index.html. -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    /* ----------------------------------------------------------------------
+       Stage 1 specific styles - simulated browser and Magicman site
+       ---------------------------------------------------------------------- */
+
+    /* Video intro placeholder. Swap this whole block for a <video> element
+       with src="../assets/video/s1-intro.mp4" once the asset is supplied. */
+    .video-stage {
+      position: relative;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(174, 210, 132, 0.18), transparent 60%),
+        linear-gradient(160deg, #0f2440 0%, var(--navy) 100%);
+    }
+    .video-placeholder {
+      aspect-ratio: 16 / 9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      text-align: center;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(174, 210, 132, 0.16), transparent 55%),
+        linear-gradient(160deg, #0f2440 0%, var(--navy) 100%);
+      padding: 24px;
+    }
+    .video-placeholder__tag {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--wasabi);
+    }
+    .video-placeholder__note {
+      font-size: 13px;
+      max-width: 460px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .play-button {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: var(--wasabi);
+      color: var(--dark-text);
+      display: grid;
+      place-items: center;
+      transition: transform var(--transition-fast);
+    }
+    .play-button:hover { transform: scale(1.06); }
+    .play-button svg { width: 30px; height: 30px; margin-left: 4px; }
+
+    /* Simulated browser window */
+    .browser {
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      background: var(--white);
+      color: var(--dark-text);
+    }
+    .browser__bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #ECEEF1;
+      border-bottom: 1px solid #d9dde2;
+    }
+    .browser__dots { display: flex; gap: 6px; }
+    .browser__dots span {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #c4c9d0;
+    }
+    .browser__address {
+      flex: 1;
+      background: var(--white);
+      border: 1px solid #d9dde2;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 14px;
+      color: #5a6573;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .browser__viewport { padding: 32px 28px; min-height: 320px; }
+
+    /* Search engine screen */
+    .search-home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      padding: 36px 0 12px;
+    }
+    .search-home__brand {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.01em;
+    }
+    .search-home__brand span { color: var(--lone-hunter); }
+    .search-box {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #d9dde2;
+      border-radius: 999px;
+      padding: 12px 20px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    }
+    .search-box__icon { color: #9aa3ae; flex-shrink: 0; }
+    .search-box__text {
+      flex: 1;
+      font-size: 16px;
+      color: var(--dark-text);
+      min-height: 22px;
+    }
+    .caret {
+      display: inline-block;
+      width: 1px;
+      border-right: 2px solid var(--navy);
+      animation: caret-blink 1s steps(1) infinite;
+    }
+    @keyframes caret-blink { 50% { opacity: 0; } }
+
+    /* Search results */
+    .results { display: flex; flex-direction: column; gap: 22px; }
+    .results__query {
+      font-size: 14px;
+      color: #5a6573;
+      border-bottom: 1px solid #e4e7eb;
+      padding-bottom: 12px;
+    }
+    .result {
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 14px 16px;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+    .result--sponsored { cursor: pointer; }
+    .result--sponsored:hover {
+      background: #f4f8ee;
+      border-color: var(--lone-hunter);
+    }
+    .result--sponsored:focus-visible {
+      outline: 3px solid var(--lone-hunter);
+      outline-offset: 2px;
+    }
+    .result__badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--wasabi);
+      color: var(--dark-text);
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-bottom: 6px;
+    }
+    .result__url { font-size: 13px; color: #4b7a16; }
+    .result__title {
+      font-size: 19px;
+      color: #1a3a7a;
+      margin: 2px 0 4px;
+      font-weight: 700;
+    }
+    .result__title .wordmark { color: var(--navy); }
+    .result__snippet { font-size: 14px; color: #5a6573; margin: 0; }
+    .result--muted { opacity: 0.55; }
+    .result--muted .result__title { color: #5a6573; }
+
+    /* Magicman simplified website */
+    .mm-site { color: var(--dark-text); }
+    .mm-site__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid var(--wasabi);
+      margin-bottom: 24px;
+    }
+    /* Logo placeholder - swap for <img src="../assets/images/magicman-logo.svg">
+       once supplied. The text wordmark keeps brand presence until then. */
+    .wordmark {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .mm-site__nav {
+      display: flex;
+      gap: 18px;
+      font-size: 14px;
+      color: #5a6573;
+    }
+    .mm-site__hero h3 { color: var(--navy); margin-bottom: 6px; }
+    .mm-site__hero p { color: #5a6573; max-width: 560px; }
+
+    /* Repair request form */
+    .repair-form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+      align-items: start;
+    }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-field--full { grid-column: 1 / -1; }
+    .form-field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .form-field select,
+    .form-field input {
+      font-family: var(--font-family);
+      font-size: 15px;
+      color: var(--dark-text);
+      padding: 11px 14px;
+      border: 1px solid #cfd5dc;
+      border-radius: 8px;
+      background: var(--white);
+    }
+    .form-field select:focus,
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--lone-hunter);
+      box-shadow: 0 0 0 3px rgba(147, 200, 71, 0.25);
+    }
+    .form-actions { grid-column: 1 / -1; }
+
+    /* Confirmation screen */
+    .confirmation { text-align: center; padding: 18px 0; }
+    .confirmation__tick {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--wasabi);
+      color: var(--dark-text);
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+    }
+    .confirmation__tick svg { width: 36px; height: 36px; }
+    .confirmation__ref {
+      display: inline-block;
+      margin-top: 6px;
+      font-weight: 700;
+      color: var(--navy);
+      background: #f4f8ee;
+      border: 1px dashed var(--lone-hunter);
+      border-radius: 8px;
+      padding: 8px 16px;
+    }
+
+    .is-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Progress indicator - Stage 1 active -->
+    <header class="progress-bar" aria-label="Journey progress">
+      <div class="progress-bar__inner">
+        <span class="label-accent">Magicman</span>
+        <ol class="progress-steps">
+          <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+          <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">2. Assessment</span></li>
+          <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. Dispatch</span></li>
+          <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Repair</span></li>
+          <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Quality</span></li>
+          <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Outcome</span></li>
+        </ol>
+      </div>
+    </header>
+
+    <main class="content-wrap">
+      <section class="stage" id="stage1">
+
+        <div class="fade-up" style="margin-bottom: 18px;">
+          <span class="label-accent">Stage 1</span>
+          <h2 style="color: var(--white); margin-top: 10px;">The Problem Lands</h2>
+          <p style="color: rgba(255,255,255,0.8); max-width: 620px;">
+            You manage a property. A basin is chipped and cracked, and you need
+            the right specialist - fast. Let us pick up the story from the moment
+            you start looking.
+          </p>
+        </div>
+
+        <!-- SCREEN: Video intro (placeholder) -->
+        <div class="video-stage fade-up" id="screen-video">
+          <div class="video-placeholder">
+            <span class="video-placeholder__tag">Intro film - 30 seconds</span>
+            <button class="play-button" id="play-intro" type="button" aria-label="Play the intro film">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <p class="video-placeholder__note">
+              Placeholder for the cinematic intro - a damaged vitreous china
+              basin in natural light, cutting to a search being typed. Drop the
+              final film at <strong>assets/video/s1-intro.mp4</strong> to replace this.
+            </p>
+            <button class="btn btn-ghost" id="skip-intro" type="button">Skip to the search</button>
+          </div>
+        </div>
+
+        <!-- SCREEN: Simulated browser -->
+        <div class="browser fade-up is-hidden" id="screen-browser">
+          <div class="browser__bar">
+            <div class="browser__dots"><span></span><span></span><span></span></div>
+            <div class="browser__address" id="browser-address">search</div>
+          </div>
+          <div class="browser__viewport">
+
+            <!-- Search home -->
+            <div id="view-search">
+              <div class="search-home">
+                <div class="search-home__brand">find<span>it</span></div>
+                <div class="search-box">
+                  <span class="search-box__icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </span>
+                  <span class="search-box__text" id="search-text"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Search results -->
+            <div id="view-results" class="results is-hidden">
+              <p class="results__query">Showing results for <strong>best surface repair specialist UK</strong></p>
+
+              <div class="result result--sponsored" id="result-magicman" role="button" tabindex="0"
+                   aria-label="Open the Magicman result">
+                <span class="result__badge">Top match</span>
+                <div class="result__url">www.magicman.co.uk</div>
+                <h4 class="result__title"><span class="wordmark">Magicman</span> - Surface Repair Specialists</h4>
+                <p class="result__snippet">
+                  35 years repairing hard surfaces - vitreous china, ceramic,
+                  acrylic, stone, wood and more. Directly employed, academy
+                  trained technicians. Nationwide, same or next day response.
+                </p>
+              </div>
+
+              <div class="result result--muted">
+                <div class="result__url">www.example-repairs.co.uk</div>
+                <h4 class="result__title">General Repairs Directory</h4>
+                <p class="result__snippet">Listings of local handymen and repair services in your area.</p>
+              </div>
+
+              <div class="result result--muted">
+                <div class="result__url">www.replace-it-now.co.uk</div>
+                <h4 class="result__title">Bathroom Replacement Quotes</h4>
+                <p class="result__snippet">Rip out and replace your basin. Compare installation costs today.</p>
+              </div>
+            </div>
+
+            <!-- Magicman website + form -->
+            <div id="view-site" class="mm-site is-hidden">
+              <div class="mm-site__header">
+                <span class="wordmark">Magicman</span>
+                <nav class="mm-site__nav">
+                  <span>Sectors</span><span>Surfaces</span><span>About</span><span>Request a repair</span>
+                </nav>
+              </div>
+              <div class="mm-site__hero">
+                <h3>Request a repair</h3>
+                <p>
+                  Tell us about the surface and we will match the right
+                  technician. We have pre-filled this from your details - check
+                  it over and submit.
+                </p>
+              </div>
+
+              <form class="repair-form" id="repair-form" novalidate>
+                <div class="form-field">
+                  <label for="surface-type">Surface type</label>
+                  <select id="surface-type" name="surface-type">
+                    <option value="vitreous-china" selected>Vitreous china</option>
+                    <option value="acrylic">Acrylic</option>
+                    <option value="upvc">uPVC</option>
+                    <option value="ceramic-tile">Ceramic tile</option>
+                    <option value="stone">Stone / composite</option>
+                    <option value="wood">Wood / laminate</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="damage-type">Damage type</label>
+                  <select id="damage-type" name="damage-type">
+                    <option value="chip-and-crack" selected>Chip and crack</option>
+                    <option value="scratch">Scratch</option>
+                    <option value="burn">Burn mark</option>
+                    <option value="hole">Hole / impact damage</option>
+                    <option value="discolouration">Discolouration</option>
+                  </select>
+                </div>
+
+                <div class="form-field form-field--full">
+                  <label for="location">Property location</label>
+                  <input type="text" id="location" name="location" value="Riverside Court, Manchester M3">
+                </div>
+
+                <div class="form-field form-field--full">
+                  <label for="urgency">Urgency</label>
+                  <select id="urgency" name="urgency">
+                    <option value="same-day" selected>Same day if possible</option>
+                    <option value="next-day">Next day</option>
+                    <option value="this-week">This week</option>
+                    <option value="flexible">Flexible</option>
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="submit-claim">Submit repair request</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Confirmation -->
+            <div id="view-confirmation" class="confirmation is-hidden">
+              <div class="confirmation__tick" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <h3 style="color: var(--navy);">Request submitted</h3>
+              <p style="color:#5a6573; max-width:480px; margin: 0 auto;">
+                Your repair request has been logged. Magicman will be in touch to
+                confirm your appointment.
+              </p>
+              <div class="confirmation__ref">Reference: MM-2026-04817</div>
+              <div style="margin-top: 24px;">
+                <button class="btn btn-primary" id="continue-stage2" type="button">Continue to assessment</button>
+              </div>
+            </div>
+
+          </div><!-- /viewport -->
+        </div><!-- /browser -->
+
+        <!-- MARV guide -->
+        <div class="marv fade-up" style="margin-top: 32px;">
+          <img class="marv-sprite" id="marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV the Magicman guide">
+          <div class="marv-bubble default" id="marv-bubble">Loading MARV...</div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /* ======================================================================
+       Stage 1 - The Problem Lands
+       Self-contained for standalone testing. Mirrors the canonical
+       setMarv() from js/main.js, with a stage-relative sprite base so the
+       file opens and tests cleanly on its own. Final assembly into
+       index.html uses the global setMarv() and root-relative paths.
+       No em dashes. UK English.
+       ====================================================================== */
+    (function () {
+      'use strict';
+
+      var MARV_BASE = '../assets/marv/';
+
+      function setMarv(emotion, text, style) {
+        var marvImg = document.getElementById('marv-sprite');
+        var marvBubble = document.getElementById('marv-bubble');
+        if (!marvImg || !marvBubble) { return; }
+        marvImg.src = MARV_BASE + emotion + '.png';
+        marvImg.alt = 'MARV looking ' + emotion;
+        marvBubble.textContent = text;
+        marvBubble.className = 'marv-bubble ' + (style || 'default');
+      }
+
+      function show(el) { el.classList.remove('is-hidden'); }
+      function hide(el) { el.classList.add('is-hidden'); }
+
+      var screenVideo = document.getElementById('screen-video');
+      var screenBrowser = document.getElementById('screen-browser');
+      var viewSearch = document.getElementById('view-search');
+      var viewResults = document.getElementById('view-results');
+      var viewSite = document.getElementById('view-site');
+      var viewConfirmation = document.getElementById('view-confirmation');
+      var address = document.getElementById('browser-address');
+
+      /* Step 1: intro film placeholder -> simulated browser */
+      function openBrowser() {
+        hide(screenVideo);
+        show(screenBrowser);
+        address.textContent = 'findit.co.uk';
+        typeSearch();
+      }
+
+      /* Step 2: type the search query, then reveal results */
+      function typeSearch() {
+        var query = 'best surface repair specialist UK';
+        var target = document.getElementById('search-text');
+        var caret = '<span class="caret">&nbsp;</span>';
+        var i = 0;
+        target.innerHTML = caret;
+        var timer = setInterval(function () {
+          i += 1;
+          target.innerHTML = query.slice(0, i) + caret;
+          if (i >= query.length) {
+            clearInterval(timer);
+            setTimeout(showResults, 650);
+          }
+        }, 55);
+      }
+
+      /* Step 3: results page */
+      function showResults() {
+        address.textContent = 'findit.co.uk/search?q=surface+repair+specialist+uk';
+        hide(viewSearch);
+        show(viewResults);
+        setMarv('marvexcited',
+          'There we are - top of the list. Click through to Magicman and let us get your request in.',
+          'default');
+      }
+
+      /* Step 4: open the Magicman site */
+      function openSite() {
+        address.textContent = 'www.magicman.co.uk/request-a-repair';
+        hide(viewResults);
+        show(viewSite);
+        setMarv('marvexcited',
+          'This is us. I have pre-filled your details from the basin - vitreous china, chipped and cracked. Check it and submit.',
+          'default');
+      }
+
+      /* Step 5: submit -> confirmation (the stage progression trigger) */
+      function submitClaim(e) {
+        e.preventDefault();
+        address.textContent = 'www.magicman.co.uk/request-a-repair/confirmed';
+        hide(viewSite);
+        show(viewConfirmation);
+        setMarv('marvconfident',
+          'Submitted and logged. Your request is in the system and I am already matching the right technician to it. Step through with me.',
+          'default');
+      }
+
+      /* Wiring */
+      document.getElementById('play-intro').addEventListener('click', openBrowser);
+      document.getElementById('skip-intro').addEventListener('click', openBrowser);
+
+      var magicmanResult = document.getElementById('result-magicman');
+      magicmanResult.addEventListener('click', openSite);
+      magicmanResult.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openSite(); }
+      });
+
+      document.getElementById('repair-form').addEventListener('submit', submitClaim);
+
+      document.getElementById('continue-stage2').addEventListener('click', function () {
+        /* In the assembled experience this advances the journey. */
+        if (window.MMCE && typeof window.MMCE.next === 'function') {
+          window.MMCE.next();
+        }
+      });
+
+      /* Entry state - MARV introduces the journey. No progression on load. */
+      setMarv('marvexcited',
+        "Claim received. I'm MARV - MAterial Repair Validator. I have been doing this for 30 years and I know exactly what your basin needs. Let me show you how this works.",
+        'default');
+    })();
+  </script>
+</body>
+</html>
