@@ -623,6 +623,36 @@
     margin-bottom: 2px;
   }
 
+  /* MARV's verdict - mirrors the claim card styling, with a wasabi left
+     border tying it to the claim above. Animates in a beat later so it
+     reads as MARV confirming the result. */
+  .marv-verdict {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(174,210,132,0.3);
+    border-left: 4px solid var(--wasabi);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 1.2s forwards;
+  }
+
+  .marv-verdict h3 {
+    margin: 0 0 10px;
+    color: var(--wasabi);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .marv-verdict p {
+    margin: 0;
+    color: #FFFFFF;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
   /* ---- BUTTONS ---- */
   .btn-primary {
     background: var(--wasabi);
@@ -1716,9 +1746,21 @@
             <div class="icon">&#9989;</div>
             <div class="text">
               <strong>Claim received: CLM-2026-047821</strong>
-              Damaged ceramic basin, Bristol. Policyholder photos processed. 
+              Damaged ceramic basin, Bristol. Policyholder photos processed.
               Surface type confirmed: vitreous china. Ready for assessment.
             </div>
+          </div>
+
+          <div class="marv-verdict">
+            <h3>How MARV makes the call</h3>
+            <p>
+              Every Magicman client has their own dedicated landing page - configured to their
+              specific repair criteria and pricing. This is all set up during onboarding, so by the
+              time the first claim arrives everything is already in place. The moment this claim
+              landed, MARV checked it against your rules automatically. Some repairs fall outside
+              scope. When that happens, your team is notified immediately and the claim is handled
+              accordingly. This one? It passed. The repair is viable. The adventure continues.
+            </p>
           </div>
 
           <div class="scene-actions">
