@@ -6,6 +6,11 @@
 <title>Magicman | The Repair Journey - Stage 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Shared shell stylesheet + device detection. Loaded before the page's own
+     <style> so Stage 1's bespoke styles win the cascade, while the higher
+     specificity body.device-mobile mobile rules in main.css still apply. -->
+<link rel="stylesheet" href="../css/main.css">
+<script src="../js/main.js" defer></script>
 <style>
   /* ---- RESET + ROOT ---- */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

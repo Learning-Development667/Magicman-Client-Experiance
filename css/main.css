@@ -534,3 +534,36 @@ body.device-mobile .kb-panel.active.kb-dir-b .kb-image {
   transform: scale(1.04);
   transition: transform 6s ease-out;
 }
+
+/* --------------------------------------------------------------------------
+   12a. Stage 1 specifics (stages/MM-CE-S1-claim.html, when wired to load this
+   stylesheet). Stage 1 uses its own class names, so the generic rules above
+   do not reach it; these target its actual layout classes. Higher specificity
+   than Stage 1's own rules, so they win regardless of load order.
+   -------------------------------------------------------------------------- */
+
+/* All Stage 1 buttons full width with a 48px touch target, stacked */
+body.device-mobile .btn-primary,
+body.device-mobile .btn-secondary {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Stack the Back / Continue button rows */
+body.device-mobile .scene-actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* MARV scene: sprite/panel and copy stack into a single column */
+body.device-mobile .marv-world {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Single column for the two-up claim field grid */
+body.device-mobile .claim-fields {
+  grid-template-columns: 1fr;
+}
