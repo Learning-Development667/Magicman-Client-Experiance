@@ -39,16 +39,16 @@ If a referenced asset is missing locally, check the remote branch first
 (`git ls-tree -r --name-only origin/claude/happy-bardeen-Qx9h7 -- assets/`) and
 pull, rather than assuming it does not exist.
 
-### Filename gotcha: the customer video typo
-The customer interview video keeps arriving misspelled as
-`cusotmer_contractor_conversation.mp4` ("cusotmer"). Claude renamed it to
-`customer_...` once; a later web upload deleted the corrected name and re-added
-the misspelled one, so the rename was lost. The current rule: **reference the
-actual on-disk filename**. Stage 1 currently points at
-`../assets/video/cusotmer_contractor_conversation.mp4`. If the user wants the
-clean spelling, they must rename it in the GitHub UI and tell Claude, who will
-then update the reference to match. Do not assume the spelling; grep the actual
-file before referencing.
+### Filename gotcha: the customer video
+The customer interview video churned through several uploads, alternating
+between the misspelled `cusotmer_contractor_conversation.mp4` and the correct
+`customer_contractor_conversation.mp4`, each upload silently replacing the
+other and breaking whichever name the HTML referenced. As of this handover the
+on-disk file is correctly named `customer_contractor_conversation.mp4` and
+Stage 1 references `../assets/video/customer_contractor_conversation.mp4`. The
+durable rule: **reference the actual on-disk filename, do not assume the
+spelling, grep the file before referencing**, and after any push rejection
+re-check this reference because uploads can swap it again.
 
 ## 3. Project architecture (read this before building Stage 2 features)
 
@@ -120,7 +120,7 @@ Self-contained document. Flow, in order:
 2. **Post-cinematic, still inside the overlay** (navy stages, fade between):
    - "Hear from a customer" button. Click plays the customer video with sound
      (`#kb-video`, full-width rounded navy card,
-     `../assets/video/cusotmer_contractor_conversation.mp4`). This click grants
+     `../assets/video/customer_contractor_conversation.mp4`). This click grants
      audio permission.
    - Customer video ends, fade to navy, a wasabi radial pulse fires, then MARV's
      **silent** welcome video (`#kb-marv-video`,
@@ -218,7 +218,8 @@ marvtriumphant, marvwincing. Path from a stage file is
 independent of these files.)
 
 ### Video, `assets/video/`
-`cusotmer_contractor_conversation.mp4` (misspelled; see section 2),
+`customer_contractor_conversation.mp4` (customer interview, plays with sound;
+spelling has churned across uploads, see section 2),
 `marv_welcome_video.mp4` (silent welcome clip).
 
 ### Audio, `assets/audio/`
