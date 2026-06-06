@@ -735,8 +735,9 @@
   // ===================== WORLD BUILD =====================
   function buildWorld() {
     positionStage();
+    // Clock hands begin rotating the instant the lab background lands, no delay.
+    document.getElementById("clock-overlay").classList.add("visible");
     setTimeout(() => { document.getElementById("map-dots").classList.add("visible"); }, 3000);
-    setTimeout(() => { document.getElementById("clock-overlay").classList.add("visible"); }, 3700);
     setTimeout(() => { document.getElementById("assessing-banner").classList.add("visible"); }, 4400);
     setTimeout(() => { document.getElementById("claim-monitor").classList.add("visible"); }, 5000);
     setTimeout(() => {
