@@ -1473,7 +1473,7 @@
   .test-skip {
     position: fixed;
     bottom: 16px;
-    right: 16px;
+    left: 16px;
     z-index: 999999;
     background: rgba(0,0,0,0.65);
     color: #AED284;
@@ -2439,6 +2439,17 @@ function testSkip() {
 
 <!-- TEST ONLY: dev skip button - remove this for the final build -->
 <button type="button" id="test-skip" class="test-skip" onclick="testSkip()">SKIP &#9656;</button>
+
+<!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+<div class="dev-nav" id="dev-nav">
+  <div class="dev-nav__panel">
+    <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+    <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+    <a class="dev-nav__btn" href="MM-CE-S2-assessment.html">Stage 2 - Assessment</a>
+  </div>
+  <button class="dev-nav__tab" type="button"
+          onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+</div>
 
 </body>
 </html>

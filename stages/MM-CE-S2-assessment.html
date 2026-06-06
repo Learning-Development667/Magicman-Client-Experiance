@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magicman | The Repair Journey - Stage 2 Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Shared shell stylesheet + device detection. Loaded before the page's own
+     <style> so this stage's bespoke styles win the cascade, while the higher
+     specificity body.device-mobile mobile rules in main.css still apply. -->
+<link rel="stylesheet" href="../css/main.css">
+<script src="../js/main.js" defer></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  .s2-wrap {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+  }
+
+  /* MARV intro line */
+  .s2-marv {
+    margin: 12px 0 26px;
+  }
+
+  /* Prompt above the stat panels */
+  .s2-prompt {
+    text-align: center;
+    color: var(--wasabi);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 4px 0 18px;
+  }
+
+  /* Stat panels - 2x2 grid, each hidden until clicked */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-panel {
+    background: var(--white);
+    color: var(--dark-text);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 22px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .stat-panel:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-panel.is-revealed {
+    border-color: var(--wasabi);
+  }
+
+  .stat-number {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.1;
+  }
+
+  .stat-hint {
+    font-size: 12px;
+    color: #5a6472;
+    margin-top: 8px;
+    letter-spacing: 0.4px;
+  }
+
+  .stat-panel.is-revealed .stat-hint {
+    display: none;
+  }
+
+  .stat-content {
+    max-height: 0;
+    opacity: 0;
+    transform: scale(0.9);
+    overflow: hidden;
+    transition: max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .stat-panel.is-revealed .stat-content {
+    max-height: 220px;
+    opacity: 1;
+    transform: scale(1);
+    margin-top: 12px;
+  }
+
+  .stat-content p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Wasabi pulse on the first panel to invite the first click */
+  .stat-panel.is-pulsing {
+    animation: s2-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes s2-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(174, 210, 132, 0.55); }
+    50%      { box-shadow: 0 0 0 12px rgba(174, 210, 132, 0); }
+  }
+
+  /* Audience cards - revealed after all stats, silent (no MARV reaction) */
+  #s2-audience {
+    display: none;
+  }
+
+  #s2-audience.is-shown {
+    display: block;
+    animation: fade-up 0.5s ease both;
+  }
+
+  .audience-head {
+    text-align: center;
+    color: var(--white);
+    font-weight: 700;
+    margin: 4px 0 16px;
+  }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .audience-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(174, 210, 132, 0.3);
+    border-radius: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease;
+  }
+
+  .audience-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .audience-card.is-revealed {
+    border-color: var(--wasabi);
+  }
+
+  .audience-card__title {
+    color: var(--wasabi);
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  .audience-card__hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 6px;
+  }
+
+  .audience-card.is-revealed .audience-card__hint {
+    display: none;
+  }
+
+  .audience-card__body {
+    max-height: 0;
+    opacity: 0;
+    transform: scale(0.92);
+    overflow: hidden;
+    transition: max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .audience-card.is-revealed .audience-card__body {
+    max-height: 180px;
+    opacity: 1;
+    transform: scale(1);
+    margin-top: 8px;
+  }
+
+  .audience-card__body p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--white);
+  }
+
+  /* Let's go reveal */
+  #s2-go {
+    display: none;
+  }
+
+  #s2-go.is-shown {
+    display: block;
+    animation: fade-up 0.5s ease both;
+  }
+
+  .s2-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  /* Section 2 - MARV Scanner placeholder */
+  #s2-game {
+    display: none;
+  }
+
+  .s2-scanner {
+    background: var(--navy);
+    border: 1px solid rgba(174, 210, 132, 0.35);
+    border-radius: 12px;
+    padding: 32px 28px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+
+  .s2-scanner h2 {
+    color: var(--wasabi);
+    margin-bottom: 12px;
+  }
+
+  .s2-scanner p {
+    color: var(--white);
+    margin: 0 auto;
+    max-width: 520px;
+  }
+
+  /* ----- Mobile optimisations (driven by device-mobile on body) ----- */
+  body.device-mobile .stat-grid,
+  body.device-mobile .audience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.device-mobile .stat-panel,
+  body.device-mobile .audience-card,
+  body.device-mobile .s2-scanner {
+    padding: 16px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Progress indicator - Stage 2 of 6 active. No id="progress-steps" so the
+       shell's main.js never re-renders or resets it. -->
+  <header class="progress-bar" aria-label="Journey progress">
+    <div class="progress-bar__inner">
+      <span class="label-accent">Magicman</span>
+      <ol class="progress-steps">
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+        <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">2. Assessment</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. Dispatch</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Repair</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Quality</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Outcome</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <div class="s2-wrap">
+
+    <!-- Persistent MARV guide, shared by both sections -->
+    <div class="marv s2-marv">
+      <img class="marv-sprite" id="s2-marv-sprite"
+           src="../assets/marv/marvexcited.png" alt="MARV looking excited">
+      <div class="marv-bubble default" id="s2-marv-bubble">
+        Right - you have seen the problem land. Now let me introduce myself properly. I am MARV. MAterial Repair Validator. And I have been waiting to show you what I can do.
+      </div>
+    </div>
+
+    <!-- ===================== SECTION 1: MARV INTRODUCTION ===================== -->
+    <section id="s2-intro">
+
+      <p class="s2-prompt">Click each panel to find out more</p>
+
+      <div class="stat-grid">
+        <div class="stat-panel is-pulsing" data-index="0" role="button" tabindex="0">
+          <div class="stat-number">35+ years</div>
+          <div class="stat-hint">Tap to reveal</div>
+          <div class="stat-content"><p>35+ years of Magicman craft intelligence built in</p></div>
+        </div>
+        <div class="stat-panel" data-index="1" role="button" tabindex="0">
+          <div class="stat-number">24/7</div>
+          <div class="stat-hint">Tap to reveal</div>
+          <div class="stat-content"><p>24/7 available, no capacity limits</p></div>
+        </div>
+        <div class="stat-panel" data-index="2" role="button" tabindex="0">
+          <div class="stat-number">Minutes</div>
+          <div class="stat-hint">Tap to reveal</div>
+          <div class="stat-content"><p>Minutes from photo to viability decision</p></div>
+        </div>
+        <div class="stat-panel" data-index="3" role="button" tabindex="0">
+          <div class="stat-number">Up to 90%</div>
+          <div class="stat-hint">Tap to reveal</div>
+          <div class="stat-content"><p>Up to 90% of a surface carbon saved versus replacing it</p></div>
+        </div>
+      </div>
+
+      <!-- Audience cards - revealed after all four stats -->
+      <div id="s2-audience">
+        <h3 class="audience-head">What this means for everyone</h3>
+        <div class="audience-grid">
+          <div class="audience-card" role="button" tabindex="0">
+            <div class="audience-card__title">For Customers</div>
+            <div class="audience-card__hint">Tap to reveal</div>
+            <div class="audience-card__body"><p>Faster answers, clearer expectations, fewer delays</p></div>
+          </div>
+          <div class="audience-card" role="button" tabindex="0">
+            <div class="audience-card__title">For Insurers</div>
+            <div class="audience-card__hint">Tap to reveal</div>
+            <div class="audience-card__body"><p>Defensible repair decisions, accurate costing, better governance</p></div>
+          </div>
+          <div class="audience-card" role="button" tabindex="0">
+            <div class="audience-card__title">For Technicians</div>
+            <div class="audience-card__hint">Tap to reveal</div>
+            <div class="audience-card__body"><p>Fewer abortive visits, smarter scheduling, properly prepared jobs</p></div>
+          </div>
+          <div class="audience-card" role="button" tabindex="0">
+            <div class="audience-card__title">Craft Intelligence</div>
+            <div class="audience-card__hint">Tap to reveal</div>
+            <div class="audience-card__body"><p>Built from decades of Magicman expertise</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Let's go - the only element that advances to the game section -->
+      <div id="s2-go">
+        <div class="s2-actions">
+          <button class="btn btn-primary" id="s2-go-btn" type="button">Let's go</button>
+        </div>
+      </div>
+
+      <div class="s2-actions">
+        <a class="btn btn-ghost" href="MM-CE-S1-claim.html">Back to Stage 1</a>
+      </div>
+
+    </section>
+
+    <!-- ===================== SECTION 2: MARV SCANNER GAME ===================== -->
+    <section id="s2-game">
+      <div class="s2-scanner">
+        <h2>The MARV Scanner</h2>
+        <p>This section is under construction. The MARV Scanner game will be built here.</p>
+      </div>
+      <div class="s2-actions">
+        <a class="btn btn-ghost" href="MM-CE-S1-claim.html">Back to Stage 1</a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-assessment.html">Stage 2 - Assessment</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    function marvSay(emotion, text) {
+      var img = document.getElementById('s2-marv-sprite');
+      var bubble = document.getElementById('s2-marv-bubble');
+      if (img) {
+        img.src = '../assets/marv/' + emotion + '.png';
+        img.alt = 'MARV looking ' + emotion;
+      }
+      if (bubble) {
+        bubble.textContent = text;
+      }
+    }
+
+    // MARV reactions for the four stat panels, by data-index.
+    var STAT_REACTIONS = [
+      { emotion: 'marvconfident',  line: 'Every repair Magicman has ever done. Every material. Every technique. All of it is in here.' },
+      { emotion: 'marvconfident',  line: 'No queues. No waiting for office hours. The moment a claim lands, I am already working.' },
+      { emotion: 'marvexcited',    line: 'Not days. Not hours. Minutes. Your client gets an answer before anyone has even picked up the phone.' },
+      { emotion: 'marvtriumphant', line: 'Repair is not just faster and cheaper. It is the right thing to do.' }
+    ];
+
+    var statPanels = document.querySelectorAll('.stat-panel');
+    var audienceCards = document.querySelectorAll('.audience-card');
+    var statsRevealed = 0;
+    var audienceRevealed = 0;
+
+    function revealStat(panel) {
+      if (panel.classList.contains('is-revealed')) {
+        return;
+      }
+      panel.classList.add('is-revealed');
+      panel.classList.remove('is-pulsing');
+      var i = parseInt(panel.getAttribute('data-index'), 10);
+      var reaction = STAT_REACTIONS[i];
+      if (reaction) {
+        marvSay(reaction.emotion, reaction.line);
+      }
+      statsRevealed += 1;
+      if (statsRevealed === statPanels.length) {
+        var audience = document.getElementById('s2-audience');
+        if (audience) {
+          audience.classList.add('is-shown');
+        }
+      }
+    }
+
+    function revealAudience(card) {
+      if (card.classList.contains('is-revealed')) {
+        return;
+      }
+      card.classList.add('is-revealed');
+      audienceRevealed += 1;
+      if (audienceRevealed === audienceCards.length) {
+        marvSay('marvconfident', 'That is who I am. But reading about me is one thing. To really understand what I do, you need to work with me. Ready to try?');
+        var go = document.getElementById('s2-go');
+        if (go) {
+          go.classList.add('is-shown');
+        }
+      }
+    }
+
+    function bindReveal(nodes, handler) {
+      Array.prototype.forEach.call(nodes, function (node) {
+        node.addEventListener('click', function () { handler(node); });
+        node.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handler(node);
+          }
+        });
+      });
+    }
+
+    bindReveal(statPanels, revealStat);
+    bindReveal(audienceCards, revealAudience);
+
+    var goBtn = document.getElementById('s2-go-btn');
+    if (goBtn) {
+      goBtn.addEventListener('click', function () {
+        var intro = document.getElementById('s2-intro');
+        var game = document.getElementById('s2-game');
+        if (intro) { intro.style.display = 'none'; }
+        if (game) { game.style.display = 'block'; }
+        marvSay('marvthinking', 'The MARV Scanner is coming soon. This is where you and I get to work.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  })();
+  </script>
+
+</body>
+</html>
