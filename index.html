@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magicman Client Experience</title>
+  <meta name="description" content="An interactive showcase of the Magicman surface repair service journey.">
+
+  <!-- Open Sans via Google Fonts (Bold for headings, Regular for body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Progress indicator - visible at all times, reflects journey position -->
+    <header class="progress-bar" aria-label="Journey progress">
+      <div class="progress-bar__inner">
+        <span class="label-accent">Magicman</span>
+        <ol class="progress-steps" id="progress-steps">
+          <!-- Steps rendered by main.js -->
+        </ol>
+      </div>
+    </header>
+
+    <main class="content-wrap">
+
+      <!-- Intro / welcome - shown before the journey begins.
+           No progression event fires on load. -->
+      <section class="stage" id="intro">
+        <div class="card fade-up">
+          <span class="label-accent">35 years of surface repair</span>
+          <h1>The Magicman Client Experience</h1>
+          <p>
+            Follow a repair from the first online search through to a completed,
+            quality-assured job. It takes around ten to fifteen minutes, and
+            MARV will guide you the whole way.
+          </p>
+          <button class="btn btn-primary" id="start-journey" type="button">
+            Begin the journey
+          </button>
+        </div>
+
+        <!-- MARV guide block -->
+        <div class="marv fade-up" style="--delay: 160ms; margin-top: 32px;">
+          <img class="marv-sprite" id="marv-sprite"
+               src="assets/marv/marvexcited.png"
+               alt="MARV the Magicman guide">
+          <div class="marv-bubble default" id="marv-bubble">
+            Hi, I am MARV. Let me walk you through the Magicman repair journey.
+          </div>
+        </div>
+      </section>
+
+      <!-- Stage host - stage files are loaded into here on demand -->
+      <section id="stage-host" aria-live="polite"></section>
+
+    </main>
+  </div>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <a class="dev-nav__btn" href="stages/MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="stages/MM-CE-S2-assessment.html">Stage 2 - Assessment</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
