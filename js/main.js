@@ -139,11 +139,37 @@
   }
 
   /* ------------------------------------------------------------------------
+     Device detection
+     Tags <body> with device-mobile (viewport < 768px) or device-desktop
+     (>= 768px) so the stylesheet can apply mobile optimisations. The class is
+     set on load and kept in sync on resize / orientation change. All mobile
+     CSS lives in css/main.css, scoped to body.device-mobile.
+     ------------------------------------------------------------------------ */
+  var MOBILE_BREAKPOINT = 768;
+
+  function applyDeviceClass() {
+    if (!document.body) {
+      return;
+    }
+    var isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+    document.body.classList.toggle('device-mobile', isMobile);
+    document.body.classList.toggle('device-desktop', !isMobile);
+  }
+
+  var deviceResizeTimer;
+  function onDeviceResize() {
+    clearTimeout(deviceResizeTimer);
+    deviceResizeTimer = setTimeout(applyDeviceClass, 150);
+  }
+
+  /* ------------------------------------------------------------------------
      Boot
      Sets the journey up on first load. Does NOT fire any progression or
      completion event - it simply renders the starting position.
      ------------------------------------------------------------------------ */
   function init() {
+    applyDeviceClass();
+    window.addEventListener('resize', onDeviceResize);
     renderProgress();
     setMarv(
       'marvexcited',

@@ -446,3 +446,91 @@ a {
     display: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   12. Mobile optimisations (class-based)
+   Applied when js/main.js tags the body with .device-mobile (viewport
+   < 768px). These are deliberately scoped to body.device-mobile so the
+   detection in main.js is the single source of truth for the breakpoint.
+
+   Note: the Ken Burns sequence, the customer / MARV videos and the full
+   MARV reveal live inside the self-contained stages/MM-CE-S1-claim.html,
+   which does not load this stylesheet. The generic `video` and Ken Burns
+   rules below take effect only for content rendered within this shell
+   (and for any stage wired to load css/main.css).
+   -------------------------------------------------------------------------- */
+
+/* No horizontal scrolling under any circumstances */
+body.device-mobile {
+  overflow-x: hidden;
+}
+
+/* Font sizes scaled down: H1 32px, H2 26px, body stays 16px */
+body.device-mobile {
+  font-size: 16px;
+}
+body.device-mobile h1 {
+  font-size: 32px;
+}
+body.device-mobile h2 {
+  font-size: 26px;
+}
+
+/* Single column layout throughout - no side by side elements */
+body.device-mobile .card-grid {
+  grid-template-columns: 1fr;
+}
+
+/* Card padding reduced to 16px minimum */
+body.device-mobile .card {
+  padding: 16px;
+}
+body.device-mobile .content-wrap {
+  padding: 24px 16px 48px;
+}
+
+/* MARV sprite and speech bubble stacked vertically - sprite above, bubble below */
+body.device-mobile .marv {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+body.device-mobile .marv-bubble {
+  max-width: 100%;
+}
+body.device-mobile .marv-bubble::before {
+  display: none; /* sideways tail makes no sense once stacked */
+}
+
+/* All buttons full width with a 48px minimum touch target */
+body.device-mobile .btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Videos scale to 100% width of the viewport */
+body.device-mobile video {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* Progress bar simplified - show the current stage number and name only */
+body.device-mobile .progress-step:not(.is-active) {
+  display: none;
+}
+body.device-mobile .progress-step__label {
+  display: block;
+  white-space: normal;
+}
+
+/* Ken Burns simplified - images still display and pan, but the alternating
+   zoom is dropped to a single lighter pan for performance on mobile. */
+body.device-mobile .kb-panel.active.kb-dir-a .kb-image,
+body.device-mobile .kb-panel.active.kb-dir-b .kb-image {
+  animation: none;
+  transform: scale(1.04);
+  transition: transform 6s ease-out;
+}
