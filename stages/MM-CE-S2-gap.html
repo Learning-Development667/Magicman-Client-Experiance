@@ -229,7 +229,7 @@
     <!-- ===================== SCENE 1 - THE VIDEO MOMENT ===================== -->
     <section id="scene1" class="scene">
       <div class="tv-frame" id="gap-tv">
-        <video id="gap-video" playsinline preload="auto">
+        <video id="gap-video" autoplay muted playsinline preload="auto">
           <source src="../assets/video/yp_advert_1991.mp4" type="video/mp4">
         </video>
         <img class="tv-overlay" src="../assets/images/old_tv.png" alt="">
@@ -485,16 +485,11 @@
       video.addEventListener('ended', endScene1);
       video.addEventListener('error', function () { setTimeout(endScene1, 600); });
 
-      // Try to play with sound; fall back to muted if the browser blocks it.
-      video.muted = false;
+      // The element autoplays muted; this play() is a backup if the attribute
+      // is ignored. It must stay muted so the autoplay policy allows it.
+      video.muted = true;
       var p = video.play();
-      if (p && p.catch) {
-        p.catch(function () {
-          video.muted = true;
-          var p2 = video.play();
-          if (p2 && p2.catch) { p2.catch(function () { setTimeout(endScene1, 1000); }); }
-        });
-      }
+      if (p && p.catch) { p.catch(function () { setTimeout(endScene1, 1000); }); }
 
       // Skip appears 3s after the video starts playing.
       setTimeout(function () {
