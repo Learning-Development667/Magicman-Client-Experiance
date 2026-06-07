@@ -78,31 +78,47 @@
     }
     #gap-cta-zone { margin-top: 22px; }
 
-    /* Day counter - large, prominent, top right of the right column */
+    /* Day counter - large, prominent, emotional - top right of the column */
     .day-counter {
       text-align: right;
       margin: 0 0 18px;
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 800;
-      font-size: 52px;
-      line-height: 1;
-      color: var(--wasabi);
       opacity: 0;
       transition: opacity 0.6s ease;
+      perspective: 500px;
     }
     .day-counter.is-on { opacity: 1; }
-    .day-counter.pulse { animation: dayPulse 0.45s ease; }
-    .day-counter.flip { animation: dayFlip 0.7s ease; }
-    @keyframes dayPulse {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.18); }
-      100% { transform: scale(1); }
+    .day-counter__num {
+      display: block;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 800;
+      font-size: 64px;
+      line-height: 1;
+      color: var(--wasabi);
+      transform-origin: center;
     }
+    .day-counter__label {
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--white);
+    }
+    .day-counter__num.flip { animation: dayFlip 0.6s ease; }
     @keyframes dayFlip {
       0% { transform: rotateX(0deg); }
       45% { transform: rotateX(90deg); opacity: 0.25; }
       55% { transform: rotateX(-90deg); opacity: 0.25; }
       100% { transform: rotateX(0deg); opacity: 1; }
+    }
+
+    /* Email column - fixed height stack that never scrolls; newest anchored
+       to the bottom at full size, older ones compress upward above it. */
+    #email-chain {
+      height: 65vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
     }
 
     /* Email cards */
@@ -112,22 +128,49 @@
       border-left: 4px solid #999999;
       border-radius: 4px;
       padding: 14px 16px;
-      margin: 0 0 12px;
+      margin: 0 0 10px;
+      width: 100%;
       max-width: 560px;
+      max-height: 360px;
+      overflow: hidden;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
       opacity: 0;
-      transform: translateX(60px);
+      transform: translateY(28px);
+      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, background 0.4s ease-out;
     }
-    .email.is-in { animation: emailIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .email.is-out { animation: emailOut 0.5s ease forwards; }
+    .email.is-in { animation: emailDrop 0.4s ease-out forwards; }
+    .email.is-out { animation: emailOut 0.4s ease forwards; }
+    @keyframes emailDrop {
+      0% { opacity: 0; transform: translateY(28px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes emailOut {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(440px); }
+    }
+    /* emailIn is retained for the MARV assessment card entrance */
     @keyframes emailIn {
       0% { opacity: 0; transform: translateX(60px); }
       100% { opacity: 1; transform: translateX(0); }
     }
-    @keyframes emailOut {
-      0% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(420px); }
+
+    /* Compressed summary line - sender, role and subject on one line */
+    .email__compact {
+      display: none;
+      font-size: 12px;
+      color: var(--navy);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 20px;
     }
+    .email.is-compressed { max-height: 36px; padding-top: 8px; padding-bottom: 8px; margin-bottom: 6px; }
+    .email.is-compressed .email__full { display: none; }
+    .email.is-compressed .email__compact { display: block; }
+
+    /* Mrs Howard - the customer - warm tint at full size; border kept compressed */
+    .email.is-customer:not(.is-compressed) { background: #FFF5F5; }
+
     .email__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .email__from { font-weight: 700; color: var(--navy); font-size: 14px; }
     .email__role { font-weight: 400; color: #888888; font-size: 12px; }
@@ -183,7 +226,8 @@
     /* ---------- Mobile ---------- */
     body.device-mobile .gap-grid { grid-template-columns: 1fr; }
     body.device-mobile .gap-marv-col { position: static; }
-    body.device-mobile .day-counter { font-size: 40px; text-align: left; }
+    body.device-mobile .day-counter { text-align: left; }
+    body.device-mobile .day-counter__num { font-size: 46px; }
     body.device-mobile .email,
     body.device-mobile .marv-card { max-width: 100%; }
     body.device-mobile #scene1-line { font-size: 30px; }
@@ -234,7 +278,10 @@
 
         <!-- Right column - day counter and the email chain -->
         <div class="gap-email-col">
-          <div class="day-counter" id="day-counter" aria-live="polite">Day 1</div>
+          <div class="day-counter" id="day-counter" aria-live="polite">
+            <span class="day-counter__num" id="day-num">Day 1</span>
+            <span class="day-counter__label" id="day-label">and counting...</span>
+          </div>
           <div id="email-chain"></div>
         </div>
 
@@ -328,21 +375,21 @@
       { day: 3,  from: 'David Reeves',   role: 'Loss Adjuster',  to: 'Sarah Mitchell', colour: '#E8A020', time: '11:47',
         subject: 'RE: Damage claim - vitreous china basin',
         body: 'Hi Sarah, I will need to arrange a site visit before I can make a decision. Earliest I can do is end of next week. Will confirm. David' },
+      { day: 4,  from: 'Mrs Patricia Howard', role: 'Customer', to: 'Sarah Mitchell', colour: '#E85D5D', time: '19:02', customer: true,
+        subject: 'My bathroom basin',
+        body: 'Hi Sarah, just wondering if there is any update on my claim? We only have the one bathroom and it is making things very difficult for us. Many thanks, Patricia' },
       { day: 5,  from: 'Sarah Mitchell', role: 'Claims Handler', to: 'David Reeves',  colour: '#4A90D9', time: '08:33',
         subject: 'RE: Damage claim - chasing',
         body: 'Hi David, the client has been in touch again. Any chance we can speed this up? They are without a functioning bathroom. Sarah' },
-      { day: 7,  from: 'David Reeves',   role: 'Loss Adjuster',  to: 'Karen Briggs',  colour: '#E8A020', time: '16:09',
-        subject: 'Site visit request - basin damage',
-        body: 'Hi Karen, I need access to the property to assess a basin claim. Can you confirm availability this week or next? David' },
       { day: 8,  from: 'Karen Briggs',   role: 'Site Manager',   to: 'David Reeves',  colour: '#9B59B6', time: '10:21',
         subject: 'RE: Site visit request',
         body: 'Hi David, this week is not possible - we have contractors on site. Can you try the week after next? Karen' },
+      { day: 9,  from: 'Mrs Patricia Howard', role: 'Customer', to: 'Sarah Mitchell', colour: '#E85D5D', time: '07:48', customer: true,
+        subject: 'RE: My bathroom basin',
+        body: 'Sarah, I have not heard anything for nearly two weeks now. My husband has mobility issues and this is becoming a real problem for us. Please can someone help. Patricia' },
       { day: 10, from: 'David Reeves',   role: 'Loss Adjuster',  to: 'Pete Hollis',   colour: '#E8A020', time: '15:52',
         subject: 'Basin replacement quote needed',
         body: 'Hi Pete, can you get me a quote for a full basin replacement? Vitreous china, standard pedestal. Client is waiting. David' },
-      { day: 12, from: 'Pete Hollis',    role: 'Contractor',     to: 'David Reeves',  colour: '#E74C3C', time: '13:05',
-        subject: 'RE: Basin replacement quote',
-        body: 'David, quote attached. Lead time on the unit is 6 to 8 weeks. Installation on top. Pete' },
       { day: 14, from: 'Sarah Mitchell', role: 'Claims Handler', to: 'David Reeves',  colour: '#4A90D9', time: '17:48',
         subject: 'RE: Damage claim - escalating',
         body: 'David, the client is escalating. We still have no decision after two weeks. Can we get a resolution please? Sarah' }
@@ -352,31 +399,37 @@
     var scene2 = document.getElementById('scene2');
     var line = document.getElementById('scene1-line');
     var dayCounter = document.getElementById('day-counter');
+    var dayNum = document.getElementById('day-num');
+    var dayLabel = document.getElementById('day-label');
     var chain = document.getElementById('email-chain');
     var ctaZone = document.getElementById('gap-cta-zone');
     var emailEls = [];
 
+    // Flip the number like a mechanical departure board on each update.
     function setDay(n) {
-      dayCounter.textContent = 'Day ' + n;
+      dayNum.textContent = 'Day ' + n;
       dayCounter.classList.add('is-on');
-      dayCounter.classList.remove('pulse');
-      void dayCounter.offsetWidth;
-      dayCounter.classList.add('pulse');
+      dayNum.classList.remove('flip');
+      void dayNum.offsetWidth;
+      dayNum.classList.add('flip');
     }
 
     function buildEmail(e) {
       var card = document.createElement('div');
-      card.className = 'email';
+      card.className = 'email' + (e.customer ? ' is-customer' : '');
       card.style.borderLeftColor = e.colour;
       card.innerHTML =
-        '<div class="email__head">' +
-          '<span><span class="email__from">' + e.from + '</span> ' +
-          '<span class="email__role">(' + e.role + ')</span></span>' +
-          '<span class="email__time">Day ' + e.day + ', ' + e.time + '</span>' +
-        '</div>' +
-        '<div class="email__to">To: ' + e.to + '</div>' +
-        '<div class="email__subject">' + e.subject + '</div>' +
-        '<p class="email__body">' + e.body + '</p>';
+        '<div class="email__compact">' + e.from + ' (' + e.role + ') - ' + e.subject + '</div>' +
+        '<div class="email__full">' +
+          '<div class="email__head">' +
+            '<span><span class="email__from">' + e.from + '</span> ' +
+            '<span class="email__role">(' + e.role + ')</span></span>' +
+            '<span class="email__time">Day ' + e.day + ', ' + e.time + '</span>' +
+          '</div>' +
+          '<div class="email__to">To: ' + e.to + '</div>' +
+          '<div class="email__subject">' + e.subject + '</div>' +
+          '<p class="email__body">' + e.body + '</p>' +
+        '</div>';
       return card;
     }
 
@@ -414,11 +467,14 @@
     function runEmailChain() {
       gapMarv('marvwincing'); // uneasy throughout, no bubble yet
       EMAILS.forEach(function (e, i) {
-        var card = buildEmail(e);
-        chain.appendChild(card);
-        emailEls.push(card);
         setTimeout(function () {
+          // existing emails compress upward as the new one drops in at the bottom
+          emailEls.forEach(function (c) { c.classList.add('is-compressed'); });
+          var card = buildEmail(e);
+          chain.appendChild(card);
+          emailEls.push(card);
           setDay(e.day);
+          void card.offsetWidth;
           card.classList.add('is-in');
           SFX.ping();
         }, 600 + i * 1800);
@@ -429,13 +485,14 @@
 
     function afterEmails() {
       gapMarv('marvalarmed',
-        'Fourteen days. Four people. Still no answer. This is the decision gap. And it is costing everyone - time, money, and client trust.',
+        'Fourteen days. Four people. A customer with mobility issues still waiting. This is the decision gap.',
         'default');
       SFX.alert();
       setTimeout(clearEmails, 2500); // pause 2.5s
     }
 
     function clearEmails() {
+      chain.style.overflow = 'visible'; // let the cards fly past the container edge
       emailEls.forEach(function (card, i) {
         setTimeout(function () { card.classList.add('is-out'); }, i * 80);
       });
@@ -447,6 +504,8 @@
     /* ---- The MARV resolution ---- */
     function showAssessment() {
       emailEls.forEach(function (c) { if (c.parentNode) { c.parentNode.removeChild(c); } });
+      chain.style.justifyContent = 'center';
+      chain.style.alignItems = 'center';
 
       gapMarv('marvconfident', 'Here is what happens when you use MARV instead.', 'default');
 
@@ -454,18 +513,19 @@
       chain.appendChild(card);
       setTimeout(function () { card.classList.add('is-in'); SFX.ping(); }, 700);
 
-      // Day counter spins back to Day 1
+      // Day counter flips back to Day 1; its label becomes Response time
       setTimeout(function () {
-        dayCounter.textContent = 'Day 1';
+        dayNum.textContent = 'Day 1';
+        dayLabel.textContent = 'Response time';
         dayCounter.classList.add('is-on');
-        dayCounter.classList.remove('flip');
-        void dayCounter.offsetWidth;
-        dayCounter.classList.add('flip');
+        dayNum.classList.remove('flip');
+        void dayNum.offsetWidth;
+        dayNum.classList.add('flip');
       }, 1500);
 
       setTimeout(function () {
         gapMarv('marvthumbsup',
-          'Same claim. Same damage. Instant answer. No site visits. No waiting. No uncertainty.',
+          'Same claim. Same damage. Instant answer. No site visits. No waiting. No uncertainty. And Mrs Howard gets her bathroom back.',
           'default');
         SFX.chime();
       }, 2200);
