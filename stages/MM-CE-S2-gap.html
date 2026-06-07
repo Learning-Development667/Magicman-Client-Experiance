@@ -45,7 +45,8 @@
     #scene2.is-in { opacity: 1; }
 
     /* ---------- Scene 1 - the vintage TV moment ---------- */
-    /* Relative container sized to the video; the TV overlay fills it on top. */
+    /* The TV image is the background layer, shown at full container width;
+       it defines the frame's size. */
     .tv-frame {
       position: relative;
       width: 80%;
@@ -56,23 +57,26 @@
     .tv-frame.is-in { opacity: 1; }
     .tv-frame.is-out { opacity: 0; }
 
-    /* Bottom layer - the video defines the container's dimensions */
+    /* Video sits behind the TV image, positioned inside the screen area.
+       Percentages derived from the 1456 x 816 TV image. */
     .tv-frame video {
-      display: block;
-      width: 100%;
-      height: auto;
+      position: absolute;
+      left: 13.4%;
+      top: 10.8%;
+      width: 58.7%;
+      height: 79.3%;
+      z-index: 1;
+      border-radius: 8%;
       filter: sepia(0.22) contrast(1.04) brightness(0.96) saturate(0.95);
     }
 
-    /* Top layer - old TV casing; multiply makes the white screen transparent */
+    /* TV casing on top; pointer-events off so the video stays reachable. */
     .tv-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
+      display: block;
+      position: relative;
+      z-index: 2;
       width: 100%;
-      height: 100%;
-      object-fit: fill;
-      mix-blend-mode: multiply;
+      height: auto;
       pointer-events: none;
     }
 
