@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magicman | The Repair Journey - Stage 2 The Decision Gap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Shared shell stylesheet + device detection, loaded before this stage's own
+       <style> so the stage's bespoke styles win the cascade while the higher
+       specificity body.device-mobile rules in main.css still apply. -->
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="../js/main.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    .gap-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 24px 64px;
+    }
+
+    .gap-back {
+      display: inline-block;
+      margin: 4px 0 8px;
+      font-size: 14px;
+    }
+
+    /* Scenes - simple opacity fade between them */
+    .scene {
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    #scene1 { min-height: 78vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #scene1.is-out { opacity: 0; }
+    #scene2 { display: none; opacity: 0; min-height: 78vh; padding-top: 12px; }
+    #scene2.is-in { opacity: 1; }
+
+    /* ---------- Scene 1 - the vintage TV moment ---------- */
+    .tv-frame {
+      position: relative;
+      width: 80%;
+      max-width: 720px;
+      background: #000;
+      border: 12px solid #f3efe6;
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+    .tv-frame.is-in { opacity: 1; }
+    .tv-frame.is-out { opacity: 0; }
+
+    .tv-frame video {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      filter: sepia(0.22) contrast(1.04) brightness(0.96) saturate(0.95);
+    }
+
+    /* Aged vignette over the picture */
+    .tv-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      pointer-events: none;
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.85);
+    }
+
+    .scene1-text {
+      text-align: center;
+      max-width: 760px;
+      padding: 0 16px;
+    }
+    #gap-line1 {
+      margin: 0 0 14px;
+      font-weight: 700;
+      font-size: 36px;
+      color: var(--white);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #gap-line2 {
+      margin: 0;
+      font-weight: 400;
+      font-size: 22px;
+      color: #AABBCC;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #gap-line1.is-in, #gap-line2.is-in { opacity: 1; }
+
+    /* ---------- Scene 2 - the decision maze ---------- */
+    .gap-grid {
+      display: grid;
+      grid-template-columns: 40% 60%;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .gap-marv-col { align-self: start; }
+    .gap-q-col { align-self: start; }
+
+    #gap-cta-zone {
+      margin-top: 22px;
+    }
+
+    .gap-basin {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .gap-basin.is-in { opacity: 1; }
+    .gap-basin.is-out { opacity: 0; transition: opacity 1.2s ease; }
+
+    .gap-label {
+      display: block;
+      margin: 12px 0 22px;
+      font-size: 14px;
+      font-variant: small-caps;
+      letter-spacing: 0.04em;
+      color: var(--wasabi);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      text-align: center;
+    }
+    .gap-label.is-in { opacity: 1; }
+    .gap-label.is-out { opacity: 0; transition: opacity 1.2s ease; }
+
+    .gap-q {
+      background: var(--white);
+      color: var(--dark-text);
+      border-left: 4px solid var(--navy);
+      border-radius: 4px;
+      padding: 16px;
+      max-width: 480px;
+      margin: 0 0 12px;
+      font-size: 16px;
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateX(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .gap-q.is-in { opacity: 1; transform: translateX(0); }
+    .gap-q.is-out { opacity: 0; transition: opacity 1.2s ease; }
+
+    /* The single Show me CTA */
+    .gap-cta {
+      background: var(--wasabi);
+      color: var(--navy);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.12s ease;
+    }
+    .gap-cta.is-in { opacity: 1; }
+    .gap-cta:hover { transform: translateY(-2px); }
+
+    /* ---------- Mobile ---------- */
+    body.device-mobile .gap-grid { grid-template-columns: 1fr; }
+    body.device-mobile .tv-frame { width: 100%; }
+    body.device-mobile .gap-q { max-width: 100%; }
+    body.device-mobile #gap-line1 { font-size: 28px; }
+    body.device-mobile #gap-line2 { font-size: 18px; }
+    body.device-mobile .gap-cta { width: 100%; }
+  </style>
+</head>
+<body>
+
+  <!-- Progress indicator - 7 stages, Stage 2 The Decision Gap active. No
+       id="progress-steps" so the shell's main.js never re-renders it. -->
+  <header class="progress-bar" aria-label="Journey progress">
+    <div class="progress-bar__inner">
+      <span class="label-accent">Magicman</span>
+      <ol class="progress-steps">
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+        <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. Assessment</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Dispatch</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Repair</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Quality</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="gap-wrap">
+
+    <a class="btn btn-ghost gap-back" href="MM-CE-S1-claim.html">Back to Stage 1</a>
+
+    <!-- ===================== SCENE 1 - THE VIDEO MOMENT ===================== -->
+    <section id="scene1" class="scene">
+      <div class="tv-frame" id="gap-tv">
+        <video id="gap-video" playsinline preload="auto">
+          <source src="../assets/video/yp_advert_1991.mp4" type="video/mp4">
+        </video>
+      </div>
+
+      <div class="scene1-text">
+        <p id="gap-line1">That was 1991.</p>
+        <p id="gap-line2">Here is how most people still handle it today.</p>
+      </div>
+    </section>
+
+    <!-- ===================== SCENE 2 - THE DECISION MAZE ===================== -->
+    <section id="scene2" class="scene">
+      <div class="gap-grid">
+
+        <!-- Left column - MARV and the CTA -->
+        <div class="gap-marv-col">
+          <div class="marv">
+            <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
+            <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
+          </div>
+          <div id="gap-cta-zone"></div>
+        </div>
+
+        <!-- Right column - the damage and the unanswered questions -->
+        <div class="gap-q-col">
+          <img class="gap-basin" id="gap-basin" src="../assets/images/basin-before.png" alt="A vitreous china basin with a chip and a crack">
+          <span class="gap-label" id="gap-label">Damage reported - vitreous china basin - chip and crack</span>
+
+          <div class="gap-q" data-index="0">Can this be repaired - or does it need replacing?</div>
+          <div class="gap-q" data-index="1">Who makes that decision?</div>
+          <div class="gap-q" data-index="2">Loss adjuster? Site manager? The contractor?</div>
+          <div class="gap-q" data-index="3">How long will this take?</div>
+          <div class="gap-q" data-index="4">What will it cost?</div>
+          <div class="gap-q" data-index="5">Who is even qualified to say?</div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+      <a class="dev-nav__btn" href="MM-CE-S3-assessment.html">Stage 3 - Assessment</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---- Synthesised sound (Web Audio API only) ---- */
+    var SFX = (function () {
+      var ctx = null, drone = null, drone2 = null, droneGain = null;
+      function ac() {
+        if (!ctx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) { ctx = new AC(); }
+        }
+        if (ctx && ctx.state === 'suspended') { ctx.resume(); }
+        return ctx;
+      }
+      function tone(freq, type, dur, vol) {
+        var c = ac();
+        if (!c) { return; }
+        var o = c.createOscillator(), g = c.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        var t = c.currentTime;
+        g.gain.value = 0.0001;
+        g.gain.linearRampToValueAtTime(vol, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(c.destination);
+        o.start(t); o.stop(t + dur + 0.03);
+      }
+      return {
+        resume: function () { ac(); },
+        tick: function () { tone(120, 'square', 0.06, 0.04); },
+        alert: function () { tone(440, 'sine', 0.5, 0.07); setTimeout(function () { tone(330, 'sine', 0.5, 0.05); }, 130); },
+        chime: function () { [523, 659, 784, 1047].forEach(function (f, i) { setTimeout(function () { tone(f, 'sine', 0.4, 0.10); }, i * 90); }); },
+        startDrone: function () {
+          var c = ac();
+          if (!c || drone) { return; }
+          drone = c.createOscillator();
+          drone2 = c.createOscillator();
+          droneGain = c.createGain();
+          drone.type = 'sine'; drone2.type = 'sine';
+          drone.frequency.value = 58; drone2.frequency.value = 58.7;
+          droneGain.gain.value = 0.0001;
+          droneGain.gain.linearRampToValueAtTime(0.05, c.currentTime + 2.5);
+          drone.connect(droneGain); drone2.connect(droneGain); droneGain.connect(c.destination);
+          drone.start(); drone2.start();
+        },
+        stopDrone: function () {
+          if (!ctx) { return; }
+          if (droneGain) { droneGain.gain.cancelScheduledValues(ctx.currentTime); droneGain.gain.setValueAtTime(droneGain.gain.value, ctx.currentTime); droneGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 1.2); }
+          if (drone) { try { drone.stop(ctx.currentTime + 1.3); drone2.stop(ctx.currentTime + 1.3); } catch (e) {} drone = null; drone2 = null; }
+        }
+      };
+    })();
+
+    // The AudioContext can only start after a user gesture, so resume on the
+    // first interaction. Best effort - the video carries its own audio.
+    ['click', 'keydown', 'touchstart'].forEach(function (ev) {
+      document.addEventListener(ev, function once() {
+        SFX.resume();
+        document.removeEventListener(ev, once);
+      });
+    });
+
+    /* ---- MARV (local control, own ids so main.js never drives them) ---- */
+    function gapMarv(emotion, text, style) {
+      var img = document.getElementById('gap-marv-sprite');
+      var bubble = document.getElementById('gap-marv-bubble');
+      if (img) {
+        img.src = '../assets/marv/' + emotion + '.png';
+        img.alt = 'MARV looking ' + emotion;
+      }
+      if (bubble) {
+        if (text) {
+          bubble.textContent = text;
+          bubble.className = 'marv-bubble ' + (style || 'default');
+          bubble.style.display = '';
+        } else {
+          bubble.textContent = '';
+          bubble.style.display = 'none';
+        }
+      }
+    }
+
+    var tv = document.getElementById('gap-tv');
+    var video = document.getElementById('gap-video');
+    var line1 = document.getElementById('gap-line1');
+    var line2 = document.getElementById('gap-line2');
+    var scene1 = document.getElementById('scene1');
+    var scene2 = document.getElementById('scene2');
+    var basin = document.getElementById('gap-basin');
+    var label = document.getElementById('gap-label');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.gap-q'));
+    var ctaZone = document.getElementById('gap-cta-zone');
+
+    /* Basin shows at 50% of its natural size on desktop */
+    if (basin) {
+      basin.addEventListener('load', function () {
+        if (!document.body.classList.contains('device-mobile') && basin.naturalWidth) {
+          basin.style.width = Math.round(basin.naturalWidth / 2) + 'px';
+        }
+      });
+    }
+
+    /* ---- Scene flow ---- */
+    var advanced = false;
+
+    function endScene1() {
+      if (advanced) { return; }
+      advanced = true;
+      try { video.pause(); } catch (e) {}
+      tv.classList.remove('is-in');
+      tv.classList.add('is-out');
+      setTimeout(function () { line1.classList.add('is-in'); }, 1500);
+      setTimeout(function () { line2.classList.add('is-in'); }, 1500 + 1200);
+      // line2 fully visible at 1500 + 1200 + 800; pause 2.5s, then Scene 2
+      setTimeout(startSceneTwo, 1500 + 1200 + 800 + 2500);
+    }
+
+    function startSceneTwo() {
+      scene1.classList.add('is-out');
+      setTimeout(function () {
+        scene1.style.display = 'none';
+        scene2.style.display = 'block';
+        void scene2.offsetWidth; // reflow so the fade-in animates
+        scene2.classList.add('is-in');
+        setTimeout(sceneTwoContent, 500);
+      }, 500);
+    }
+
+    function sceneTwoContent() {
+      gapMarv('marvwincing'); // uneasy, no bubble yet
+      basin.classList.add('is-in');
+      setTimeout(function () { label.classList.add('is-in'); }, 500);
+
+      var qStart = 1100;
+      cards.forEach(function (card, i) {
+        setTimeout(function () {
+          card.classList.add('is-in');
+          SFX.tick();
+          if (i === 0) { SFX.startDrone(); }
+        }, qStart + i * 1400);
+      });
+
+      var q6At = qStart + 5 * 1400;
+      setTimeout(afterQuestions, q6At + 1500);
+    }
+
+    function afterQuestions() {
+      gapMarv('marvalarmed', 'This is the decision gap. Every day it goes unanswered, it costs someone time, money, or both.', 'default');
+      SFX.alert();
+
+      setTimeout(function () {
+        cards.forEach(function (card) { card.classList.add('is-out'); });
+        basin.classList.add('is-out');
+        label.classList.add('is-out');
+        SFX.stopDrone();
+
+        setTimeout(function () {
+          gapMarv('marvconfident', 'There is a better way. We built something for this.', 'default');
+          setTimeout(showCta, 1500);
+        }, 1200);
+      }, 2000);
+    }
+
+    function showCta() {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gap-cta';
+      btn.textContent = 'Show me';
+      btn.addEventListener('click', function () {
+        SFX.chime();
+        setTimeout(function () { window.location.href = 'MM-CE-S3-assessment.html'; }, 180);
+      });
+      ctaZone.appendChild(btn);
+      void btn.offsetWidth;
+      btn.classList.add('is-in');
+    }
+
+    /* ---- Boot Scene 1: fade in the frame, autoplay the advert ---- */
+    function bootScene1() {
+      void tv.offsetWidth;
+      tv.classList.add('is-in');
+      video.addEventListener('ended', endScene1);
+      video.addEventListener('error', function () { setTimeout(endScene1, 600); });
+
+      // Try to play with sound; fall back to muted if the browser blocks it.
+      video.muted = false;
+      var p = video.play();
+      if (p && p.catch) {
+        p.catch(function () {
+          video.muted = true;
+          var p2 = video.play();
+          if (p2 && p2.catch) { p2.catch(function () { setTimeout(endScene1, 1000); }); }
+        });
+      }
+
+      // Safety net in case 'ended' never fires.
+      setTimeout(endScene1, 45000);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootScene1);
+    } else {
+      bootScene1();
+    }
+  })();
+  </script>
+
+</body>
+</html>

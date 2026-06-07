@@ -13,12 +13,13 @@
      the stages/ folder and are loaded into the stage host on demand.
      ------------------------------------------------------------------------ */
   var STAGES = [
-    { id: 's1', label: 'Claim',       file: 'stages/MM-CE-S1-claim.html' },
-    { id: 's2', label: 'Assessment',  file: 'stages/MM-CE-S2-assessment.html' },
-    { id: 's3', label: 'Dispatch',    file: 'stages/MM-CE-S3-dispatch.html' },
-    { id: 's4', label: 'Repair',      file: 'stages/MM-CE-S4-repair.html' },
-    { id: 's5', label: 'Quality',     file: 'stages/MM-CE-S5-quality.html' },
-    { id: 's6', label: 'Outcome',     file: 'stages/MM-CE-S6-outcome.html' }
+    { id: 's1', label: 'Claim',            file: 'stages/MM-CE-S1-claim.html' },
+    { id: 's2', label: 'The Decision Gap', file: 'stages/MM-CE-S2-gap.html' },
+    { id: 's3', label: 'Assessment',       file: 'stages/MM-CE-S3-assessment.html' },
+    { id: 's4', label: 'Dispatch',         file: 'stages/MM-CE-S4-dispatch.html' },
+    { id: 's5', label: 'Repair',           file: 'stages/MM-CE-S5-repair.html' },
+    { id: 's6', label: 'Quality',          file: 'stages/MM-CE-S6-quality.html' },
+    { id: 's7', label: 'Outcome',          file: 'stages/MM-CE-S7-outcome.html' }
   ];
 
   /* Current journey position. Starts at 0 (intro / first stage).
