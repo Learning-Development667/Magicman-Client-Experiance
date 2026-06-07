@@ -45,10 +45,11 @@
     #scene2.is-in { opacity: 1; }
 
     /* ---------- Scene 1 - the vintage TV moment ---------- */
-    /* The TV image is the background layer, shown at full container width;
-       it defines the frame's size. */
+    /* The TV image is the size reference (inline-block shrink-wraps to it),
+       so the absolutely positioned video has correct anchor points. */
     .tv-frame {
       position: relative;
+      display: inline-block;
       width: 80%;
       max-width: 720px;
       opacity: 0;
