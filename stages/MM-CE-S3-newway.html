@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magicman | The Repair Journey - Stage 3 The New Way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Shared shell stylesheet + device detection. Loaded before the page's own
+     <style> so Stage 1's bespoke styles win the cascade, while the higher
+     specificity body.device-mobile mobile rules in main.css still apply. -->
+<link rel="stylesheet" href="../css/main.css">
+<script src="../js/main.js" defer></script>
+<style>
+  /* ---- RESET + ROOT ---- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #13294B;
+    --wasabi: #AED284;
+    --hunter: #93C847;
+    --white:  #FFFFFF;
+    --dark:   #1A1A2E;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    --radius: 12px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Open Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ---- PROGRESS BAR ---- */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(19,41,75,0.95);
+    backdrop-filter: blur(8px);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid rgba(174,210,132,0.2);
+  }
+
+  .progress-logo {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .progress-logo span {
+    color: var(--wasabi);
+  }
+
+  .progress-stages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .stage-pip {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.4s ease;
+  }
+
+  .stage-pip.active {
+    background: var(--wasabi);
+  }
+
+  .stage-pip.done {
+    background: var(--hunter);
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ---- MAIN WRAPPER ---- */
+  #stage-wrapper {
+    padding-top: 52px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- SCENES ---- */
+  .scene {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: calc(100vh - 52px);
+    padding: 40px 24px;
+  }
+
+  .scene.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .scene-inner {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ---- SCENE 1 - DESKTOP SIMULATION ---- */
+  .desktop-sim {
+    background: #1e2a3a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    width: 100%;
+  }
+
+  .desktop-topbar {
+    background: #0f1923;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .desktop-toolbar {
+    background: #1a2535;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tb-nav {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: rgba(255,255,255,0.5);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 13px;
+    cursor: default;
+  }
+
+  .tb-url {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-family: monospace;
+  }
+
+  .desktop-content {
+    padding: 0;
+    background: #f5f7fa;
+  }
+
+  /* ---- CLAIMS SYSTEM UI ---- */
+  .claims-ui {
+    background: #F2F8F8;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  .claims-header {
+    background: #0D7377;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .claims-header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .claims-header .user-badge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+
+  .claims-body {
+    display: flex;
+    flex: 1;
+  }
+
+  .claims-sidebar {
+    width: 220px;
+    background: #0A5C60;
+    padding: 16px 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar-item {
+    padding: 10px 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-item.active {
+    background: #E0F4F4;
+    color: #0D7377;
+    border-left: 3px solid #0D7377;
+    padding-left: 17px;
+  }
+
+  .claims-main {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+    background: #F2F8F8;
+  }
+
+  .claim-card {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #CFE5E5;
+  }
+
+  .claim-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .claim-ref {
+    font-size: 11px;
+    color: #888;
+    font-family: monospace;
+  }
+
+  .claim-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #14292B;
+    margin-top: 2px;
+  }
+
+  .claim-badge {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .fnol-message {
+    background: #f8f9fa;
+    border-left: 3px solid #0D7377;
+    border-radius: 0 6px 6px 0;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+
+  .fnol-message .msg-from {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  .fnol-message .msg-text {
+    font-size: 14px;
+    color: #2A3F3F;
+    line-height: 1.5;
+  }
+
+  .claim-photos {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .photo-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .photo-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .photo-label {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 6px;
+  }
+
+  .claim-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .field-value {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #2A3F3F;
+  }
+
+  .field-value.warning {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+    font-weight: 700;
+  }
+
+  .field-value.cost {
+    background: #ffeaea;
+    border-color: #f5c6cb;
+    color: #721c24;
+    font-weight: 700;
+  }
+
+  /* ---- ASK MARV PANEL ---- */
+  .ask-marv-panel {
+    background: var(--navy);
+    border: 2px solid var(--wasabi);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .ask-marv-info {
+    flex: 1;
+  }
+
+  .ask-marv-info .panel-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--wasabi);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .ask-marv-info .panel-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .ask-marv-btn {
+    background: var(--wasabi);
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 0 0 0 rgba(174,210,132,0.4);
+    animation: pulse-btn 2.5s infinite;
+  }
+
+  .ask-marv-btn:hover {
+    background: #c5e89e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(174,210,132,0.4);
+  }
+
+  @keyframes pulse-btn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(174,210,132,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(174,210,132,0); }
+  }
+
+  .marv-icon {
+    width: 48px;
+    height: auto;
+    object-fit: contain;
+    vertical-align: middle;
+    border: none;
+    background: none;
+  }
+
+  /* ---- SCENE 3 - TRANSITION ---- */
+  #scene-transition {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .transition-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .shrinking-screen {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center center;
+  }
+
+  .shrinking-screen.shrunk {
+    transform: scale(0.35) rotateX(12deg) rotateY(-6deg) translateY(-60px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7);
+  }
+
+  .workshop-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center bottom, #1e3a5f 0%, var(--navy) 70%);
+    opacity: 0;
+    transition: opacity 1s ease 0.5s;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .workshop-overlay.visible {
+    opacity: 1;
+    z-index: 0;
+  }
+
+  .transition-label {
+    text-align: center;
+    color: var(--white);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: transparent;
+    margin-top: 40px;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.8s;
+  }
+
+  .transition-label.visible {
+    opacity: 1;
+  }
+
+  /* ---- SCENE 4 - MARV'S WORLD ---- */
+  .marv-world {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .marv-panel {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .marv-sprite {
+    width: 200px;
+    height: 250px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
+    transition: opacity 0.4s ease;
+  }
+
+  .marv-speech {
+    background: var(--white);
+    color: var(--dark);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 15px;
+    line-height: 1.6;
+    width: 260px;
+    position: relative;
+    box-shadow: var(--card-shadow);
+    margin-top: 0;
+  }
+
+  .marv-speech::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom-color: var(--white);
+    border-top: none;
+    margin-top: -10px;
+  }
+
+  .marv-speech.correct-reaction {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    color: #155724;
+  }
+
+  .marv-speech.correct-reaction::before {
+    border-bottom-color: #28a745;
+  }
+
+  .marv-info {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .stage-headline {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--wasabi);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .stage-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .stage-title { font-size: 26px; }
+  }
+
+  .stage-body {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .claim-received-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(174,210,132,0.3);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .claim-received-box .icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .claim-received-box .text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.5;
+  }
+
+  .claim-received-box .text strong {
+    color: var(--wasabi);
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  /* MARV's verdict - mirrors the claim card styling, with a wasabi left
+     border tying it to the claim above. Animates in a beat later so it
+     reads as MARV confirming the result. */
+  .marv-verdict {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(174,210,132,0.3);
+    border-left: 4px solid var(--wasabi);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 1.2s forwards;
+  }
+
+  .marv-verdict h3 {
+    margin: 0 0 10px;
+    color: var(--wasabi);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .marv-verdict p {
+    margin: 0;
+    color: #FFFFFF;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ---- BUTTONS ---- */
+  .btn-primary {
+    background: var(--wasabi);
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover {
+    background: #c5e89e;
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .btn-visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Secondary (Back) button - outlined and muted so it stays clearly
+     subordinate to the solid wasabi progression buttons. */
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.55);
+    color: var(--white);
+  }
+
+  /* Groups a Back button alongside the main progression button */
+  .scene-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ---- INTRO SCREEN ---- */
+  #scene-intro {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: calc(100vh - 52px);
+  }
+
+  .intro-inner {
+    max-width: 700px;
+    padding: 0 24px;
+  }
+
+  .intro-logo {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--wasabi);
+    margin-bottom: 24px;
+  }
+
+  .intro-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .intro-title { font-size: 32px; }
+  }
+
+  .intro-sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  /* ---- NOTIFICATION BADGE ---- */
+  .notification-dot {
+    display: inline-block;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 18px;
+    text-align: center;
+    animation: notify-pulse 1.5s infinite;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  @keyframes notify-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.85; }
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-in {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .claim-fields { grid-template-columns: 1fr; }
+    .claims-sidebar { display: none; }
+    .marv-world { flex-direction: column; align-items: center; }
+    .marv-info { text-align: center; }
+    .claim-received-box { flex-direction: column; text-align: center; }
+    .intro-title { font-size: 32px; }
+    .ask-marv-panel { flex-direction: column; }
+    .stage-title { font-size: 26px; }
+  }
+
+  @media (max-width: 480px) {
+    .progress-logo { display: none; }
+    .marv-sprite { width: 160px; height: 200px; }
+    .marv-speech { width: 220px; font-size: 13px; }
+  }
+
+  /* ---- HANDLER DECISION BUTTONS (STATE 1) ---- */
+  .decision-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .decision-buttons.fade-out {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+  }
+
+  /* Buttons stay hidden until their staggered entrance is triggered */
+  .decision-buttons.pre-enter .decision-btn {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  /* Each button rises up from below, one after another */
+  .decision-buttons.arrive .decision-btn {
+    animation: decision-rise 0.4s ease both;
+  }
+  .decision-buttons.arrive .decision-btn--repair    { animation-delay: 0s; }
+  .decision-buttons.arrive .decision-btn--replace   { animation-delay: 0.15s; }
+  .decision-buttons.arrive .decision-btn--repudiate { animation-delay: 0.3s; }
+
+  @keyframes decision-rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .decision-btn {
+    flex: 1;
+    min-width: 160px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+  }
+
+  .decision-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  }
+
+  .decision-btn--repair {
+    background: #e9ecef;
+    color: #495057;
+  }
+
+  .decision-btn--replace {
+    background: #ffc107;
+    color: var(--dark);
+  }
+
+  .decision-btn--repudiate {
+    background: #dc3545;
+    color: var(--white);
+  }
+
+  /* ---- ASK MARV PANEL MATERIALISE (STATE 2) ---- */
+  .ask-marv-panel.pre-reveal {
+    display: none;
+  }
+
+  /* Panel reveal animation removed: the panel appears directly and settles
+     into the gentle steady wasabi glow. */
+  .ask-marv-panel.revealed {
+    opacity: 1;
+    animation: marv-steady-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes marv-steady-glow {
+    0%, 100% { box-shadow: 0 0 20px 8px rgba(174,210,132,0.4); }
+    50%      { box-shadow: 0 0 8px 2px rgba(174,210,132,0.15); }
+  }
+
+  /* Panel content is fully visible as soon as the panel appears */
+  .ask-marv-panel.revealed > * {
+    opacity: 1;
+  }
+
+  /* ---- HANDLER THOUGHT BUBBLE (INTERMEDIATE STATE) ---- */
+  .handler-thought {
+    display: none;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    z-index: 60;
+    width: 65vw;
+    max-width: 700px;
+    min-width: 320px;
+    background: var(--white);
+    color: var(--navy);
+    border: 3px solid #13294B;
+    border-radius: 24px;
+    padding: 40px 48px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.4;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+    transform-origin: bottom center;
+  }
+
+  .handler-thought::before {
+    content: '';
+    position: absolute;
+    left: 56px;
+    bottom: -28px;
+    width: 0;
+    height: 0;
+    border-width: 28px 28px 0 0;
+    border-style: solid;
+    border-color: #13294B transparent transparent transparent;
+  }
+
+  .handler-thought::after {
+    content: '';
+    position: absolute;
+    left: 59px;
+    bottom: -23px;
+    width: 0;
+    height: 0;
+    border-width: 23px 23px 0 0;
+    border-style: solid;
+    border-color: var(--white) transparent transparent transparent;
+  }
+
+  .handler-thought.pop-in {
+    animation: thought-pop 0.3s ease-out forwards;
+  }
+
+  .handler-thought.fade-away {
+    animation: thought-fade 0.5s ease forwards;
+  }
+
+  @keyframes thought-pop {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.8); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
+
+  @keyframes thought-fade {
+    0%   { opacity: 1; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) scale(0.96); }
+  }
+
+  /* ---- FNOL TOAST NOTIFICATION ---- */
+  .fnol-toast {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 200;
+    width: 360px;
+    background: #0D7377;
+    border-left: 4px solid #E0F4F4;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    padding: 16px 20px;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .fnol-toast.visible {
+    transform: translateX(0);
+  }
+
+  .fnol-toast__title {
+    color: #E0F4F4;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 3px;
+  }
+
+  .fnol-toast__body {
+    color: var(--white);
+    font-size: 14px;
+  }
+
+  /* ---- SCENE CAPTION (NARRATOR) ---- */
+  .scene-caption {
+    background: var(--navy);
+    color: var(--wasabi);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .scene-caption.visible {
+    opacity: 1;
+  }
+
+  /* Positioning context so the handler thought bubble floats over the claims screen */
+  /* ---- MAGICMAN WEBSITE SCREENSHOTS (after Ask MARV) ---- */
+  /* Two stacked views; only the active one shows, with a fade between them. */
+  .mm-view {
+    display: none;
+    opacity: 0;
+    position: relative;
+    transition: opacity 0.45s ease;
+  }
+  .mm-view.active { display: block; }
+  .mm-view.shown { opacity: 1; }
+
+  .mm-shot {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Transparent pulsing highlight on top of the screenshot. It marks the
+     clickable area without hiding the content underneath. */
+  .mm-overlay {
+    position: absolute;
+    border: 2px solid rgba(174,210,132,0.85);
+    border-radius: 8px;
+    background: rgba(174,210,132,0.12);
+    cursor: pointer;
+    z-index: 5;
+    animation: mm-overlay-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes mm-overlay-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(174,210,132,0.45);
+      border-color: rgba(174,210,132,0.7);
+    }
+    50% {
+      box-shadow: 0 0 22px 7px rgba(174,210,132,0.85);
+      border-color: rgba(174,210,132,1);
+    }
+  }
+
+  /* ===========================================================
+     OVERLAY POSITIONS - tune these after first render.
+     Values are percentages of the screenshot, so they track the
+     image at any render size. Adjust top / left / width / height.
+     =========================================================== */
+
+  /* View 1: Online Estimate button (top right of homepage) */
+  .mm-overlay--estimate {
+    top: 5%;
+    left: 80.5%;
+    width: 10.5%;
+    height: 4%;
+  }
+
+  /* View 2: Client Enquiry box (right-hand option in the estimate form) */
+  .mm-overlay--client {
+    top: 57%;
+    left: 66.5%;
+    width: 20%;
+    height: 8%;
+  }
+
+  /* Animated pointer drawing attention to the Client Enquiry card */
+  .mm-pointer {
+    position: absolute;
+    left: 50%;
+    bottom: -44px;
+    font-size: 30px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    animation: mm-point-bob 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  }
+
+  @keyframes mm-point-bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-10px); }
+  }
+
+
+  #scene-website {
+    background: #1A1A1A;
+  }
+
+  #scene-fnol {
+    background: #1A1A1A;
+  }
+
+  #scene-fnol .scene-inner {
+    position: relative;
+  }
+
+  /* =========================================================
+     KEN BURNS OPENING SEQUENCE
+     Full-screen intro that runs once, before Stage 1 begins.
+     ========================================================= */
+  .kb-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+    overflow: hidden;
+    transition: opacity 0.8s ease;
+  }
+
+  /* Final teardown - the claims UI fades in as this overlay fades out */
+  .kb-overlay.kb-fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Start gate - cinematic and music begin on this click (a user gesture,
+     which satisfies the browser autoplay policy for the audio track). */
+  .kb-start {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: #0d0d0d;
+    transition: opacity 0.6s ease;
+  }
+
+  .kb-start.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .kb-start-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+  }
+
+  .kb-start-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #AED284;
+    margin-bottom: 32px;
+  }
+
+  /* Post-cinematic stages (customer video, then MARV) - full-screen navy
+     layers that fade in and out over the top of the cinematic panels. */
+  .kb-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: var(--navy);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .kb-stage.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Customer video, held in a rounded navy card */
+  .kb-video-card {
+    width: 92%;
+    max-width: 960px;
+    background: var(--navy);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    transition: opacity 0.8s ease;
+  }
+
+  .kb-video-card.kb-faded {
+    opacity: 0;
+  }
+
+  .kb-video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* MARV reveal - radial wasabi pulse rings expanding from centre */
+  .kb-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    border: 3px solid var(--wasabi);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .kb-marv-stage.show .kb-pulse {
+    animation: kb-pulse-ring 1.7s ease-out forwards;
+  }
+
+  .kb-marv-stage.show .kb-pulse-delay {
+    animation-delay: 0.35s;
+  }
+
+  @keyframes kb-pulse-ring {
+    0%   { transform: scale(0.3); opacity: 0.85; }
+    100% { transform: scale(9);   opacity: 0; }
+  }
+
+  /* MARV's silent welcome video, in place of the sprite, materialises from
+     small to full size with a wasabi glow. */
+  .kb-marv-video {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 320px;
+    max-width: 78vw;
+    height: auto;
+    border-radius: 16px;
+    transform: scale(0.3);
+    opacity: 0;
+    filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
+  }
+
+  .kb-marv-stage.show .kb-marv-video {
+    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
+  }
+
+  @keyframes kb-marv-materialise {
+    from { transform: scale(0.3); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .kb-marv-bubble {
+    position: relative;
+    z-index: 2;
+    margin-top: 30px;
+    max-width: 580px;
+    background: #FFFFFF;
+    color: var(--navy);
+    border-radius: 16px;
+    padding: 18px 26px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.45;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .kb-marv-bubble::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    margin-left: -10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #FFFFFF;
+  }
+
+  .kb-marv-bubble.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .kb-showme {
+    position: relative;
+    z-index: 2;
+    margin-top: 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .kb-showme.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .kb-panel {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    overflow: hidden;
+  }
+
+  .kb-panel.active {
+    opacity: 1;
+  }
+
+  .kb-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.0);
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  /* Ken Burns zoom/pan - direction alternates between panels */
+  .kb-panel.active.kb-dir-a .kb-image {
+    animation: kb-zoom-a 4.5s ease-out forwards;
+  }
+
+  .kb-panel.active.kb-dir-b .kb-image {
+    animation: kb-zoom-b 4.5s ease-out forwards;
+  }
+
+  @keyframes kb-zoom-a {
+    from { transform: scale(1.0) translate(0, 0); }
+    to   { transform: scale(1.08) translate(-2%, -1.5%); }
+  }
+
+  @keyframes kb-zoom-b {
+    from { transform: scale(1.0) translate(0, 0); }
+    to   { transform: scale(1.08) translate(2%, 1.5%); }
+  }
+
+  /* Dark gradient behind the incident text for legibility */
+  .kb-panel::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 45%;
+    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .kb-label {
+    position: absolute;
+    top: 0; left: 0;
+    margin: 32px;
+    z-index: 2;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #AED284;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    opacity: 0;
+  }
+
+  .kb-panel.active .kb-label {
+    animation: kb-fade-up 0.7s ease 0.5s forwards;
+  }
+
+  /* Centred incident report - styled as a system log entry, types out */
+  .kb-report {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: calc(100% - 64px);
+    max-width: 700px;
+    box-sizing: border-box;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #FFFFFF;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+    white-space: pre-wrap;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .kb-report.show {
+    opacity: 1;
+  }
+
+  @keyframes kb-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .kb-title-card {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #0d0d0d;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .kb-title-card.show {
+    opacity: 1;
+  }
+
+  .kb-title-main {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 54px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+  }
+
+  .kb-title-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #AED284;
+  }
+
+  @media (max-width: 600px) {
+    .kb-title-main { font-size: 34px; }
+    .kb-title-sub { font-size: 22px; }
+  }
+
+  /* ============================================================
+     TEST ONLY - dev skip button. Remove this rule, the #test-skip
+     markup, and the testSkip() function for the final build.
+     ============================================================ */
+  .test-skip {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    z-index: 999999;
+    background: rgba(0,0,0,0.65);
+    color: #AED284;
+    border: 1px solid #AED284;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    opacity: 0.85;
+  }
+  .test-skip:hover { opacity: 1; }
+
+  /* ---- SCENE 3 - COMPARISON AND MARV ---- */
+  #scene-comparison .scene-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 160px); }
+  .compare-wrap { display: flex; gap: 32px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+  .compare-card { background: #0e1f38; border: 2px solid #888888; border-radius: 14px; padding: 40px 48px; text-align: center; min-width: 240px; opacity: 0; transform: scale(0.9); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .compare-card.landed { opacity: 1; transform: scale(1); }
+  .compare-card--old { border-color: #FF4444; }
+  .compare-card--new { border-color: #AED284; }
+  .compare-num { font-size: 96px; font-weight: 800; line-height: 1; }
+  .compare-card--old .compare-num { color: #FF4444; }
+  .compare-card--new .compare-num { color: #AED284; }
+  .compare-label { margin-top: 10px; font-size: 20px; font-weight: 700; color: #ffffff; }
+  .compare-sub { margin-top: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+  .s3-marv { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .s3-marv.show { opacity: 1; transform: translateY(0); }
+  .s3-marv-sprite { width: 120px; height: auto; }
+  .s3-marv-bubble { background: #ffffff; color: #13294b; border-radius: 14px; padding: 14px 20px; font-size: 16px; font-weight: 600; max-width: 420px; text-align: center; }
+
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<nav id="progress-bar">
+  <div class="progress-logo">magic<span>man</span></div>
+  <div class="progress-stages">
+    <div class="stage-pip done" id="pip-1" title="Claim"></div>
+    <div class="stage-pip done" id="pip-2" title="The Decision Gap"></div>
+    <div class="stage-pip active" id="pip-3" title="The New Way"></div>
+    <div class="stage-pip" id="pip-4" title="Assessment"></div>
+    <div class="stage-pip" id="pip-5" title="Dispatch"></div>
+    <div class="stage-pip" id="pip-6" title="Repair"></div>
+    <div class="stage-pip" id="pip-7" title="Outcome"></div>
+  </div>
+  <div class="progress-label" id="progress-label">Stage 3 of 7</div>
+</nav>
+
+<!-- STAGE WRAPPER -->
+<div id="stage-wrapper">
+
+  <!-- SCENE 1: FNOL CLAIM -->
+  <!-- FNOL TOAST NOTIFICATION -->
+  <div class="fnol-toast" id="fnol-toast">
+    <div class="fnol-toast__title">New FNOL Received</div>
+    <div class="fnol-toast__body">CLM-2026-047821 - Accidental Damage, Bristol</div>
+  </div>
+
+  <section id="scene-fnol" class="scene active">
+    <div class="scene-inner">
+
+      <!-- HANDLER THOUGHT BUBBLE (floats above the claims screen) -->
+      <div class="handler-thought" id="handler-thought">I should check with Magicman to see if this can be repaired.</div>
+
+      <div class="desktop-sim animate-in">
+
+        <!-- Browser chrome -->
+        <div class="desktop-topbar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <div class="desktop-toolbar">
+          <button class="tb-nav">&#8592;</button>
+          <button class="tb-nav">&#8594;</button>
+          <div class="tb-url">claims.insurancesystem.co.uk/dashboard</div>
+        </div>
+
+        <!-- SCENE CAPTION (NARRATOR) -->
+        <div class="scene-caption" id="fnol-caption">A claim lands. A familiar decision to make.</div>
+
+        <!-- Claims system -->
+        <div class="claims-ui">
+
+          <div class="claims-header">
+            <h1>Claims Management System</h1>
+            <div class="user-badge">J. Harrison &nbsp;|&nbsp; Claims Handler</div>
+          </div>
+
+          <div class="claims-body">
+
+            <div class="claims-sidebar">
+              <div class="sidebar-item">&#128202; &nbsp;Dashboard</div>
+              <div class="sidebar-item active">&#128220; &nbsp;Active Claims</div>
+              <div class="sidebar-item">
+                &#128276; &nbsp;Inbox
+                <span class="notification-dot" id="inbox-dot">1</span>
+              </div>
+              <div class="sidebar-item">&#128203; &nbsp;Reports</div>
+              <div class="sidebar-item">&#9881; &nbsp;Settings</div>
+            </div>
+
+            <div class="claims-main">
+
+              <div class="claim-card">
+                <div class="claim-card-header">
+                  <div>
+                    <div class="claim-ref">REF: CLM-2026-047821 &nbsp;|&nbsp; Received today, 09:14</div>
+                    <div class="claim-title">Accidental Damage - Sanitary Ware</div>
+                  </div>
+                  <div class="claim-badge">ACTION REQUIRED</div>
+                </div>
+
+                <div class="fnol-message">
+                  <div class="msg-from">From: Policyholder &nbsp;&bull;&nbsp; Property: 14 Elmwood Close, Bristol</div>
+                  <div class="msg-text">"Hi, I've had an accident in my bathroom. My basin has a large crack running across it and it's leaking underneath. My contractor came out to have a look and mentioned a company called Magicman - he said they specialise in repair over replacement and the results are excellent. I'd love to explore that option if possible. Can I make a claim please? I've attached some photos."</div>
+                </div>
+
+                <div class="photo-label">Attachments (2 photos)</div>
+                <div class="claim-photos">
+                  <img src="data:image/jpeg;base64,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" class="photo-thumb" alt="Damaged basin - photo 1" title="Click to enlarge">
+                  <img src="data:image/jpeg;base64,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" class="photo-thumb" alt="Damaged basin - photo 2" title="Click to enlarge" style="filter:brightness(0.9) saturate(1.1)">
+                </div>
+
+                <div class="claim-fields">
+                  <div class="field-group">
+                    <label>Damage Type</label>
+                    <div class="field-value">Accidental - Sanitary Ware (Ceramic)</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Policy Cover</label>
+                    <div class="field-value">Accidental Damage - Confirmed</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Initial Assessment</label>
+                    <div class="field-value warning">Replacement Recommended</div>
+                  </div>
+                  <div class="field-group">
+                    <label>Estimated Cost</label>
+                    <div class="field-value cost">Replacement: &pound;450 - &pound;800</div>
+                  </div>
+                </div>
+
+                <!-- HANDLER DECISION BUTTONS (STATE 1) -->
+                <div class="decision-buttons pre-enter" id="decision-buttons">
+                  <button class="decision-btn decision-btn--repair" type="button">Authorise Repair</button>
+                  <button class="decision-btn decision-btn--replace" type="button">Authorise Replacement</button>
+                  <button class="decision-btn decision-btn--repudiate" type="button">Repudiate</button>
+                </div>
+
+                <!-- ASK MARV PANEL (STATE 2) -->
+                <div class="ask-marv-panel pre-reveal" id="ask-marv-panel">
+                  <div class="ask-marv-info">
+                    <div class="panel-title">
+                      <img class="marv-icon" src="../assets/marv/marvconfident.png" alt="MARV">
+                      MARV &nbsp;&bull;&nbsp; AI Repair Viability Check
+                    </div>
+                    <div class="panel-sub">Powered by Magicman &bull; Instant surface repair assessment &bull; Integrated into your workflow</div>
+                  </div>
+                  <div class="scene-actions">
+                    <button class="ask-marv-btn" onclick="activateMarv()" id="ask-marv-btn">
+                      Visit the Magicman Website &rarr;
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 1.5: MAGICMAN WEBSITE (two steps) -->
+  <section id="scene-website" class="scene">
+    <div class="scene-inner">
+      <div class="desktop-sim animate-in">
+
+        <!-- Browser chrome -->
+        <div class="desktop-topbar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <div class="desktop-toolbar">
+          <button class="tb-nav">&#8592;</button>
+          <button class="tb-nav">&#8594;</button>
+          <div class="tb-url" id="mm-url">magicman.co.uk</div>
+        </div>
+
+        <!-- Magicman website screenshots -->
+        <div class="mm-views">
+
+          <!-- VIEW 1: Homepage screenshot -->
+          <div class="mm-view active shown" id="mm-view-home">
+            <img class="mm-shot" src="../assets/images/magicman-site-home.jpg" alt="Magicman homepage">
+            <!-- Overlay highlights the Online Estimate button (top right) -->
+            <div class="mm-overlay mm-overlay--estimate" onclick="goToEstimate()" role="button" tabindex="0" aria-label="Online Estimate">
+              <div class="mm-pointer">&#128070;</div>
+            </div>
+          </div>
+
+          <!-- VIEW 2: Online Estimate screenshot -->
+          <div class="mm-view" id="mm-view-estimate">
+            <img class="mm-shot" src="../assets/images/magicman-site-estimate.jpg" alt="Online Estimate page">
+            <!-- Overlay highlights the Client Enquiry card -->
+            <div class="mm-overlay mm-overlay--client" onclick="selectClientEnquiry()" role="button" tabindex="0" aria-label="Client Enquiry">
+              <div class="mm-pointer">&#128070;</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- SCENE 3 AND 4: COMPARISON AND MARV -->
+  <section id="scene-comparison" class="scene">
+    <div class="scene-inner">
+      <div class="compare-wrap">
+        <div class="compare-card compare-card--old">
+          <div class="compare-num">14</div>
+          <div class="compare-label">Days. The old way.</div>
+          <div class="compare-sub">Four people. No resolution.</div>
+        </div>
+        <div class="compare-card compare-card--new">
+          <div class="compare-num">1</div>
+          <div class="compare-label">Day. With Magicman.</div>
+          <div class="compare-sub">One assessment. Instant answer.</div>
+        </div>
+      </div>
+      <div class="s3-marv" id="s3-marv">
+        <img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
+        <div class="s3-marv-bubble">One day versus fourteen. Want to see how I do it?</div>
+        <button class="btn-primary" id="s3-show-me" onclick="goToAssessment()">Show me</button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end stage-wrapper -->
+
+<script>
+// ---- AUDIO (Web Audio API) ----
+var audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+}
+function playTone(freq, duration, type, vol) {
+  if (!audioCtx) { return; }
+  var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = type || 'sine';
+  o.frequency.value = freq;
+  var t = audioCtx.currentTime;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t); o.stop(t + duration + 0.02);
+}
+function playNotificationPing() { playTone(880, 0.1, 'sine', 0.1); setTimeout(function () { playTone(1100, 0.1, 'sine', 0.1); }, 120); }
+function playButtonClick() { playTone(600, 0.05, 'square', 0.05); }
+function playProcessingHum() { playTone(220, 0.3, 'sawtooth', 0.05); setTimeout(function () { playTone(330, 0.3, 'sawtooth', 0.05); }, 200); }
+function playChime() { playTone(880, 0.15, 'sine', 0.1); setTimeout(function () { playTone(1100, 0.2, 'sine', 0.1); }, 150); setTimeout(function () { playTone(1320, 0.3, 'sine', 0.08); }, 300); }
+
+// ---- SCENES ----
+function showScene(id) {
+  document.querySelectorAll('.scene').forEach(function (s) { s.classList.remove('active'); s.style.opacity = 0; });
+  var target = document.getElementById(id);
+  if (target) {
+    target.classList.add('active');
+    setTimeout(function () { target.style.opacity = 1; }, 50);
+  }
+}
+
+// ---- SCENE 1: THE CMS (runs on load) ----
+function runCms() {
+  var caption = document.getElementById('fnol-caption');
+  var toast = document.getElementById('fnol-toast');
+  var buttons = document.getElementById('decision-buttons');
+  var thought = document.getElementById('handler-thought');
+  var panel = document.getElementById('ask-marv-panel');
+  setTimeout(function () { if (caption) { caption.classList.add('visible'); } }, 100);
+  setTimeout(function () { if (toast) { toast.classList.add('visible'); } playNotificationPing(); }, 1500);
+  setTimeout(function () { if (buttons) { buttons.classList.remove('pre-enter'); buttons.classList.add('arrive'); } }, 2000);
+  setTimeout(function () { if (toast) { toast.classList.remove('visible'); } }, 4000);
+  setTimeout(function () { if (buttons) { buttons.classList.add('fade-out'); } }, 6000);
+  setTimeout(function () { if (buttons) { buttons.style.display = 'none'; } }, 6800);
+  setTimeout(function () { if (thought) { thought.style.display = 'block'; void thought.offsetWidth; thought.classList.add('pop-in'); } }, 7200);
+  setTimeout(function () { if (thought) { thought.classList.remove('pop-in'); thought.classList.add('fade-away'); } }, 11200);
+  setTimeout(function () { if (thought) { thought.style.display = 'none'; } if (panel) { panel.classList.remove('pre-reveal'); void panel.offsetWidth; panel.classList.add('revealed'); } }, 12000);
+}
+
+// ---- SCENE 2: THE BROWSER SIMULATION ----
+function activateMarv() {
+  initAudio();
+  playButtonClick();
+  var btn = document.getElementById('ask-marv-btn');
+  if (btn) { btn.textContent = 'Connecting...'; btn.disabled = true; btn.style.opacity = '0.7'; }
+  setTimeout(function () {
+    showSiteView('mm-view-home');
+    var url = document.getElementById('mm-url');
+    if (url) { url.textContent = 'magicman.co.uk'; }
+    showScene('scene-website');
+  }, 400);
+}
+function showSiteView(viewId) {
+  document.querySelectorAll('.mm-view').forEach(function (v) { v.classList.remove('active', 'shown'); });
+  var view = document.getElementById(viewId);
+  if (!view) { return; }
+  view.classList.add('active');
+  void view.offsetWidth;
+  view.classList.add('shown');
+}
+function goToEstimate() {
+  initAudio();
+  playButtonClick();
+  var url = document.getElementById('mm-url');
+  if (url) { url.textContent = 'magicman.co.uk/online-estimate/'; }
+  var home = document.getElementById('mm-view-home');
+  var estimate = document.getElementById('mm-view-estimate');
+  if (home) { home.classList.remove('shown'); }
+  setTimeout(function () {
+    if (home) { home.classList.remove('active'); }
+    if (estimate) { estimate.classList.add('active'); void estimate.offsetWidth; estimate.classList.add('shown'); }
+  }, 450);
+}
+function selectClientEnquiry() {
+  initAudio();
+  playProcessingHum();
+  showScene('scene-comparison');
+  showComparison();
+}
+
+// ---- SCENE 3 + 4: COMPARISON AND MARV ----
+function showComparison() {
+  var cards = document.querySelectorAll('.compare-card');
+  setTimeout(function () { cards.forEach(function (c) { c.classList.add('landed'); }); }, 150);
+  setTimeout(function () {
+    var marv = document.getElementById('s3-marv');
+    if (marv) { marv.classList.add('show'); }
+    playChime();
+  }, 1600);
+}
+function goToAssessment() {
+  initAudio();
+  playButtonClick();
+  setTimeout(function () { window.location.href = 'MM-CE-S4-assessment.html'; }, 180);
+}
+
+// ---- INIT ----
+window.addEventListener('load', function () {
+  var dot = document.getElementById('inbox-dot');
+  if (dot) { setTimeout(function () { dot.style.display = 'inline-block'; }, 500); }
+  runCms();
+});
+</script>
+
+
+
+<!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+<div class="dev-nav" id="dev-nav">
+  <div class="dev-nav__panel">
+    <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+    <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+    <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+    <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
+  </div>
+  <button class="dev-nav__tab" type="button"
+          onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+</div>
+
+</body>
+</html>
