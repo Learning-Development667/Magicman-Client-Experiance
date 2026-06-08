@@ -46,6 +46,29 @@
     }
     .s4-lab.is-on { opacity: 1; }
 
+    /* Clock (ported from the previous Stage 4) */
+    #clock-overlay {
+      position: fixed;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    #clock-overlay.visible { opacity: 1; }
+    .clock-centre {
+      position: absolute; top: 50%; left: 50%;
+      border-radius: 50%; background: #2a1a0a; z-index: 3;
+    }
+    .clock-hand {
+      position: absolute; bottom: 50%; left: 50%;
+      border-radius: 3px 3px 0 0;
+      transform-origin: bottom center;
+      background: #2a1a0a;
+    }
+    .hand-hour   { animation: spinHour   4s   linear infinite; }
+    .hand-minute { animation: spinMinute 1.5s linear infinite; }
+    @keyframes spinHour   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spinMinute { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
     /* Content wrapper */
     .s4-wrap {
       position: relative;
@@ -92,7 +115,6 @@
       font-weight: 800;
       font-size: 26px;
       letter-spacing: 0.06em;
-      text-transform: uppercase;
       color: var(--wasabi);
       text-shadow: 0 0 10px rgba(174, 210, 132, 0.6);
     }
@@ -220,13 +242,20 @@
 
   <!-- Fullscreen transition video -->
   <div class="s4-transition" id="s4-transition">
-    <video id="s4-video" class="s4-video" muted playsinline preload="auto">
+    <video id="s4-video" class="s4-video" playsinline preload="auto">
       <source src="../assets/video/marv_world_transition.mp4" type="video/mp4">
     </video>
   </div>
 
   <!-- MARV's lab background -->
   <div class="s4-lab" id="s4-lab"></div>
+
+  <!-- Background clock, ported from the previous Stage 4 -->
+  <div id="clock-overlay">
+    <div class="clock-hand hand-hour"   id="hand-hour"></div>
+    <div class="clock-hand hand-minute" id="hand-minute"></div>
+    <div class="clock-centre"           id="clock-centre"></div>
+  </div>
 
   <main class="s4-wrap">
     <div class="s4-content is-in" id="s4-content"></div>
@@ -257,12 +286,51 @@
   (function () {
     'use strict';
 
+    /* Audio unlock - resume an AudioContext (using the gesture that navigated
+       here from the previous stage) before the transition video plays, so the
+       browser autoplay policy does not block the video audio. */
+    var audioCtx = null;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { audioCtx = new AC(); }
+    } catch (e) {}
+    function unlockAudio() { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } }
+
     var SPRITES = '../assets/marv/';
     var sprite = document.getElementById('s4-marv-sprite');
     var bubble = document.getElementById('s4-marv-bubble');
     var marvRow = document.getElementById('s4-marv');
     var content = document.getElementById('s4-content');
     var cta = document.getElementById('s4-cta');
+
+    /* ---- Background clock (ported from the previous Stage 4) ----
+       Positioned over the cover-scaled lab background. IMG_W/H are the natural
+       dimensions of the current marv_lab_interior.png so the clock tracks it. */
+    var IMG_W = 1376, IMG_H = 768;
+    var CLOCK_X = 363, CLOCK_Y = 199, CLOCK_R = 52;
+    function positionClock() {
+      var overlay = document.getElementById('clock-overlay');
+      if (!overlay) { return; }
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var scale = Math.max(vw / IMG_W, vh / IMG_H);
+      var offX = (vw - IMG_W * scale) / 2, offY = (vh - IMG_H * scale) / 2;
+      var cx = CLOCK_X * scale, cy = CLOCK_Y * scale, r = CLOCK_R * scale;
+      overlay.style.left = (offX + cx - r) + 'px';
+      overlay.style.top = (offY + cy - r) + 'px';
+      overlay.style.width = (r * 2) + 'px';
+      overlay.style.height = (r * 2) + 'px';
+      var hourH = document.getElementById('hand-hour');
+      var minuteH = document.getElementById('hand-minute');
+      var centre = document.getElementById('clock-centre');
+      var hLen = Math.round(r * 0.68), mLen = Math.round(r * 0.92);
+      var hW = Math.max(3, Math.round(r * 0.13)), mW = Math.max(2, Math.round(r * 0.09)), cR = Math.max(3, Math.round(r * 0.12));
+      hourH.style.height = hLen + 'px'; hourH.style.width = hW + 'px'; hourH.style.marginLeft = -(hW / 2) + 'px';
+      minuteH.style.height = mLen + 'px'; minuteH.style.width = mW + 'px'; minuteH.style.marginLeft = -(mW / 2) + 'px';
+      centre.style.width = (cR * 2) + 'px'; centre.style.height = (cR * 2) + 'px';
+      centre.style.marginLeft = -cR + 'px'; centre.style.marginTop = -cR + 'px';
+    }
+    positionClock();
+    window.addEventListener('resize', positionClock);
 
     function setMarv(emotion, text) {
       if (sprite) { sprite.src = SPRITES + emotion + '.png'; sprite.alt = 'MARV looking ' + emotion; }
@@ -273,8 +341,9 @@
     }
 
     /* ---- Data ---- */
-    var MATERIAL_WORDS = ['ceramic', 'timber', 'uPVC', 'steel', 'marble', 'stone', 'glass', 'enamel'];
-    var DAMAGE_WORDS = ['crack', 'scratch', 'burn', 'chip', 'break', 'gouge', 'stain', 'impact'];
+    /* Generic scan terms only - no material or damage type is ever shown during
+       the flicker. Both scans use these and land on "Match found." */
+    var SCAN_WORDS = ['analysing', 'scanning', 'processing', 'matching', 'calibrating', 'cross-referencing'];
 
     var MATERIAL_CARDS = [
       { img: 'material_china.png', label: 'Vitreous china', correct: true },
@@ -310,21 +379,21 @@
         '<div class="s4-cards" id="s4-cards"></div>';
     }
 
-    function runScan(words, duration, done) {
+    function runScan(done) {
       var el = document.getElementById('s4-scan-text');
       var box = document.getElementById('s4-scanbox');
       var i = 0;
-      var timer = setInterval(function () { el.textContent = words[i % words.length]; i++; }, 70);
+      var timer = setInterval(function () { el.textContent = SCAN_WORDS[i % SCAN_WORDS.length]; i++; }, 70);
       setTimeout(function () {
         clearInterval(timer);
         var delay = 90;
         (function slow() {
-          el.textContent = words[i % words.length]; i++;
+          el.textContent = SCAN_WORDS[i % SCAN_WORDS.length]; i++;
           delay += 70;
           if (delay < 520) { setTimeout(slow, delay); }
-          else { if (box) { box.classList.add('s4-stopped'); } done(); }
+          else { el.textContent = 'Match found.'; if (box) { box.classList.add('s4-stopped'); } done(); }
         })();
-      }, duration);
+      }, 3000);
     }
 
     function showCards(cards, onAnswer) {
@@ -363,7 +432,7 @@
     /* ---- A quiz scene (used for material and damage scans) ---- */
     function runQuiz(opts) {
       fadeSwap(buildScanScene, function () {
-        runScan(opts.words, 3000, function () {
+        runScan(function () {
           setMarv('marvconfident', opts.prompt);
           showCards(opts.cards, function (card, row) {
             if (card.correct) {
@@ -395,6 +464,9 @@
         fired = true;
         if (trans) { trans.classList.add('is-out'); setTimeout(function () { trans.style.display = 'none'; }, 700); }
         document.getElementById('s4-lab').classList.add('is-on');
+        var clock = document.getElementById('clock-overlay');
+        if (clock) { clock.classList.add('visible'); }
+        positionClock();
         marvRow.classList.add('is-on');
         setMarv('marvexcited', 'Right - you have seen the old way. Now let me show you mine.');
         setTimeout(startS42, 2000);
@@ -402,6 +474,7 @@
       if (vid) {
         vid.addEventListener('ended', reveal);
         vid.addEventListener('error', reveal);
+        unlockAudio();
         var p = vid.play();
         if (p && p.catch) { p.catch(function () { reveal(); }); }
         setTimeout(reveal, 20000); // safety net
@@ -413,7 +486,6 @@
     /* ---- S4-2: material scan ---- */
     function startS42() {
       runQuiz({
-        words: MATERIAL_WORDS,
         cards: MATERIAL_CARDS,
         prompt: 'I have narrowed it down. But let us see if you can spot it too.',
         success: 'Vitreous china. Good eye. I have worked with this surface ten thousand times.',
@@ -424,7 +496,6 @@
     /* ---- S4-3: damage scan ---- */
     function startS43() {
       runQuiz({
-        words: DAMAGE_WORDS,
         cards: DAMAGE_CARDS,
         prompt: 'I already know what this is. But it might be fun for you to have a go.',
         success: 'Correct. Severe impact damage. Portion of the basin wall lost. I have seen this before - and I know exactly what it takes to fix it.',
