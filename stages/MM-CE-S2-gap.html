@@ -25,7 +25,7 @@
       width: 100%;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 16px 24px 80px;
+      padding: 16px 24px 64px;
     }
 
     .gap-back {
@@ -34,43 +34,57 @@
       font-size: 14px;
     }
 
-    /* ---------- Three-zone composition ----------
-       Left: MARV (small, supporting). Centre: day counter (hero).
-       Right: the email chain. */
+    /* Full-width stage header */
+    .stage-header { width: 100%; margin: 6px 0 26px; }
+    .stage-header__title {
+      margin: 0 0 10px;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      color: var(--white);
+    }
+    .stage-header__rule { height: 2px; width: 100%; background: var(--wasabi); }
+
+    /* ---------- Three column composition ---------- */
     .gap-grid {
       display: grid;
-      grid-template-columns: 20% 34% 46%;
-      gap: 24px;
-      align-items: start;
-      min-height: 70vh;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 28px;
+      align-items: stretch;
+      min-height: 65vh;
     }
 
-    /* Left zone - MARV, smaller and supporting, anchored top-left */
-    .gap-marv-col { position: sticky; top: 96px; align-self: start; }
-    .gap-marv-col .marv { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-    .gap-marv-col .marv-sprite { width: 104px; height: auto; }
+    /* Left column - MARV, medium and with breathing room; button centred */
+    .gap-marv-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      padding-top: 8px;
+    }
+    .gap-marv-col .marv { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .gap-marv-col .marv-sprite { width: 160px; height: auto; }
     .gap-marv-col .marv-bubble { max-width: 100%; }
-    #gap-cta-zone { margin-top: 18px; }
 
-    /* Centre zone - day counter locked as the hero. A fixed-height box centres
-       it vertically so it never drifts before, during, or after the chain. */
+    /* Centre column - the day counter, locked and vertically centred */
     .gap-day-col {
-      position: relative;
-      height: 65vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
     }
-    .day-counter {
-      position: relative;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      perspective: 700px;
-    }
+    .day-counter { opacity: 0; transition: opacity 0.6s ease; perspective: 700px; }
     .day-counter.is-on { opacity: 1; }
+    .day-counter__label {
+      display: block;
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-variant: small-caps;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
     .day-counter__num {
       display: block;
       font-family: 'Open Sans', sans-serif;
@@ -81,108 +95,45 @@
       color: var(--wasabi);
       transform-origin: center;
     }
-    .day-counter__label {
-      display: block;
-      margin-top: 8px;
-      font-size: 18px;
-      font-style: italic;
-      color: var(--white);
-    }
     .day-counter__num.flip { animation: dayFlip 0.6s ease; }
-    .day-counter__num.reset { animation: dayReset 0.9s ease; }
     @keyframes dayFlip {
       0% { transform: rotateX(0deg); }
       45% { transform: rotateX(90deg); opacity: 0.25; }
       55% { transform: rotateX(-90deg); opacity: 0.25; }
       100% { transform: rotateX(0deg); opacity: 1; }
     }
-    @keyframes dayReset {
-      0% { transform: scale(1); text-shadow: none; }
-      30% { transform: scale(1.55); text-shadow: 0 0 24px rgba(174, 210, 132, 0.9), 0 0 52px rgba(174, 210, 132, 0.7); }
-      100% { transform: scale(1); text-shadow: none; }
-    }
 
-    /* Wasabi flash behind the counter on the dramatic reset */
-    .day-flash {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 280px;
-      height: 280px;
-      margin: -140px 0 0 -140px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(174, 210, 132, 0.6), rgba(174, 210, 132, 0));
-      opacity: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .day-flash.go { animation: dayFlash 0.9s ease; }
-    @keyframes dayFlash {
-      0% { opacity: 0; transform: scale(0.5); }
-      25% { opacity: 1; transform: scale(1.1); }
-      100% { opacity: 0; transform: scale(1.7); }
-    }
-
-    /* Right zone - fixed height stack that never scrolls; newest anchored
-       to the bottom at full size, older ones compress upward above it. */
+    /* Right column - fixed height, emails build top-down, scroll inside only */
     #email-chain {
       height: 65vh;
       overflow-x: hidden;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
 
-    /* Email cards */
     .email {
       background: var(--white);
       color: #333333;
       border-left: 4px solid #999999;
       border-radius: 4px;
       padding: 14px 16px;
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       width: 100%;
       max-width: 560px;
-      max-height: 360px;
-      overflow: hidden;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
       opacity: 0;
       transform: translateY(28px);
-      transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, background 0.4s ease-out;
     }
     .email.is-in { animation: emailDrop 0.4s ease-out forwards; }
-    .email.is-out { animation: emailOut 0.4s ease forwards; }
     @keyframes emailDrop {
       0% { opacity: 0; transform: translateY(28px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    @keyframes emailOut {
-      0% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(440px); }
-    }
-    /* emailIn is retained for the MARV assessment card entrance */
-    @keyframes emailIn {
-      0% { opacity: 0; transform: translateX(60px); }
-      100% { opacity: 1; transform: translateX(0); }
-    }
 
-    /* Compressed summary line - sender, role and subject on one line */
-    .email__compact {
-      display: none;
-      font-size: 12px;
-      color: var(--navy);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 20px;
-    }
-    .email.is-compressed { max-height: 36px; padding-top: 8px; padding-bottom: 8px; margin-bottom: 6px; }
-    .email.is-compressed .email__full { display: none; }
-    .email.is-compressed .email__compact { display: block; }
-
-    /* Mrs Howard - the customer - warm tint at full size; border kept compressed */
-    .email.is-customer:not(.is-compressed) { background: #FFF5F5; }
+    /* Mrs Howard - the customer - warm tint */
+    .email.is-customer { background: #FFF5F5; }
 
     .email__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .email__from { font-weight: 700; color: var(--navy); font-size: 14px; }
@@ -192,34 +143,7 @@
     .email__subject { font-style: italic; font-size: 13px; color: #555555; margin: 8px 0 6px; }
     .email__body { font-size: 13px; color: #333333; line-height: 1.5; margin: 0; }
 
-    /* The MARV assessment card - styled apart from the emails */
-    .marv-card {
-      background: var(--navy);
-      color: var(--wasabi);
-      border: 1px solid rgba(174, 210, 132, 0.4);
-      border-radius: 8px;
-      padding: 24px 28px;
-      margin: 6px auto 0;
-      max-width: 560px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      opacity: 0;
-      transform: translateX(60px);
-    }
-    .marv-card.is-in { animation: emailIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .marv-card h3 { margin: 0 0 14px; font-size: 20px; font-weight: 800; color: var(--wasabi); }
-    .marv-card__row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 7px 0;
-      font-size: 15px;
-      border-bottom: 1px solid rgba(174, 210, 132, 0.18);
-    }
-    .marv-card__row:last-child { border-bottom: none; }
-    .marv-card__row span:first-child { opacity: 0.8; }
-    .marv-card__row span:last-child { font-weight: 700; }
-
-    /* Action buttons - start, better way, submit */
+    /* Action buttons */
     .gap-cta {
       background: var(--wasabi);
       color: var(--navy);
@@ -235,6 +159,7 @@
     }
     .gap-cta.is-in { opacity: 1; }
     .gap-cta:hover { transform: translateY(-2px); }
+    .gap-cta--wide { padding: 16px 72px; font-size: 20px; }
     /* Attention-grab pulse for the start button; removed once clicked */
     .gap-cta--pulse { animation: ctaPulse 1.4s ease-in-out infinite; }
     @keyframes ctaPulse {
@@ -242,15 +167,16 @@
       50% { box-shadow: 0 0 20px 7px rgba(174, 210, 132, 0.85); }
     }
 
+    /* Bottom - full-width button zone below the three columns */
+    .gap-bottom { text-align: center; margin-top: 30px; min-height: 60px; }
+
     /* ---------- Mobile ---------- */
     body.device-mobile .gap-grid { grid-template-columns: 1fr; min-height: 0; }
-    body.device-mobile .gap-marv-col,
-    body.device-mobile .gap-day-col { position: static; align-self: start; }
-    body.device-mobile .gap-marv-col .marv { flex-direction: row; align-items: center; }
+    body.device-mobile .gap-day-col { padding: 24px 0; }
     body.device-mobile .day-counter__num { font-size: 56px; }
-    body.device-mobile .email,
-    body.device-mobile .marv-card { max-width: 100%; }
+    body.device-mobile .email { max-width: 100%; }
     body.device-mobile .gap-cta { width: 100%; }
+    body.device-mobile .gap-cta--wide { padding: 16px 0; }
   </style>
 </head>
 <body>
@@ -276,34 +202,40 @@
 
     <a class="btn btn-ghost gap-back" href="MM-CE-S1-claim.html">Back to Stage 1</a>
 
-    <section class="gap-stage">
-      <div class="gap-grid">
+    <!-- Full-width stage header -->
+    <div class="stage-header">
+      <h1 class="stage-header__title">The Decision Gap.</h1>
+      <div class="stage-header__rule"></div>
+    </div>
 
-        <!-- Left zone - MARV (small, supporting) and the action buttons -->
-        <div class="gap-marv-col">
-          <div class="marv">
-            <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
-            <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
-          </div>
-          <div id="gap-cta-zone"></div>
+    <div class="gap-grid">
+
+      <!-- Left column - MARV and the start button -->
+      <div class="gap-marv-col">
+        <div class="marv">
+          <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
+          <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
         </div>
-
-        <!-- Centre zone - the day counter, the hero -->
-        <div class="gap-day-col">
-          <div class="day-flash" id="day-flash"></div>
-          <div class="day-counter" id="day-counter" aria-live="polite">
-            <span class="day-counter__num" id="day-num">Day 1</span>
-            <span class="day-counter__label" id="day-label">and counting...</span>
-          </div>
-        </div>
-
-        <!-- Right zone - the email chain -->
-        <div class="gap-email-col">
-          <div id="email-chain"></div>
-        </div>
-
+        <div id="gap-cta-zone"></div>
       </div>
-    </section>
+
+      <!-- Centre column - the day counter, the hero -->
+      <div class="gap-day-col">
+        <div class="day-counter" id="day-counter" aria-live="polite">
+          <span class="day-counter__label">Days without resolution</span>
+          <span class="day-counter__num" id="day-num">Day 1</span>
+        </div>
+      </div>
+
+      <!-- Right column - the email chain -->
+      <div class="gap-email-col">
+        <div id="email-chain"></div>
+      </div>
+
+    </div>
+
+    <!-- Bottom - full-width better-way button -->
+    <div class="gap-bottom" id="gap-bottom"></div>
 
   </main>
 
@@ -405,11 +337,9 @@
 
     var dayCounter = document.getElementById('day-counter');
     var dayNum = document.getElementById('day-num');
-    var dayLabel = document.getElementById('day-label');
-    var dayFlash = document.getElementById('day-flash');
     var chain = document.getElementById('email-chain');
     var ctaZone = document.getElementById('gap-cta-zone');
-    var emailEls = [];
+    var bottomZone = document.getElementById('gap-bottom');
 
     // Flip the number like a mechanical departure board on each update.
     function setDay(n) {
@@ -425,69 +355,52 @@
       card.className = 'email' + (e.customer ? ' is-customer' : '');
       card.style.borderLeftColor = e.colour;
       card.innerHTML =
-        '<div class="email__compact">' + e.from + ' (' + e.role + ') - ' + e.subject + '</div>' +
-        '<div class="email__full">' +
-          '<div class="email__head">' +
-            '<span><span class="email__from">' + e.from + '</span> ' +
-            '<span class="email__role">(' + e.role + ')</span></span>' +
-            '<span class="email__time">Day ' + e.day + ', ' + e.time + '</span>' +
-          '</div>' +
-          '<div class="email__to">To: ' + e.to + '</div>' +
-          '<div class="email__subject">' + e.subject + '</div>' +
-          '<p class="email__body">' + e.body + '</p>' +
-        '</div>';
-      return card;
-    }
-
-    function buildMarvCard() {
-      var card = document.createElement('div');
-      card.className = 'marv-card';
-      card.innerHTML =
-        '<h3>MARV Assessment - vitreous china basin</h3>' +
-        '<div class="marv-card__row"><span>Damage</span><span>chip and crack</span></div>' +
-        '<div class="marv-card__row"><span>Surface</span><span>repairable</span></div>' +
-        '<div class="marv-card__row"><span>Confidence</span><span>high</span></div>' +
-        '<div class="marv-card__row"><span>Estimated repair time</span><span>2 to 3 hours</span></div>' +
-        '<div class="marv-card__row"><span>Response time</span><span>instant</span></div>';
+        '<div class="email__head">' +
+          '<span><span class="email__from">' + e.from + '</span> ' +
+          '<span class="email__role">(' + e.role + ')</span></span>' +
+          '<span class="email__time">Day ' + e.day + ', ' + e.time + '</span>' +
+        '</div>' +
+        '<div class="email__to">To: ' + e.to + '</div>' +
+        '<div class="email__subject">' + e.subject + '</div>' +
+        '<p class="email__body">' + e.body + '</p>';
       return card;
     }
 
     /* ---- Buttons ---- */
-    function showButton(label, onClick, pulse) {
-      ctaZone.innerHTML = '';
+    function showButton(zone, label, onClick, pulse, wide) {
+      zone.innerHTML = '';
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'gap-cta' + (pulse ? ' gap-cta--pulse' : '');
+      btn.className = 'gap-cta' + (wide ? ' gap-cta--wide' : '') + (pulse ? ' gap-cta--pulse' : '');
       btn.textContent = label;
       btn.addEventListener('click', function () {
         SFX.resume(); // this click is the gesture that unlocks audio
         btn.classList.remove('gap-cta--pulse'); // stop the pulse once clicked
         onClick();
       });
-      ctaZone.appendChild(btn);
+      zone.appendChild(btn);
       void btn.offsetWidth;
       btn.classList.add('is-in');
       return btn;
     }
 
-    /* ---- Trigger 1: load state - nothing plays until clicked ---- */
+    /* ---- Opening state - nothing plays until the start button is clicked ---- */
     function boot() {
       dayNum.textContent = 'Day 1';
-      dayCounter.classList.add('is-on'); // day counter is the hero from the start
+      dayCounter.classList.add('is-on'); // counter is the hero from the start
       gapMarv('marvwincing', 'Before MARV, this is what happened next.', 'default');
-      showButton('See what happens next', startChain, true);
+      showButton(ctaZone, 'See what happens next', startChain, true, false);
     }
 
-    /* ---- The inbox builds automatically once started ---- */
+    /* ---- The inbox builds top-down ---- */
     function startChain() {
       ctaZone.innerHTML = '';
       gapMarv('marvwincing'); // uneasy throughout, drop the bubble while it builds
       EMAILS.forEach(function (e, i) {
         setTimeout(function () {
-          emailEls.forEach(function (c) { c.classList.add('is-compressed'); });
           var card = buildEmail(e);
           chain.appendChild(card);
-          emailEls.push(card);
+          chain.scrollTop = chain.scrollHeight; // keep the newest in view
           setDay(e.day);
           void card.offsetWidth;
           card.classList.add('is-in');
@@ -495,72 +408,26 @@
         }, 600 + i * 1800);
       });
       var lastAt = 600 + (EMAILS.length - 1) * 1800; // Day 14 arrives
-      setTimeout(afterEmails, lastAt + 2000);        // pause 2s after it lands
+      setTimeout(closing, lastAt + 1000);            // pause one second after it lands
     }
 
-    /* ---- Trigger 2: the pause, then the second button ---- */
-    function afterEmails() {
+    /* ---- Closing state ---- */
+    function closing() {
       gapMarv('marvalarmed',
         'Fourteen days. Four people. One customer still waiting. This is the decision gap.',
         'default');
       SFX.alert();
-      setTimeout(function () { showButton("There's a better way", resolve); }, 1500);
-    }
-
-    function resolve() {
-      ctaZone.innerHTML = '';
-      emailEls.forEach(function (card, i) {
-        setTimeout(function () { card.classList.add('is-out'); }, i * 80);
-      });
-      var goneAt = (emailEls.length - 1) * 80 + 600;
-      setTimeout(showAssessment, goneAt);
-    }
-
-    /* ---- The MARV resolution ---- */
-    function showAssessment() {
-      emailEls.forEach(function (c) { if (c.parentNode) { c.parentNode.removeChild(c); } });
-      chain.style.justifyContent = 'center';
-      chain.style.alignItems = 'center';
-
-      gapMarv('marvtriumphant', 'Here is what happens when you use MARV instead.', 'default');
-      dramaticDayReset();
-
-      var card = buildMarvCard();
-      chain.appendChild(card);
-      setTimeout(function () { card.classList.add('is-in'); SFX.ping(); }, 700);
-
       setTimeout(function () {
-        gapMarv('marvtriumphant',
-          'Same claim. Same damage. Instant answer. No site visits. No waiting. No uncertainty. And Mrs Howard gets her bathroom back.',
-          'default');
-        SFX.chime();
-      }, 2400);
-
-      setTimeout(showSubmit, 2400 + 2000);
+        showButton(bottomZone, "There's a better way", transitionOut, false, true);
+      }, 800);
     }
 
-    // Day counter dramatically resets to Day 1 with a wasabi flash and flourish.
-    function dramaticDayReset() {
-      dayNum.textContent = 'Day 1';
-      dayLabel.textContent = 'Response time';
-      dayCounter.classList.add('is-on');
-      if (dayFlash) {
-        dayFlash.classList.remove('go');
-        void dayFlash.offsetWidth;
-        dayFlash.classList.add('go');
-      }
-      dayNum.classList.remove('flip', 'reset');
-      void dayNum.offsetWidth;
-      dayNum.classList.add('reset');
+    /* ---- Transition out to Stage 3 ---- */
+    function transitionOut() {
+      bottomZone.innerHTML = '';
+      gapMarv('marvconfident', 'Let me show you what happens when you do this properly.', 'default');
       SFX.chime();
-    }
-
-    function showSubmit() {
-      var btn = showButton('Submit the Claim', function () {
-        SFX.chime();
-        setTimeout(function () { window.location.href = 'MM-CE-S3-assessment.html'; }, 180);
-      });
-      return btn;
+      setTimeout(function () { window.location.href = 'MM-CE-S3-assessment.html'; }, 2200);
     }
 
     if (document.readyState === 'loading') {
