@@ -116,6 +116,7 @@
       white-space: nowrap;
       color: var(--wasabi);
       transform-origin: center;
+      transition: color 0.5s ease;
     }
     .day-counter__num.flip { animation: dayFlip 0.6s ease; }
     @keyframes dayFlip {
@@ -360,9 +361,25 @@
     var ctaZone = document.getElementById('gap-cta-zone');
     var betterZone = document.getElementById('gap-better-zone');
 
+    // Interpolate the counter colour: green (Day 1) -> amber (Day 7) -> red (Day 14).
+    function dayColour(n) {
+      var green = { r: 174, g: 210, b: 132 }; // #AED284
+      var amber = { r: 255, g: 165, b: 0 };   // #FFA500
+      var red   = { r: 255, g: 68,  b: 68 };  // #FF4444
+      var d = Math.max(1, Math.min(14, n));
+      var from, to, t;
+      if (d <= 7) { from = green; to = amber; t = (d - 1) / 6; }
+      else { from = amber; to = red; t = (d - 7) / 7; }
+      var r = Math.round(from.r + (to.r - from.r) * t);
+      var g = Math.round(from.g + (to.g - from.g) * t);
+      var b = Math.round(from.b + (to.b - from.b) * t);
+      return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+    }
+
     // Flip the number like a mechanical departure board on each update.
     function setDay(n) {
       dayNum.textContent = 'Day ' + n;
+      dayNum.style.color = dayColour(n);
       dayCounter.classList.add('is-on');
       dayNum.classList.remove('flip');
       void dayNum.offsetWidth;
