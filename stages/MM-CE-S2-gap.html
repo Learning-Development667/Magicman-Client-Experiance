@@ -67,13 +67,35 @@
     .gap-marv-col .marv-sprite { width: 160px; height: auto; }
     .gap-marv-col .marv-bubble { max-width: 100%; }
 
-    /* Centre column - the day counter, locked and vertically centred */
+    /* Centre column - the day counter, locked and vertically centred.
+       Subtle lighter panel separates it from the navy on either side. */
     .gap-day-col {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 28px 24px;
+    }
+
+    /* Dark card that anchors the counter so it no longer floats on the navy */
+    .day-card {
+      background: rgba(0, 0, 0, 0.22);
+      border: 2px solid #AED284;
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    /* Reserve space so the counter card never shifts when the button appears */
+    #gap-better-zone {
+      width: 100%;
+      min-height: 110px;
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .day-counter { opacity: 0; transition: opacity 0.6s ease; perspective: 700px; }
     .day-counter.is-on { opacity: 1; }
@@ -159,16 +181,14 @@
     }
     .gap-cta.is-in { opacity: 1; }
     .gap-cta:hover { transform: translateY(-2px); }
-    .gap-cta--wide { padding: 16px 72px; font-size: 20px; }
-    /* Attention-grab pulse for the start button; removed once clicked */
+    /* Large hero button below the counter card, full width of the centre column */
+    .gap-cta--hero { width: 100%; min-height: 80px; font-size: 24px; padding: 14px 24px; }
+    /* Attention-grab pulse animation; removed once clicked */
     .gap-cta--pulse { animation: ctaPulse 1.4s ease-in-out infinite; }
     @keyframes ctaPulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(174, 210, 132, 0.55); }
       50% { box-shadow: 0 0 20px 7px rgba(174, 210, 132, 0.85); }
     }
-
-    /* Bottom - full-width button zone below the three columns */
-    .gap-bottom { text-align: center; margin-top: 30px; min-height: 60px; }
 
     /* ---------- Mobile ---------- */
     body.device-mobile .gap-grid { grid-template-columns: 1fr; min-height: 0; }
@@ -176,7 +196,6 @@
     body.device-mobile .day-counter__num { font-size: 56px; }
     body.device-mobile .email { max-width: 100%; }
     body.device-mobile .gap-cta { width: 100%; }
-    body.device-mobile .gap-cta--wide { padding: 16px 0; }
   </style>
 </head>
 <body>
@@ -219,12 +238,15 @@
         <div id="gap-cta-zone"></div>
       </div>
 
-      <!-- Centre column - the day counter, the hero -->
+      <!-- Centre column - the day counter (the hero) and the better-way button -->
       <div class="gap-day-col">
-        <div class="day-counter" id="day-counter" aria-live="polite">
-          <span class="day-counter__label">Days without resolution</span>
-          <span class="day-counter__num" id="day-num">Day 1</span>
+        <div class="day-card">
+          <div class="day-counter" id="day-counter" aria-live="polite">
+            <span class="day-counter__label">Days without resolution</span>
+            <span class="day-counter__num" id="day-num">Day 1</span>
+          </div>
         </div>
+        <div id="gap-better-zone"></div>
       </div>
 
       <!-- Right column - the email chain -->
@@ -233,9 +255,6 @@
       </div>
 
     </div>
-
-    <!-- Bottom - full-width better-way button -->
-    <div class="gap-bottom" id="gap-bottom"></div>
 
   </main>
 
@@ -339,7 +358,7 @@
     var dayNum = document.getElementById('day-num');
     var chain = document.getElementById('email-chain');
     var ctaZone = document.getElementById('gap-cta-zone');
-    var bottomZone = document.getElementById('gap-bottom');
+    var betterZone = document.getElementById('gap-better-zone');
 
     // Flip the number like a mechanical departure board on each update.
     function setDay(n) {
@@ -367,11 +386,11 @@
     }
 
     /* ---- Buttons ---- */
-    function showButton(zone, label, onClick, pulse, wide) {
+    function showButton(zone, label, onClick, pulse, extraClass) {
       zone.innerHTML = '';
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'gap-cta' + (wide ? ' gap-cta--wide' : '') + (pulse ? ' gap-cta--pulse' : '');
+      btn.className = 'gap-cta' + (extraClass ? ' ' + extraClass : '') + (pulse ? ' gap-cta--pulse' : '');
       btn.textContent = label;
       btn.addEventListener('click', function () {
         SFX.resume(); // this click is the gesture that unlocks audio
@@ -389,7 +408,7 @@
       dayNum.textContent = 'Day 1';
       dayCounter.classList.add('is-on'); // counter is the hero from the start
       gapMarv('marvwincing', 'Before MARV, this is what happened next.', 'default');
-      showButton(ctaZone, 'See what happens next', startChain, true, false);
+      showButton(ctaZone, 'See what happens next', startChain, true, '');
     }
 
     /* ---- The inbox builds top-down ---- */
@@ -418,13 +437,13 @@
         'default');
       SFX.alert();
       setTimeout(function () {
-        showButton(bottomZone, "There's a better way", transitionOut, false, true);
+        showButton(betterZone, "There's a better way", transitionOut, true, 'gap-cta--hero');
       }, 800);
     }
 
     /* ---- Transition out to Stage 3 ---- */
     function transitionOut() {
-      bottomZone.innerHTML = '';
+      betterZone.innerHTML = '';
       gapMarv('marvconfident', 'Let me show you what happens when you do this properly.', 'default');
       SFX.chime();
       setTimeout(function () { window.location.href = 'MM-CE-S3-assessment.html'; }, 2200);
