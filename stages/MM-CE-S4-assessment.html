@@ -6,6 +6,7 @@
   <title>Magicman | The Repair Journey - Stage 4 Assessment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
   <!-- Shared shell stylesheet + device detection, loaded before this stage's own
        <style> so the stage's bespoke styles win the cascade. -->
   <link rel="stylesheet" href="../css/main.css">
@@ -145,16 +146,13 @@
     .s4-card-img { width: 100%; height: 96px; object-fit: cover; border-radius: 6px; background: rgba(0, 0, 0, 0.2); }
     .s4-card-label { margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--white); }
 
-    /* Verdict card */
+    /* Verdict card (shares the glow-card border treatment below) */
     .s4-verdict {
       background: rgba(0, 0, 0, 0.28);
-      border: 2px solid var(--wasabi);
-      border-radius: 12px;
       padding: 28px 32px;
       max-width: 560px;
       margin: 0 auto;
       text-align: left;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
     .s4-verdict-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; color: var(--wasabi); }
     .s4-verdict-row {
@@ -168,6 +166,64 @@
     .s4-verdict-row span:first-child { opacity: 0.8; }
     .s4-verdict-row span:last-child { font-weight: 700; text-align: right; }
     .s4-verdict-verdict { margin-top: 18px; font-size: 40px; font-weight: 800; color: var(--wasabi); text-align: center; }
+
+    /* ---- Glow-card border treatment (stat cards + verdict) - a warm
+       diagnostic-readout look from MARV's lab: wasabi border, glow pulse,
+       and a faint trace running around the edge. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-stat, .s4-verdict {
+      position: relative;
+      border: 2px solid #AED284;
+      border-radius: 16px;
+      box-shadow: 0 0 8px rgba(174, 210, 132, 0.22), inset 0 0 12px rgba(174, 210, 132, 0.06);
+      animation: s4Glow 2.6s ease-in-out infinite;
+    }
+    .s4-stat::before, .s4-verdict::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+                  rgba(174, 210, 132, 0) 0deg,
+                  rgba(174, 210, 132, 0) 290deg,
+                  #AED284 335deg,
+                  rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes s4Glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(174, 210, 132, 0.22), inset 0 0 12px rgba(174, 210, 132, 0.06); }
+      50% { box-shadow: 0 0 22px rgba(174, 210, 132, 0.5), inset 0 0 18px rgba(174, 210, 132, 0.12); }
+    }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
+
+    /* ---- S4-intro stat cards ---- */
+    .s4-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .s4-stat {
+      width: 220px;
+      padding: 22px 20px;
+      text-align: center;
+      background: rgba(6, 14, 26, 0.5);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .s4-stat.is-in { opacity: 1; transform: scale(1); }
+    .s4-stat__icon { font-size: 40px; line-height: 1; color: var(--wasabi); }
+    .s4-stat__h { margin: 12px 0 6px; font-size: 28px; font-weight: 800; color: var(--white); }
+    .s4-stat__sub { font-size: 13px; color: rgba(255, 255, 255, 0.75); line-height: 1.45; }
+
+    /* Pulsing wasabi glow for the Run-the-assessment button */
+    .s4-btn--pulse { animation: s4BtnPulse 1.4s ease-in-out infinite; }
+    @keyframes s4BtnPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(174, 210, 132, 0.55); }
+      50% { box-shadow: 0 0 20px 7px rgba(174, 210, 132, 0.85); }
+    }
 
     /* MARV row */
     .s4-marv {
@@ -219,6 +275,7 @@
     body.device-mobile .s4-marv { flex-direction: column; }
     body.device-mobile .s4-marv-sprite { width: 100px; }
     body.device-mobile .s4-verdict-verdict { font-size: 32px; }
+    body.device-mobile .s4-stat { width: 100%; max-width: 280px; }
   </style>
 </head>
 <body>
@@ -469,7 +526,7 @@
         positionClock();
         marvRow.classList.add('is-on');
         setMarv('marvexcited', 'Right - you have seen the old way. Now let me show you mine.');
-        setTimeout(startS42, 2000);
+        setTimeout(startIntro, 2000);
       }
       if (vid) {
         vid.addEventListener('ended', reveal);
@@ -481,6 +538,53 @@
       } else {
         reveal();
       }
+    }
+
+    /* ---- S4-intro: MARV introduces himself ---- */
+    function statCard(icon, h, sub) {
+      return '<div class="s4-stat">' +
+        '<i class="ti ' + icon + ' s4-stat__icon"></i>' +
+        '<div class="s4-stat__h">' + h + '</div>' +
+        '<div class="s4-stat__sub">' + sub + '</div>' +
+        '</div>';
+    }
+
+    function startIntro() {
+      setMarv('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
+      setTimeout(introBeat2, 2000);
+    }
+    function introBeat2() {
+      setMarv('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
+      setTimeout(introBeat3, 2000);
+    }
+    function introBeat3() {
+      content.innerHTML = '<div class="s4-stats">' +
+        statCard('ti-clock', '35+ Years', 'of Magicman craft intelligence, built in') +
+        statCard('ti-calendar', '24/7', 'available, no capacity limits, no waiting') +
+        statCard('ti-bolt', 'Minutes', 'from photo to viability decision') +
+        '</div>';
+      var cards = content.querySelectorAll('.s4-stat');
+      Array.prototype.forEach.call(cards, function (card, i) {
+        setTimeout(function () { card.classList.add('is-in'); }, i * 500);
+      });
+      // last card revealed at 1000ms, 0.5s entrance, then a 1s pause
+      setTimeout(introBeat4, 1000 + 500 + 1000);
+    }
+    function introBeat4() {
+      setMarv('marvconfident', 'Every decision I make is reviewed by a Magicman expert. When they agree, I learn. When they know better, I learn faster.');
+      setTimeout(introBeat5, 2000);
+    }
+    function introBeat5() {
+      setMarv('marvtriumphant', 'Right. Let us look at that claim.');
+      cta.innerHTML = '';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 's4-btn s4-btn--pulse';
+      b.textContent = 'Run the assessment';
+      b.addEventListener('click', function () { cta.innerHTML = ''; startS42(); });
+      cta.appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('is-in');
     }
 
     /* ---- S4-2: material scan ---- */
