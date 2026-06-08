@@ -1726,7 +1726,21 @@ function initAudio() {
   if (!audioCtx) {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
   }
+  if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
 }
+// Unlock the AudioContext on the first user interaction. Browser autoplay
+// policy does not carry the navigation gesture from the previous stage across
+// pages, so the first interaction here (e.g. the "Visit the Magicman Website"
+// button click) resumes the context.
+function unlockAudioOnce() {
+  initAudio();
+  document.removeEventListener('pointerdown', unlockAudioOnce);
+  document.removeEventListener('keydown', unlockAudioOnce);
+  document.removeEventListener('touchstart', unlockAudioOnce);
+}
+document.addEventListener('pointerdown', unlockAudioOnce);
+document.addEventListener('keydown', unlockAudioOnce);
+document.addEventListener('touchstart', unlockAudioOnce);
 function playTone(freq, duration, type, vol) {
   if (!audioCtx) { return; }
   var o = audioCtx.createOscillator(), g = audioCtx.createGain();
