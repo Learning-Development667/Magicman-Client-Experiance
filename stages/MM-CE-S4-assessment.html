@@ -279,6 +279,8 @@
       transition: opacity 0.4s ease;
     }
     .s4-marv-bubble.is-on { opacity: 1; }
+    .s4-marv-bubble:empty { display: none; }
+    .s4-marv-bubbles { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 
     /* Buttons */
     .s4-cta { margin-top: 26px; text-align: center; min-height: 56px; }
@@ -351,7 +353,9 @@
       <div class="s4-marv-sprite-frame">
         <img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV">
       </div>
-      <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      <div class="s4-marv-bubbles" id="s4-marv-bubbles">
+        <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      </div>
     </div>
     <div class="s4-cta" id="s4-cta"></div>
   </main>
@@ -596,12 +600,24 @@
         '</div>';
     }
 
+    // Intro bubbles stack: update the sprite and add a new bubble below the
+    // previous ones without removing any.
+    function introBeat(emotion, text) {
+      var img = document.getElementById('s4-marv-sprite');
+      if (img) { img.src = SPRITES + emotion + '.png'; img.alt = 'MARV looking ' + emotion; }
+      var b = document.createElement('div');
+      b.className = 's4-marv-bubble s4-intro-bubble';
+      b.textContent = text;
+      document.getElementById('s4-marv-bubbles').appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('is-on');
+    }
     function startIntro() {
-      setMarv('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
+      introBeat('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
       setTimeout(introBeat2, 2000);
     }
     function introBeat2() {
-      setMarv('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
+      introBeat('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
       setTimeout(introBeat3, 2000);
     }
     function introBeat3() {
@@ -618,17 +634,24 @@
       setTimeout(introBeat4, 1000 + 500 + 1000);
     }
     function introBeat4() {
-      setMarv('marvconfident', 'Every decision I make is reviewed by a Magicman expert. When they agree, I learn. When they know better, I learn faster.');
+      introBeat('marvconfident', 'Every decision I make is reviewed by a Magicman expert. When they agree, I learn. When they know better, I learn faster.');
       setTimeout(introBeat5, 2000);
     }
     function introBeat5() {
-      setMarv('marvtriumphant', 'Right. Let us look at that claim.');
+      introBeat('marvtriumphant', 'Right. Let us look at that claim.');
       cta.innerHTML = '';
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 's4-btn s4-btn--pulse';
       b.textContent = 'Run the assessment';
-      b.addEventListener('click', function () { cta.innerHTML = ''; startS42(); });
+      b.addEventListener('click', function () {
+        cta.innerHTML = '';
+        // Clear the stacked intro bubbles before the scan scenes (which use a single bubble).
+        Array.prototype.forEach.call(document.querySelectorAll('.s4-intro-bubble'), function (el) {
+          if (el.parentNode) { el.parentNode.removeChild(el); }
+        });
+        startS42();
+      });
       cta.appendChild(b);
       void b.offsetWidth;
       b.classList.add('is-in');
