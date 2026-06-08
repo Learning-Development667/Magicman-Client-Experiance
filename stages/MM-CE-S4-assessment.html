@@ -442,10 +442,10 @@
       { img: 'material_marble.png', label: 'Marble', wrong: 'Marble has natural veining and a cold feel. This is a manufactured ceramic surface.' }
     ];
     var DAMAGE_CARDS = [
-      { img: 'damage_chip.png', label: 'Impact chip', correct: true },
-      { img: 'damage_scratch.png', label: 'Surface scratch', wrong: 'A scratch leaves a shallow linear mark. This damage has lost material entirely - a portion has broken away.' },
-      { img: 'damage_burn.png', label: 'Burn mark', wrong: 'A burn discolours the surface with heat. This damage is structural - the basin wall is gone.' },
-      { img: 'damage_crack.png', label: 'Hairline crack', wrong: 'A hairline crack is a fine line with no material loss. This damage is far more severe.' }
+      { img: 'damage_chip.png', label: 'Impact chip', wrong: 'A chip takes a small piece off the surface. This damage is a crack with material lost along its length.' },
+      { img: 'damage_scratch.png', label: 'Surface scratch', wrong: 'A scratch leaves a shallow linear mark. This damage runs far deeper - a crack with material lost along it.' },
+      { img: 'damage_burn.png', label: 'Burn mark', wrong: 'A burn discolours the surface with heat. This damage is structural - a crack with material loss.' },
+      { img: 'damage_crack.png', label: 'Impact crack', correct: true }
     ];
 
     /* ---- Helpers ---- */
@@ -533,25 +533,27 @@
 
     /* ---- A quiz scene (used for material and damage scans) ---- */
     function runQuiz(opts) {
+      function handleAnswer(card, row) {
+        if (card.correct) {
+          setCardsEnabled(row, false);
+          cta.innerHTML = '';
+          setMarv('marvthumbsup', opts.success);
+          setTimeout(opts.next, 2600);
+        } else {
+          setCardsEnabled(row, false);
+          setMarv('marvdisappointed', card.wrong);
+          showButton('Retry', true, function () {
+            cta.innerHTML = '';
+            setMarv('marvconfident', opts.prompt);
+            // Rebuild the cards so they are always fresh, enabled and clickable.
+            showCards(opts.cards, handleAnswer);
+          });
+        }
+      }
       fadeSwap(function () { buildScanScene(opts.label); }, function () {
         runScan(function () {
           setMarv('marvconfident', opts.prompt);
-          showCards(opts.cards, function (card, row) {
-            if (card.correct) {
-              setCardsEnabled(row, false);
-              cta.innerHTML = '';
-              setMarv('marvthumbsup', opts.success);
-              setTimeout(opts.next, 2600);
-            } else {
-              setCardsEnabled(row, false);
-              setMarv('marvdisappointed', card.wrong);
-              showButton('Retry', true, function () {
-                cta.innerHTML = '';
-                setMarv('marvconfident', opts.prompt);
-                setCardsEnabled(row, true);
-              });
-            }
-          });
+          showCards(opts.cards, handleAnswer);
         });
       });
     }
@@ -649,7 +651,7 @@
         label: 'Scanning for damage type...',
         cards: DAMAGE_CARDS,
         prompt: 'I already know what this is. But it might be fun for you to have a go.',
-        success: 'Correct. Severe impact damage. Portion of the basin wall lost. I have seen this before - and I know exactly what it takes to fix it.',
+        success: 'Correct. Impact crack with material loss. I have seen this before - and I know exactly what it takes to fix it.',
         next: startS44
       });
     }
