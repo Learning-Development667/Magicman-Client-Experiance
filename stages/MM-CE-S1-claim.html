@@ -1801,7 +1801,7 @@ function setMarv(emotion, text, style) {
 function goToStage3() {
   initAudio();
   playButtonClick();
-  window.location.href = 'MM-CE-S2-gap.html';
+  window.location.href = 'stages/MM-CE-S2-gap.html';
 }
 
 // ---- INIT ----
@@ -2006,7 +2006,8 @@ window.addEventListener('load', () => {
 
   if (showMeBtn) {
     showMeBtn.addEventListener('click', function () {
-      // Claims UI fades in as the navy overlay fades out, then we tear it down.
+      // Go straight to MARV's world; the navy overlay fades out over it.
+      startJourney();
       overlay.classList.add('kb-fade-out');
       setTimeout(function () {
         if (overlay && overlay.parentNode) {
