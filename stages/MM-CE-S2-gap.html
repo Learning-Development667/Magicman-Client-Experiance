@@ -52,10 +52,15 @@
     .gap-marv-col .marv-bubble { max-width: 100%; }
     #gap-cta-zone { margin-top: 18px; }
 
-    /* Centre zone - day counter as the hero, dominant and central */
+    /* Centre zone - day counter locked as the hero. A fixed-height box centres
+       it vertically so it never drifts before, during, or after the chain. */
     .gap-day-col {
       position: relative;
-      align-self: center;
+      height: 65vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
     }
     .day-counter {
@@ -122,7 +127,8 @@
        to the bottom at full size, older ones compress upward above it. */
     #email-chain {
       height: 65vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -229,6 +235,12 @@
     }
     .gap-cta.is-in { opacity: 1; }
     .gap-cta:hover { transform: translateY(-2px); }
+    /* Attention-grab pulse for the start button; removed once clicked */
+    .gap-cta--pulse { animation: ctaPulse 1.4s ease-in-out infinite; }
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(174, 210, 132, 0.55); }
+      50% { box-shadow: 0 0 20px 7px rgba(174, 210, 132, 0.85); }
+    }
 
     /* ---------- Mobile ---------- */
     body.device-mobile .gap-grid { grid-template-columns: 1fr; min-height: 0; }
@@ -441,14 +453,15 @@
     }
 
     /* ---- Buttons ---- */
-    function showButton(label, onClick) {
+    function showButton(label, onClick, pulse) {
       ctaZone.innerHTML = '';
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'gap-cta';
+      btn.className = 'gap-cta' + (pulse ? ' gap-cta--pulse' : '');
       btn.textContent = label;
       btn.addEventListener('click', function () {
         SFX.resume(); // this click is the gesture that unlocks audio
+        btn.classList.remove('gap-cta--pulse'); // stop the pulse once clicked
         onClick();
       });
       ctaZone.appendChild(btn);
@@ -462,7 +475,7 @@
       dayNum.textContent = 'Day 1';
       dayCounter.classList.add('is-on'); // day counter is the hero from the start
       gapMarv('marvwincing', 'Before MARV, this is what happened next.', 'default');
-      showButton('See what happens next', startChain);
+      showButton('See what happens next', startChain, true);
     }
 
     /* ---- The inbox builds automatically once started ---- */
@@ -488,7 +501,7 @@
     /* ---- Trigger 2: the pause, then the second button ---- */
     function afterEmails() {
       gapMarv('marvalarmed',
-        'Fourteen days. Four people. A customer with mobility issues still waiting. This is the decision gap.',
+        'Fourteen days. Four people. One customer still waiting. This is the decision gap.',
         'default');
       SFX.alert();
       setTimeout(function () { showButton("There's a better way", resolve); }, 1500);
@@ -496,7 +509,6 @@
 
     function resolve() {
       ctaZone.innerHTML = '';
-      chain.style.overflow = 'visible'; // let the cards fly past the container edge
       emailEls.forEach(function (card, i) {
         setTimeout(function () { card.classList.add('is-out'); }, i * 80);
       });
