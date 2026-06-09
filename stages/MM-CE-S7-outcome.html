@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magicman | The Repair Journey - Stage 7 Outcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="../js/main.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { background: var(--navy); color: var(--white); font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
+
+    .s7-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 96px;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Each scene is shown one at a time. */
+    .s7-scene { display: none; }
+    .s7-scene.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: calc(100vh - 140px);
+      gap: 26px;
+    }
+
+    /* ---- Scene 0: the gate (no audio or motion until the user clicks) ---- */
+    .s7-lead { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(174, 210, 132, 0.85); }
+    .s7-hero { margin: 0; font-size: 52px; font-weight: 800; line-height: 1.08; color: var(--wasabi); max-width: 760px; }
+    .s7-hero-sub { margin: 0; font-size: 19px; color: var(--white); opacity: 0.9; max-width: 620px; }
+
+    .s7-btn {
+      background: var(--wasabi);
+      color: var(--navy);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 15px 42px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background-color 0.2s ease;
+    }
+    .s7-btn:hover { transform: translateY(-2px); background-color: var(--lone-hunter); }
+    .s7-btn--xl { font-size: 22px; padding: 18px 56px; border-radius: 999px; }
+
+    /* ---- Scene 1: closing Ken Burns cinematic ---- */
+    .s7-kb {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: #000000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    .s7-kb.on { opacity: 1; pointer-events: auto; }
+    .s7-kb.fade-out { opacity: 0; }
+
+    .kb-panel { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; overflow: hidden; }
+    .kb-panel.active { opacity: 1; }
+    .kb-image {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scale(1.0);
+      transform-origin: center center;
+      will-change: transform;
+    }
+    .kb-panel.active.kb-dir-a .kb-image { animation: kb-zoom-a 4.8s ease-out forwards; }
+    .kb-panel.active.kb-dir-b .kb-image { animation: kb-zoom-b 4.8s ease-out forwards; }
+    @keyframes kb-zoom-a { from { transform: scale(1.0) translate(0, 0); } to { transform: scale(1.09) translate(-2%, -1.5%); } }
+    @keyframes kb-zoom-b { from { transform: scale(1.0) translate(0, 0); } to { transform: scale(1.09) translate(2%, 1.5%); } }
+
+    /* Dark gradient behind the captions for legibility */
+    .kb-panel::after {
+      content: '';
+      position: absolute; left: 0; right: 0; bottom: 0;
+      height: 48%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .kb-surface {
+      position: absolute; left: 0; bottom: 88px;
+      margin: 0 40px;
+      z-index: 2;
+      font-size: 40px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--wasabi);
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+    }
+    .kb-repair {
+      position: absolute; left: 0; bottom: 44px;
+      margin: 0 40px;
+      z-index: 2;
+      font-size: 22px; font-weight: 600;
+      color: var(--white);
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+    }
+    .kb-panel.active .kb-surface { animation: kb-fade-up 0.7s ease 0.4s forwards; }
+    .kb-panel.active .kb-repair { animation: kb-fade-up 0.7s ease 0.8s forwards; }
+    @keyframes kb-fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .kb-progress {
+      position: absolute; top: 28px; right: 36px;
+      z-index: 3;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.75);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ---- Scene 2: credentials ---- */
+    .s7-section-title { margin: 0 0 8px; font-size: 34px; font-weight: 800; color: var(--white); }
+    .s7-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 12px;
+    }
+    .s7-card {
+      padding: 26px 22px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .s7-card.is-in { opacity: 1; transform: translateY(0); }
+    .s7-card-num { font-size: 22px; font-weight: 800; color: var(--wasabi); margin-bottom: 10px; }
+    .s7-card-text { position: relative; z-index: 2; font-size: 17px; font-weight: 600; line-height: 1.4; color: var(--white); }
+
+    /* ---- Scene 3: the close ---- */
+    .s7-marv-frame { padding: 12px; }
+    .s7-marv-frame > img { width: 170px; height: auto; }
+    .s7-final-bubble {
+      background: var(--white);
+      color: var(--navy);
+      border-radius: 16px;
+      padding: 18px 28px;
+      font-size: 22px;
+      font-weight: 700;
+      max-width: 560px;
+    }
+
+    /* ---- Mobile ---- */
+    body.device-mobile .s7-hero { font-size: 34px; }
+    body.device-mobile .s7-cards { grid-template-columns: 1fr; }
+    body.device-mobile .kb-surface { font-size: 28px; }
+    body.device-mobile .kb-repair { font-size: 18px; }
+    body.device-mobile .s7-marv-frame > img { width: 130px; }
+  </style>
+</head>
+<body>
+
+  <!-- Progress indicator - 7 stages, Stage 7 Outcome active. Class only,
+       no id="progress-steps", so the shell's main.js never re-renders it. -->
+  <header class="progress-bar" aria-label="Journey progress - Stage 7 of 7">
+    <div class="progress-bar__inner">
+      <span class="label-accent">Magicman</span>
+      <ol class="progress-steps">
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
+        <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <!-- Fullscreen closing cinematic. Built and run only after the user clicks. -->
+  <div class="s7-kb" id="s7-kb"></div>
+
+  <main class="s7-wrap">
+
+    <!-- Scene 0: the gate -->
+    <section class="s7-scene active" id="s7-start">
+      <p class="s7-lead">Stage 7 of 7 - Outcome</p>
+      <h1 class="s7-hero">Every repair tells the same story. A surface saved.</h1>
+      <p class="s7-hero-sub">Thirty years of expertise, on every claim. Press play to see the results MARV delivers, day after day.</p>
+      <button class="s7-btn s7-btn--xl" type="button" id="s7-play">See the results</button>
+    </section>
+
+    <!-- Scene 2: credentials -->
+    <section class="s7-scene" id="s7-credentials">
+      <h2 class="s7-section-title">Why the answer is always Magicman</h2>
+      <div class="s7-cards">
+        <div class="s7-card glow-card" id="s7-card-0">
+          <div class="s7-card-num">Since 1993</div>
+          <div class="s7-card-text">Expert surface repair since 1993.</div>
+        </div>
+        <div class="s7-card glow-card" id="s7-card-1">
+          <div class="s7-card-num">Our people</div>
+          <div class="s7-card-text">Directly employed Academy trained technicians.</div>
+        </div>
+        <div class="s7-card glow-card" id="s7-card-2">
+          <div class="s7-card-num">UK wide</div>
+          <div class="s7-card-text">National coverage across the UK.</div>
+        </div>
+        <div class="s7-card glow-card" id="s7-card-3">
+          <div class="s7-card-num">Guaranteed</div>
+          <div class="s7-card-text">12-month guarantee on every repair.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: the close -->
+    <section class="s7-scene" id="s7-close">
+      <span class="s7-marv-frame marv-frame glow-card"><img src="../assets/marv/marvtriumphant.png" alt="MARV looking triumphant"></span>
+      <div class="s7-final-bubble">Every claim. Every surface. Every time.</div>
+      <button class="s7-btn s7-btn--xl" type="button" id="s7-talk">Talk to Magicman</button>
+    </section>
+
+  </main>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+      <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
+      <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
+      <a class="dev-nav__btn" href="MM-CE-S5-dispatch.html">Stage 5 - Dispatch</a>
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - Repair</a>
+      <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - Outcome</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* Audio is created up front but only resumed on the user's first click,
+       so nothing ever sounds on load. */
+    var audioCtx = null;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { audioCtx = new AC(); }
+    } catch (e) {}
+    function unlockAudio() { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } }
+
+    function chime(freqs, vol) {
+      if (!audioCtx) { return; }
+      freqs.forEach(function (f, i) {
+        var t = audioCtx.currentTime + i * 0.12;
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + 0.36);
+      });
+    }
+    function tick() {
+      if (!audioCtx) { return; }
+      var t = audioCtx.currentTime;
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = 1200;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.08, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.1);
+    }
+
+    /* ---- Scene helpers ---- */
+    function showScene(id) {
+      var scenes = document.querySelectorAll('.s7-scene');
+      Array.prototype.forEach.call(scenes, function (s) { s.classList.remove('active'); });
+      var target = document.getElementById(id);
+      if (target) { target.classList.add('active'); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ---- Scene 1: closing Ken Burns ---- */
+    var PANELS = [
+      { img: '../assets/images/basin-after.png',     surface: 'Vitreous china basin', repair: 'Impact crack repaired' },
+      { img: '../assets/images/marble-after.png',    surface: 'Marble worktop',       repair: 'Chip and scratch restored' },
+      { img: '../assets/images/sideboard-after.png', surface: 'Timber sideboard',     repair: 'Surface damage refinished' },
+      { img: '../assets/images/tile-after.png',      surface: 'Ceramic floor tile',   repair: 'Cracked tile repaired' },
+      { img: '../assets/images/window-after.png',    surface: 'uPVC window frame',     repair: 'Scratch and scuff removed' },
+      { img: '../assets/images/cabinet-after.png',   surface: 'Cabinet door',         repair: 'Impact mark repaired' }
+    ];
+
+    var kb = document.getElementById('s7-kb');
+    var panelEls = [];
+
+    function buildCinematic() {
+      panelEls = PANELS.map(function (p, i) {
+        var panel = document.createElement('div');
+        panel.className = 'kb-panel ' + (i % 2 === 0 ? 'kb-dir-a' : 'kb-dir-b');
+
+        var img = document.createElement('img');
+        img.className = 'kb-image';
+        img.src = p.img;
+        img.alt = '';
+
+        var surface = document.createElement('div');
+        surface.className = 'kb-surface';
+        surface.textContent = p.surface;
+
+        var repair = document.createElement('div');
+        repair.className = 'kb-repair';
+        repair.textContent = p.repair;
+
+        var prog = document.createElement('div');
+        prog.className = 'kb-progress';
+        prog.textContent = (i + 1) + ' / ' + PANELS.length;
+
+        panel.appendChild(img);
+        panel.appendChild(surface);
+        panel.appendChild(repair);
+        panel.appendChild(prog);
+        kb.appendChild(panel);
+        return panel;
+      });
+    }
+
+    var PANEL_HOLD = 4800;
+    var current = 0;
+
+    function showPanel(i) {
+      if (i > 0 && panelEls[i - 1]) { panelEls[i - 1].classList.remove('active'); }
+      panelEls[i].classList.add('active');
+      tick();
+    }
+
+    function advance() {
+      if (current >= PANELS.length) {
+        endCinematic();
+        return;
+      }
+      showPanel(current);
+      current++;
+      setTimeout(advance, PANEL_HOLD);
+    }
+
+    function endCinematic() {
+      if (panelEls.length) { panelEls[panelEls.length - 1].classList.remove('active'); }
+      kb.classList.add('fade-out');
+      setTimeout(function () {
+        kb.classList.remove('on', 'fade-out');
+        runCredentials();
+      }, 700);
+    }
+
+    function startCinematic() {
+      unlockAudio();
+      buildCinematic();
+      kb.classList.add('on');
+      current = 0;
+      setTimeout(advance, 300);
+    }
+
+    /* ---- Scene 2: credentials ---- */
+    function runCredentials() {
+      showScene('s7-credentials');
+      for (var i = 0; i < 4; i++) {
+        (function (n) {
+          setTimeout(function () {
+            var card = document.getElementById('s7-card-' + n);
+            if (card) { card.classList.add('is-in'); }
+            tick();
+            if (n === 3) {
+              chime([660, 880, 1100], 0.09);
+              setTimeout(runClose, 2400);
+            }
+          }, 250 + n * 450);
+        })(i);
+      }
+    }
+
+    /* ---- Scene 3: the close ---- */
+    function runClose() {
+      showScene('s7-close');
+      chime([880, 1100, 1320], 0.1);
+    }
+
+    /* ---- Wiring ---- */
+    var playBtn = document.getElementById('s7-play');
+    if (playBtn) { playBtn.addEventListener('click', startCinematic); }
+
+    var talkBtn = document.getElementById('s7-talk');
+    if (talkBtn) {
+      talkBtn.addEventListener('click', function () {
+        unlockAudio();
+        chime([784, 988, 1175], 0.1);
+      });
+    }
+  })();
+  </script>
+
+</body>
+</html>
