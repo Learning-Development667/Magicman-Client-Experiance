@@ -1519,7 +1519,7 @@
     <span class="kb-pulse kb-pulse-delay"></span>
     <video id="kb-marv-video" class="kb-marv-video" muted playsinline preload="auto"
            src="../assets/video/marv_welcome_video.mp4"></video>
-    <div id="kb-marv-bubble" class="kb-marv-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
+    <div id="kb-marv-bubble" class="kb-marv-bubble">That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That's not how we do it.</div>
     <div id="kb-showme" class="kb-showme">
       <button type="button" id="continue-btn" class="btn-primary" onclick="goToStage3()">Continue</button>
     </div>
@@ -1979,7 +1979,7 @@ window.addEventListener('load', () => {
     if (marvFinished) { return; }
     marvFinished = true;
     if (marvBubble) {
-      marvBubble.textContent = 'Let me show you how this usually goes.';
+      marvBubble.textContent = 'I\'m MARV - MAterial Repair Validator. I live inside the Magicman system, but today I\'m stepping out to show you exactly how this works. From the moment a repair is requested to the moment it\'s done. Let\'s go.';
       marvBubble.classList.add('show');
     }
     if (showMe) { showMe.classList.add('show'); }
@@ -2163,6 +2163,7 @@ function testSkip() {
     <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
     <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
     <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+    <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
   </div>
   <button class="dev-nav__tab" type="button"
           onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
