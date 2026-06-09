@@ -284,6 +284,11 @@
   <div class="dev-nav" id="dev-nav">
     <div class="dev-nav__panel">
       <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
       <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
       <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
       <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
@@ -497,6 +502,26 @@
     } else {
       boot();
     }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. This stage is
+       one continuous timeline, so it has two scenes: the opening state (Day 1 +
+       prompt) and the escalation (the email chain that plays to the decision
+       gap). Each replays from the start exactly as on first load. ---- */
+    var DEV_ORDER = ['intro', 'escalation'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devCur() { return (chain && chain.children.length > 0) ? 1 : 0; }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      if (chain) { chain.innerHTML = ''; }
+      if (ctaZone) { ctaZone.innerHTML = ''; }
+      if (betterZone) { betterZone.innerHTML = ''; }
+      boot();
+      if (i === 1) { startChain(); }
+    }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
   })();
   </script>
 

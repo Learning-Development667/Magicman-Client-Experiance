@@ -580,6 +580,11 @@
   <div class="dev-nav" id="dev-nav">
     <div class="dev-nav__panel">
       <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
       <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
       <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
       <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
@@ -1276,6 +1281,40 @@
     } else {
       startS41();
     }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. Two scenes:
+       MARV's intro (lab + stat cards) and the assessment machine run (spin,
+       questions, verdict). Each replays from the start exactly as on first
+       load, skipping the opening transition video. ---- */
+    var DEV_ORDER = ['intro', 'assessment'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devIntro() {
+      verdictReached = false;
+      spinStarted = false;
+      document.body.classList.remove('s4-verdict');
+      var trans = document.getElementById('s4-transition'); if (trans) { trans.classList.add('is-out'); trans.style.display = 'none'; }
+      var lab = document.getElementById('s4-lab'); if (lab) { lab.classList.add('is-on'); }
+      var clock = document.getElementById('clock-overlay'); if (clock) { clock.classList.add('visible'); }
+      positionClock();
+      marvRow.classList.add('is-on');
+      var bub = document.getElementById('s4-marv-bubbles'); if (bub) { bub.innerHTML = ''; }
+      content.innerHTML = '';
+      var vslot = document.getElementById('s4-verdict-slot'); if (vslot) { vslot.innerHTML = ''; }
+      var ch = document.getElementById('s4-choices'); if (ch && ch.parentNode) { ch.parentNode.removeChild(ch); }
+      cta.innerHTML = '';
+      setMarv('marvexcited', 'Right - you have seen the old way. Now let me show you mine.');
+      startIntro();
+    }
+    function devCur() { return verdictReached ? 1 : 0; }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      if (i === 0) { devIntro(); }
+      else { runMachineSequence(); }
+    }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
   })();
   </script>
 

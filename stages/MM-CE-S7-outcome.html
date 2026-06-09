@@ -387,6 +387,11 @@
   <div class="dev-nav" id="dev-nav">
     <div class="dev-nav__panel">
       <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
       <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
       <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
       <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
@@ -599,6 +604,48 @@
     } else {
       start();
     }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay), exposed for the dev panel.
+       Each scene's entrance animations replay from the start without the
+       first-load auto-advance, so navigation lands on the chosen scene. ---- */
+    var DEV_ORDER = ['title', 'kb', 'cred', 'marv', 'yp', 'closing'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devPlayKb() {
+      showScene('kb');
+      var panels = scenes.kb.querySelectorAll('[data-kb]');
+      panels.forEach(function (p) { p.classList.remove('active'); var c = p.querySelector('.s7-kb-caption'); if (c) { c.classList.remove('show'); } });
+      panels.forEach(function (p, i) {
+        setTimeout(function () {
+          panels.forEach(function (q, j) {
+            q.classList.toggle('active', j === i);
+            if (j !== i) { var cc = q.querySelector('.s7-kb-caption'); if (cc) { cc.classList.remove('show'); } }
+          });
+          var cap = panels[i].querySelector('.s7-kb-caption');
+          setTimeout(function () { if (cap) { cap.classList.add('show'); } }, CAPTION_DELAY);
+        }, i * PANEL_HOLD);
+      });
+    }
+    function devPlayCred() {
+      showScene('cred');
+      var cards = scenes.cred.querySelectorAll('[data-cred]');
+      cards.forEach(function (c) { c.classList.remove('show'); });
+      cards.forEach(function (card, i) { setTimeout(function () { card.classList.add('show'); }, 300 + i * 500); });
+    }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      var key = DEV_ORDER[i];
+      if (key === 'title') { showScene('title'); }
+      else if (key === 'kb') { devPlayKb(); }
+      else if (key === 'cred') { devPlayCred(); }
+      else if (key === 'marv') { showScene('marv'); }
+      else if (key === 'yp') { ypStarted = false; if (ypHint) { ypHint.style.display = ''; } showScene('yp'); if (audioUnlocked) { playYellowPages(); } }
+      else if (key === 'closing') { closingDone = false; startClosing(); }
+    }
+    function devCur() { var i = DEV_ORDER.indexOf(current); return i < 0 ? 0 : i; }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
   })();
   </script>
 

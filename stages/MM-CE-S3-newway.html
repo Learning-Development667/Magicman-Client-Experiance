@@ -1961,6 +1961,11 @@ window.addEventListener('load', function () {
 <div class="dev-nav" id="dev-nav">
   <div class="dev-nav__panel">
     <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+    </div>
     <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
     <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
     <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
@@ -1973,6 +1978,50 @@ window.addEventListener('load', function () {
   <button class="dev-nav__tab" type="button"
           onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
 </div>
+
+<!-- DEV scene stepper (Prev/Next/Replay) - remove before launch with the dev panel -->
+<script>
+(function () {
+  var ORDER = ['scene-fnol', 'scene-website', 'scene-comparison', 'scene-account', 'scene-onboard'];
+  function clearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+  function rm(id, cls) { var e = document.getElementById(id); if (e) { e.classList.remove(cls); } }
+  function reset(id) {
+    if (id === 'scene-fnol') {
+      rm('fnol-caption', 'visible'); rm('fnol-toast', 'visible');
+      var b = document.getElementById('decision-buttons'); if (b) { b.classList.remove('arrive', 'fade-out'); b.classList.add('pre-enter'); b.style.display = ''; }
+      var t = document.getElementById('handler-thought'); if (t) { t.classList.remove('pop-in', 'fade-away'); t.style.display = 'none'; }
+      var p = document.getElementById('ask-marv-panel'); if (p) { p.classList.remove('revealed'); p.classList.add('pre-reveal'); }
+    } else if (id === 'scene-comparison') {
+      var cards = document.querySelectorAll('#scene-comparison .compare-card');
+      for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('landed'); }
+      rm('s3-marv', 'show');
+    } else if (id === 'scene-account') {
+      ['s3-acc-1', 's3-acc-2', 's3-acc-3', 's3-acc-marv', 's3-acc-continue'].forEach(function (x) { rm(x, 'show'); });
+    } else if (id === 'scene-onboard') {
+      rm('s3-onb-card', 'show'); rm('s3-onb-marv', 'show');
+    }
+  }
+  function play(id) {
+    if (id === 'scene-fnol' && window.runCms) { runCms(); }
+    else if (id === 'scene-website' && window.showSiteView) { showSiteView('mm-view-home'); }
+    else if (id === 'scene-comparison' && window.showComparison) { showComparison(); }
+    else if (id === 'scene-account' && window.revealAccount) { revealAccount(); }
+    else if (id === 'scene-onboard' && window.revealOnboard) { revealOnboard(); }
+  }
+  function cur() { var a = document.querySelector('.scene.active'); var i = a ? ORDER.indexOf(a.id) : -1; return i < 0 ? 0 : i; }
+  function go(i) {
+    if (i < 0 || i >= ORDER.length) { return; }
+    clearTimers();
+    var id = ORDER[i];
+    reset(id);
+    if (window.showScene) { showScene(id); }
+    play(id);
+  }
+  window.__devPrevScene = function () { go(cur() - 1); };
+  window.__devNextScene = function () { go(cur() + 1); };
+  window.__devReplayScene = function () { go(cur()); };
+})();
+</script>
 
 </body>
 </html>
