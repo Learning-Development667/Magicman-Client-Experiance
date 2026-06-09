@@ -243,6 +243,46 @@
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
+    /* ---- S4-4 verdict scene layout ----
+       A body.s4-verdict class scopes everything below to the verdict scene so
+       the scan stages above are untouched. It force-hides every persistent
+       S4-1 to S4-3 decoration (transition video, lab backdrop, spinning clock)
+       and lays the scene out as two columns - MARV one third on the left, the
+       fruit machine two thirds on the right, level with each other - with a
+       full-width row below for the verdict card (built next) and the button. */
+    body.s4-verdict .s4-transition,
+    body.s4-verdict .s4-lab,
+    body.s4-verdict #clock-overlay { display: none !important; }
+
+    body.s4-verdict .s4-wrap {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-areas:
+        "marv machine"
+        "verdict verdict"
+        "cta cta";
+      align-items: center;
+      column-gap: 32px;
+      row-gap: 20px;
+      max-width: 1180px;
+    }
+    body.s4-verdict #s4-marv {
+      grid-area: marv;
+      margin-top: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    body.s4-verdict #s4-content { grid-area: machine; margin: 0; }
+    body.s4-verdict #s4-verdict-slot { grid-area: verdict; width: 100%; }
+    body.s4-verdict #s4-cta { grid-area: cta; margin-top: 0; }
+
+    /* Narrow / portrait: stack into one column - MARV, machine, card, button. */
+    body.s4-verdict.device-mobile .s4-wrap {
+      grid-template-columns: 1fr;
+      grid-template-areas: "marv" "machine" "verdict" "cta";
+    }
+
     /* ---- Glow-card border treatment (stat cards + verdict) - a warm
        diagnostic-readout look from MARV's lab: wasabi border, glow pulse,
        and a faint trace running around the edge. ---- */
@@ -406,6 +446,9 @@
         <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
       </div>
     </div>
+    <!-- Full-width verdict card area, below the two columns. Populated when the
+         reels lock in the next step; empty (and invisible) for now. -->
+    <div class="s4-verdict-slot" id="s4-verdict-slot"></div>
     <div class="s4-cta" id="s4-cta"></div>
   </main>
 
@@ -420,6 +463,10 @@
       <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
       <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
       <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+      <!-- DEV ONLY - skip straight to the S4-4 verdict for review. Remove this
+           button (and jumpToVerdict in the script) before the animation step. -->
+      <button class="dev-nav__btn" type="button" id="s4-dev-jump"
+              style="width: 100%; text-align: left; cursor: pointer; color: #fff; background: rgba(192, 57, 43, 0.22); border-color: var(--reaction-wrong);">DEV ONLY - Jump to S4-4 verdict</button>
     </div>
     <button class="dev-nav__tab" type="button"
             onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
@@ -808,12 +855,14 @@
 
     function startS44() {
       setMarv('marvconfident', '');
-      // Clear the lab backdrop and the spinning clock from the scan stages so
-      // the fruit machine is the only thing in the verdict scene.
-      var lab = document.getElementById('s4-lab');
-      if (lab) { lab.classList.remove('is-on'); }
-      var clock = document.getElementById('clock-overlay');
-      if (clock) { clock.classList.remove('visible'); }
+      // Enter the verdict scene: the body.s4-verdict class lays the scene out as
+      // two columns and force-hides every persistent S4-1 to S4-3 decoration
+      // (transition video, lab backdrop, spinning clock) via display:none, so
+      // only the fruit machine, MARV and clean navy remain.
+      document.body.classList.add('s4-verdict');
+      var vid = document.getElementById('s4-video');
+      if (vid) { try { vid.pause(); } catch (e) {} }
+      marvRow.classList.add('is-on');
       fadeSwap(buildMachine, function () {
         positionMachine();
         setMarv('marvconfident',
@@ -824,6 +873,17 @@
         }, 2000);
       });
     }
+
+    /* DEV ONLY - jump straight to S4-4 for review, skipping the transition,
+       intro and scans. Remove this function and its button before the
+       animation step. */
+    function jumpToVerdict() {
+      var trans = document.getElementById('s4-transition');
+      if (trans) { trans.style.display = 'none'; }
+      startS44();
+    }
+    var devJump = document.getElementById('s4-dev-jump');
+    if (devJump) { devJump.addEventListener('click', jumpToVerdict); }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', startS41);
