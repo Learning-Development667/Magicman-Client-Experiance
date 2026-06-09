@@ -197,6 +197,27 @@
     body.device-mobile .day-counter__num { font-size: 56px; }
     body.device-mobile .email { max-width: 100%; }
     body.device-mobile .gap-cta { width: 100%; }
+
+    /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace added over
+       the wasabi border that the MARV sprite, bubble and day-card carry. The
+       trace is a masked ::after so it adds no layout box. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+    .marv-bubble, .day-card { position: relative; }
+    .day-card { animation: marvGlowPulse 2s ease-in-out infinite; }
+    .s4-frame::after, .marv-bubble::after, .day-card::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+        rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+        rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+        rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite; pointer-events: none;
+    }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
   </style>
 </head>
 <body>
@@ -233,7 +254,7 @@
       <!-- Left column - MARV and the start button -->
       <div class="gap-marv-col">
         <div class="marv">
-          <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
+          <span class="s4-frame"><img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy"></span>
           <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
         </div>
         <div id="gap-cta-zone"></div>

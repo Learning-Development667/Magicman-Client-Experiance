@@ -80,20 +80,26 @@
     @keyframes s7kbA { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.12) translate(-2%, -1.5%); } }
     @keyframes s7kbB { from { transform: scale(1.12) translate(2%, 1.5%); } to { transform: scale(1) translate(0, 0); } }
 
+    /* Caption styled to match the Stage 1 Ken Burns report - centred, large,
+       white with a soft shadow, no background bar. */
     .s7-kb-caption {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.55);
-      color: #FFFFFF;
-      padding: 16px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      width: calc(100% - 64px);
+      max-width: 700px;
+      box-sizing: border-box;
+      text-align: center;
       font-family: 'Open Sans', sans-serif;
-      font-size: 15px;
+      font-size: 32px;
+      font-weight: 700;
       line-height: 1.5;
-      text-align: left;
+      color: #FFFFFF;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
       opacity: 0;                       /* fades in 1s after the panel appears */
-      transition: opacity 0.8s ease;
+      transition: opacity 0.4s ease;
     }
     .s7-kb-caption.show { opacity: 1; }
     .s7-kb-caption span { display: block; }
@@ -136,6 +142,7 @@
       border-radius: 16px;
       animation: marvGlowPulse 2s ease-in-out infinite;
     }
+    #s7-marv-cta { display: block; margin: 28px auto 0; }
 
     /* ---- SCENE 5 - YELLOW PAGES ADVERT ---- */
     .s7-tv-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
@@ -207,40 +214,32 @@
     }
     .s7-navy-out.show { opacity: 1; }
 
-    /* ---- Start gate - holds the experience and gates the ambient music behind
-       a user click (the music never autoplays), the same as Stage 1. ---- */
-    .s7-start {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: #13294B;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      transition: opacity 0.6s ease;
+    /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the
+       wasabi border that the MARV sprite and credential cards already carry. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+    .s7-cred-card { position: relative; }
+    .s4-frame::after, .s7-cred-card::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+        rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+        rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+        rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite; pointer-events: none;
     }
-    .s7-start.hide { opacity: 0; pointer-events: none; }
-    .s7-start-title { color: #FFFFFF; font-weight: 800; font-size: 40px; line-height: 1.15; margin: 0 0 12px; }
-    .s7-start-sub { color: #AED284; font-weight: 600; font-size: 18px; margin: 0 0 28px; }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
   </style>
 </head>
 <body>
 
-  <!-- Ambient music for the Ken Burns montage. Played only after the Begin
-       click (never autoplays); loops and fades out when the montage ends. -->
+  <!-- Ambient music for the Ken Burns montage. Started on the first user
+       interaction with the page (never autoplays); loops and fades out when the
+       montage ends. -->
   <audio id="s7-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
-
-  <!-- Start gate - the user clicks Begin to start the sequence, which is the
-       gesture that starts the ambient music. -->
-  <div class="s7-start" id="s7-start">
-    <div>
-      <div class="s7-start-title">The Repair Journey</div>
-      <div class="s7-start-sub">Sound on for the full experience</div>
-      <button type="button" id="s7-begin" class="btn-primary">Begin &nbsp;&rarr;</button>
-    </div>
-  </div>
 
   <!-- Progress indicator - Stage 7 of 7, the journey complete. No id on the list
        so the shell's main.js never re-renders it. -->
@@ -353,7 +352,8 @@
     <section class="s7-scene" id="s7-scene-marv">
       <div class="s7-inner">
         <h2 class="s7-marv-line">Every claim. Every surface. Every time.</h2>
-        <img class="s7-marv-sprite" src="../assets/marv/marvtriumphant.png" alt="MARV, triumphant">
+        <span class="s4-frame"><img class="s7-marv-sprite" src="../assets/marv/marvtriumphant.png" alt="MARV, triumphant"></span>
+        <button type="button" id="s7-marv-cta" class="btn-primary">See how far we've come</button>
       </div>
     </section>
 
@@ -428,6 +428,7 @@
     var music = document.getElementById('s7-music');
     if (music) { music.volume = 0.3; }
     var musicFade = null;
+    var montageMusicDone = false;
     function startMusic() {
       if (!music) { return; }
       if (musicFade) { clearInterval(musicFade); musicFade = null; }
@@ -436,6 +437,7 @@
       if (p && p.catch) { p.catch(function () {}); }
     }
     function fadeOutMusic() {
+      montageMusicDone = true;   // the montage has ended; do not start music after this
       if (!music || music.paused) { return; }
       if (musicFade) { clearInterval(musicFade); }
       musicFade = setInterval(function () {
@@ -506,7 +508,8 @@
     /* ---- Scene 4: MARV closing ---- */
     function startMarv() {
       showScene('marv');
-      setTimeout(startYellowPages, 3000);   // hold 3s, then the advert
+      // The advert is reached when the user clicks the "See how far we've come"
+      // button (wired below), not by a timer.
     }
 
     /* ---- Scene 5: Yellow Pages advert ---- */
@@ -573,27 +576,29 @@
       }, 3500);
     }
 
-    /* ---- First user gesture: unlock audio and, if waiting, start the advert ---- */
+    /* ---- First user gesture: unlock audio, start the gated montage music,
+       and (if waiting) start the advert ---- */
     function onFirstGesture() {
       unlockAudio();
+      // Ambient music is gated behind the first interaction. Only start it while
+      // the Ken Burns montage (or its title lead-in) is still running.
+      if (!montageMusicDone && music && music.paused) { startMusic(); }
       if (current === 'yp' && !ypStarted) { playYellowPages(); }
     }
     document.addEventListener('click', onFirstGesture);
     document.addEventListener('keydown', onFirstGesture);
 
-    /* ---- Go - the experience waits for the Begin click, which is the gesture
-       that starts the ambient music (so it never autoplays). ---- */
-    function beginExperience() {
-      var gate = document.getElementById('s7-start');
-      if (gate) {
-        gate.classList.add('hide');
-        setTimeout(function () { if (gate.parentNode) { gate.parentNode.removeChild(gate); } }, 600);
-      }
-      startMusic();
+    // The "See how far we've come" button on the MARV scene proceeds to the advert.
+    var marvCta = document.getElementById('s7-marv-cta');
+    if (marvCta) { marvCta.addEventListener('click', startYellowPages); }
+
+    /* ---- Go - the montage starts automatically on load; the ambient music is
+       gated behind the first user interaction (so it never autoplays). ---- */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
       start();
     }
-    var beginBtn = document.getElementById('s7-begin');
-    if (beginBtn) { beginBtn.addEventListener('click', beginExperience); }
   })();
   </script>
 

@@ -1487,6 +1487,26 @@
      click overlays) down together to fit 800px tall. */
   #scene-website .desktop-sim { max-width: 690px; margin-left: auto; margin-right: auto; }
 
+  /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the
+     wasabi border the MARV sprites, bubbles and account/onboarding cards carry.
+     The trace is a masked ::after, so it adds no layout box. ---- */
+  @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+  .s3-marv-bubble, .s3-acc-card, .s3-onb-card { position: relative; }
+  .s4-frame::after, .s3-marv-bubble::after, .s3-acc-card::after, .s3-onb-card::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+    background: conic-gradient(from var(--s4angle, 0deg),
+      rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+      rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+      rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: s4Trace 3.5s linear infinite; pointer-events: none;
+  }
+  @keyframes s4Trace { to { --s4angle: 360deg; } }
+
 </style>
 </head>
 <body>
@@ -1693,7 +1713,7 @@
         </div>
       </div>
       <div class="s3-marv" id="s3-marv">
-        <img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited"></span>
         <div class="s3-marv-bubble">One day versus fourteen. Let me show you how it all fits together.</div>
         <button class="btn-primary" id="s3-show-me" onclick="goToAccount()">Continue</button>
       </div>
@@ -1722,7 +1742,7 @@
         </div>
       </div>
       <div class="s3-acc-marv" id="s3-acc-marv">
-        <img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident">
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident"></span>
         <div class="s3-marv-bubble">One account. Every site. Every job. All in one place.</div>
       </div>
       <div class="s3-acc-continue" id="s3-acc-continue">
@@ -1745,7 +1765,7 @@
         <p class="s3-onb-sub">All we really need is location, access and contact. Everything else MARV works out from the photos.</p>
       </div>
       <div class="s3-onb-marv" id="s3-onb-marv">
-        <img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident">
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident"></span>
         <div class="s3-marv-bubble">Want to see how I do it?</div>
         <button class="btn-primary" id="s3-show-me-final" onclick="goToAssessment()">Show me</button>
       </div>
