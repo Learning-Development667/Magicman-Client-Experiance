@@ -1506,6 +1506,36 @@
   .s3-marv-sprite { width: 120px; height: auto; border: 3px solid #AED284; border-radius: 16px; animation: marvGlowPulse 2s ease-in-out infinite; }
   .s3-marv-bubble { background: #ffffff; color: #13294b; border: 3px solid #AED284; border-radius: 16px; padding: 14px 20px; font-size: 16px; font-weight: 600; max-width: 420px; text-align: center; animation: marvGlowPulse 2s ease-in-out infinite; }
 
+  /* ---- SCENE: CLIENT ACCOUNT BLOCK + ONBOARDING CARD ---- */
+  @keyframes wasabiGlow {
+    0%, 100% { box-shadow: 0 0 16px rgba(174, 210, 132, 0.30); }
+    50%      { box-shadow: 0 0 30px rgba(174, 210, 132, 0.70); }
+  }
+  #scene-account .scene-inner,
+  #scene-onboard .scene-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 160px); }
+
+  .s3-acc-heading { color: #AED284; font-size: 26px; font-weight: 800; line-height: 1.3; text-align: center; margin: 0 0 30px; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-row { display: flex; gap: 24px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+  .s3-acc-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 26px 24px; width: 280px; max-width: 280px; text-align: center; opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-card.show { opacity: 1; transform: translateY(0) scale(1); animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .s3-acc-icon { font-size: 34px; line-height: 1; margin-bottom: 12px; }
+  .s3-acc-card h3 { color: #AED284; font-size: 19px; font-weight: 800; margin: 0 0 10px; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-card p { color: #FFFFFF; font-size: 15px; line-height: 1.5; margin: 0; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-marv { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-marv.show { opacity: 1; transform: translateY(0); }
+  .s3-acc-continue { margin-top: 18px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-continue.show { opacity: 1; transform: translateY(0); }
+
+  .s3-onb-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 34px 40px; max-width: 640px; margin: 0 auto; text-align: center; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .s3-onb-card.show { opacity: 1; transform: translateY(0); animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .s3-onb-card h2 { color: #AED284; font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 22px; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-list { list-style: none; padding: 0; margin: 0 auto 20px; max-width: 420px; text-align: left; }
+  .s3-onb-list li { position: relative; padding-left: 30px; margin: 0 0 12px; font-size: 17px; font-weight: 600; color: #FFFFFF; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: #AED284; }
+  .s3-onb-sub { color: #CDD7E4; font-size: 15px; line-height: 1.5; margin: 0; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-marv { margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-onb-marv.show { opacity: 1; transform: translateY(0); }
+
 </style>
 </head>
 <body>
@@ -1711,8 +1741,60 @@
       </div>
       <div class="s3-marv" id="s3-marv">
         <img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
-        <div class="s3-marv-bubble">One day versus fourteen. Want to see how I do it?</div>
-        <button class="btn-primary" id="s3-show-me" onclick="goToAssessment()">Show me</button>
+        <div class="s3-marv-bubble">One day versus fourteen. Let me show you how it all fits together.</div>
+        <button class="btn-primary" id="s3-show-me" onclick="goToAccount()">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: CLIENT ACCOUNT BLOCK -->
+  <section id="scene-account" class="scene">
+    <div class="scene-inner">
+      <h2 class="s3-acc-heading">Every Magicman client gets their own identity in MARV.</h2>
+      <div class="s3-acc-row">
+        <div class="s3-acc-card" id="s3-acc-1">
+          <div class="s3-acc-icon">&#127991;</div>
+          <h3>Your client code</h3>
+          <p>A unique code that tags every job to your account. Reporting, history and invoicing all kept together, on your terms.</p>
+        </div>
+        <div class="s3-acc-card" id="s3-acc-2">
+          <div class="s3-acc-icon">&#128682;</div>
+          <h3>Your portal</h3>
+          <p>A single place for your sites to raise a repair and upload photos, set up for the way your organisation works.</p>
+        </div>
+        <div class="s3-acc-card" id="s3-acc-3">
+          <div class="s3-acc-icon">&#128193;</div>
+          <h3>Your client record</h3>
+          <p>Your sites, contacts, access notes and agreed terms held in one place. We are not re-gathering them every time.</p>
+        </div>
+      </div>
+      <div class="s3-acc-marv" id="s3-acc-marv">
+        <img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident">
+        <div class="s3-marv-bubble">One account. Every site. Every job. All in one place.</div>
+      </div>
+      <div class="s3-acc-continue" id="s3-acc-continue">
+        <button class="btn-primary" onclick="goToOnboard()">And getting set up?</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: ONBOARDING CARD -->
+  <section id="scene-onboard" class="scene">
+    <div class="scene-inner">
+      <div class="s3-onb-card" id="s3-onb-card">
+        <h2>Getting set up with Magicman takes one conversation.</h2>
+        <ul class="s3-onb-list">
+          <li>Your sites and locations</li>
+          <li>Access requirements</li>
+          <li>Key contacts</li>
+          <li>The types of repairs you need</li>
+        </ul>
+        <p class="s3-onb-sub">All we really need is location, access and contact. Everything else MARV works out from the photos.</p>
+      </div>
+      <div class="s3-onb-marv" id="s3-onb-marv">
+        <img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident">
+        <div class="s3-marv-bubble">Want to see how I do it?</div>
+        <button class="btn-primary" id="s3-show-me-final" onclick="goToAssessment()">Show me</button>
       </div>
     </div>
   </section>
@@ -1841,6 +1923,55 @@ function goToAssessment() {
   initAudio();
   playButtonClick();
   setTimeout(function () { window.location.href = 'MM-CE-S4-assessment.html'; }, 180);
+}
+
+// ---- SCENE: CLIENT ACCOUNT BLOCK ----
+function goToAccount() {
+  initAudio();
+  playButtonClick();
+  showScene('scene-account');
+  revealAccount();
+}
+function revealAccount() {
+  // Each card animates in one at a time, then MARV speaks, then the continue
+  // button appears once all three are visible.
+  var cardIds = ['s3-acc-1', 's3-acc-2', 's3-acc-3'];
+  cardIds.forEach(function (id, i) {
+    setTimeout(function () {
+      var card = document.getElementById(id);
+      if (card) { card.classList.add('show'); }
+      playTone(680 + i * 130, 0.08, 'sine', 0.05);
+    }, 300 + i * 650);
+  });
+  var afterCards = 300 + cardIds.length * 650;
+  setTimeout(function () {
+    var marv = document.getElementById('s3-acc-marv');
+    if (marv) { marv.classList.add('show'); }
+    playChime();
+  }, afterCards);
+  setTimeout(function () {
+    var cont = document.getElementById('s3-acc-continue');
+    if (cont) { cont.classList.add('show'); }
+  }, afterCards + 550);
+}
+
+// ---- SCENE: ONBOARDING CARD ----
+function goToOnboard() {
+  initAudio();
+  playButtonClick();
+  showScene('scene-onboard');
+  revealOnboard();
+}
+function revealOnboard() {
+  setTimeout(function () {
+    var card = document.getElementById('s3-onb-card');
+    if (card) { card.classList.add('show'); }
+  }, 200);
+  setTimeout(function () {
+    var marv = document.getElementById('s3-onb-marv');
+    if (marv) { marv.classList.add('show'); }
+    playChime();
+  }, 900);
 }
 
 // ---- INIT ----

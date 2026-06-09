@@ -1521,7 +1521,7 @@
            src="../assets/video/marv_welcome_video.mp4"></video>
     <div id="kb-marv-bubble" class="kb-marv-bubble">That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That's not how we do it.</div>
     <div id="kb-showme" class="kb-showme">
-      <button type="button" id="continue-btn" class="btn-primary" onclick="goToStage3()">Continue</button>
+      <button type="button" id="continue-btn" class="btn-primary">Next</button>
     </div>
   </div>
 
@@ -1973,17 +1973,37 @@ window.addEventListener('load', () => {
   }
 
   // The pulse fires, MARV's silent welcome video materialises in the sprite's
-  // place, then the speech bubble and Show me button appear.
-  var marvFinished = false;
-  function finishMarv() {
-    if (marvFinished) { return; }
-    marvFinished = true;
+  // place, then MARV steps through three speech bubble beats. The button
+  // advances one beat per click and becomes "Continue" on the final beat,
+  // which then moves on to the next stage.
+  var marvBeats = [
+    'That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That\'s not how we do it.',
+    'Six steps. From the moment damage is reported to the moment the job is closed with a warranty. I\'ll show you every one.',
+    'I\'m MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me. Let me show you what happens next.'
+  ];
+  var marvBeatIdx = 0;
+  var marvNextBtn = document.getElementById('continue-btn');
+
+  function showMarvBeat(idx) {
+    marvBeatIdx = idx;
     if (marvBubble) {
-      marvBubble.textContent = 'I\'m MARV - MAterial Repair Validator. I live inside the Magicman system, but today I\'m stepping out to show you exactly how this works. From the moment a repair is requested to the moment it\'s done. Let\'s go.';
+      marvBubble.textContent = marvBeats[idx];
       marvBubble.classList.add('show');
     }
-    if (showMe) { showMe.classList.add('show'); }
+    if (marvNextBtn) {
+      marvNextBtn.textContent = (idx >= marvBeats.length - 1) ? 'Continue' : 'Next';
+    }
   }
+
+  function advanceMarv() {
+    if (marvBeatIdx < marvBeats.length - 1) {
+      showMarvBeat(marvBeatIdx + 1);
+    } else {
+      goToStage3();
+    }
+  }
+
+  if (marvNextBtn) { marvNextBtn.addEventListener('click', advanceMarv); }
 
   function revealMarv() {
     if (marvStage) { marvStage.classList.add('show'); }
@@ -1992,11 +2012,12 @@ window.addEventListener('load', () => {
       // The clip is muted, so it plays without needing a user gesture.
       var pm = marvVideo.play();
       if (pm && pm.catch) { pm.catch(function () {}); }
-      marvVideo.addEventListener('ended', finishMarv);
-      marvVideo.addEventListener('error', finishMarv);
     }
-    // MARV's welcome line shows during the clip; it is swapped when the clip ends.
-    setTimeout(function () { if (marvBubble) { marvBubble.classList.add('show'); } }, 600);
+    // MARV's first beat and the advance button appear during the materialise clip.
+    setTimeout(function () {
+      showMarvBeat(0);
+      if (showMe) { showMe.classList.add('show'); }
+    }, 600);
   }
 
   if (showMeBtn) {
