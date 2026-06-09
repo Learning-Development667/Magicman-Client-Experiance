@@ -206,9 +206,41 @@
       pointer-events: none;
     }
     .s7-navy-out.show { opacity: 1; }
+
+    /* ---- Start gate - holds the experience and gates the ambient music behind
+       a user click (the music never autoplays), the same as Stage 1. ---- */
+    .s7-start {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #13294B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      transition: opacity 0.6s ease;
+    }
+    .s7-start.hide { opacity: 0; pointer-events: none; }
+    .s7-start-title { color: #FFFFFF; font-weight: 800; font-size: 40px; line-height: 1.15; margin: 0 0 12px; }
+    .s7-start-sub { color: #AED284; font-weight: 600; font-size: 18px; margin: 0 0 28px; }
   </style>
 </head>
 <body>
+
+  <!-- Ambient music for the Ken Burns montage. Played only after the Begin
+       click (never autoplays); loops and fades out when the montage ends. -->
+  <audio id="s7-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
+
+  <!-- Start gate - the user clicks Begin to start the sequence, which is the
+       gesture that starts the ambient music. -->
+  <div class="s7-start" id="s7-start">
+    <div>
+      <div class="s7-start-title">The Repair Journey</div>
+      <div class="s7-start-sub">Sound on for the full experience</div>
+      <button type="button" id="s7-begin" class="btn-primary">Begin &nbsp;&rarr;</button>
+    </div>
+  </div>
 
   <!-- Progress indicator - Stage 7 of 7, the journey complete. No id on the list
        so the shell's main.js never re-renders it. -->
@@ -390,6 +422,29 @@
       } catch (e) {}
     }
 
+    /* ---- Ambient music for the Ken Burns montage. Started by the Begin click
+       (never autoplays), loops, then fades out when the montage ends. Same
+       treatment as Stage 1. ---- */
+    var music = document.getElementById('s7-music');
+    if (music) { music.volume = 0.3; }
+    var musicFade = null;
+    function startMusic() {
+      if (!music) { return; }
+      if (musicFade) { clearInterval(musicFade); musicFade = null; }
+      music.volume = 0.3;
+      var p = music.play();
+      if (p && p.catch) { p.catch(function () {}); }
+    }
+    function fadeOutMusic() {
+      if (!music || music.paused) { return; }
+      if (musicFade) { clearInterval(musicFade); }
+      musicFade = setInterval(function () {
+        var v = music.volume - 0.015;
+        if (v <= 0) { music.volume = 0; music.pause(); clearInterval(musicFade); musicFade = null; }
+        else { music.volume = v; }
+      }, 60);
+    }
+
     var scenes = {
       title:   document.getElementById('s7-scene-title'),
       kb:      document.getElementById('s7-scene-kb'),
@@ -438,6 +493,8 @@
     /* ---- Scene 3: credentials cards ---- */
     function startCredentials() {
       showScene('cred');
+      fadeOutMusic();   // the Ken Burns montage has ended
+
       var cards = scenes.cred.querySelectorAll('[data-cred]');
       cards.forEach(function (card, i) {
         setTimeout(function () { card.classList.add('show'); }, 300 + i * 500);
@@ -524,12 +581,19 @@
     document.addEventListener('click', onFirstGesture);
     document.addEventListener('keydown', onFirstGesture);
 
-    /* ---- Go ---- */
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', start);
-    } else {
+    /* ---- Go - the experience waits for the Begin click, which is the gesture
+       that starts the ambient music (so it never autoplays). ---- */
+    function beginExperience() {
+      var gate = document.getElementById('s7-start');
+      if (gate) {
+        gate.classList.add('hide');
+        setTimeout(function () { if (gate.parentNode) { gate.parentNode.removeChild(gate); } }, 600);
+      }
+      startMusic();
       start();
     }
+    var beginBtn = document.getElementById('s7-begin');
+    if (beginBtn) { beginBtn.addEventListener('click', beginExperience); }
   })();
   </script>
 

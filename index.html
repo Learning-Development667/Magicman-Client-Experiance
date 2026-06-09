@@ -3,16 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magicman Client Experience</title>
+  <title>Magicman | From damage to done</title>
   <meta name="description" content="An interactive showcase of the Magicman surface repair service journey.">
-
-  <!-- The experience starts at Stage 1. The root redirects straight there so
-       the standalone, cinematic stage pages run as intended. -->
-  <link rel="canonical" href="stages/MM-CE-S1-claim.html">
-  <meta http-equiv="refresh" content="0; url=stages/MM-CE-S1-claim.html">
-  <script>window.location.replace('stages/MM-CE-S1-claim.html');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
       background: #13294B;
@@ -24,14 +21,70 @@
       text-align: center;
       padding: 24px;
     }
-    a { color: #AED284; font-weight: 700; }
+
+    /* Wasabi glow border treatment - circuit trace style, matching the MARV
+       sprites and cards across the stage files. */
+    @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .landing-card {
+      position: relative;
+      background: #0E1F38;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      padding: 48px 56px;
+      max-width: 560px;
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+    .landing-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 3px;
+      background: conic-gradient(from var(--angle, 0deg),
+                  rgba(174, 210, 132, 0) 0deg,
+                  rgba(174, 210, 132, 0) 250deg,
+                  rgba(174, 210, 132, 0.7) 300deg,
+                  #AED284 335deg,
+                  rgba(174, 210, 132, 0.7) 350deg,
+                  rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: trace 3.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
+    }
+    @keyframes trace { to { --angle: 360deg; } }
+
+    .landing-title {
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 44px;
+      line-height: 1.1;
+      margin: 0 0 28px;
+    }
+    .landing-cta {
+      display: inline-block;
+      background: #AED284;
+      color: #13294B;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+    .landing-cta:hover { background: #c5e89e; transform: translateY(-2px); }
   </style>
 </head>
 <body>
-  <p>
-    Starting the Magicman repair journey...
-    <br>
-    If you are not redirected, <a href="stages/MM-CE-S1-claim.html">enter here</a>.
-  </p>
+  <main class="landing-card">
+    <h1 class="landing-title">From damage to done</h1>
+    <a class="landing-cta" href="stages/MM-CE-S1-claim.html">Enter the experience &nbsp;&rarr;</a>
+  </main>
 </body>
 </html>
