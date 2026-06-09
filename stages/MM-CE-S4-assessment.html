@@ -340,9 +340,9 @@
   <main class="s4-wrap">
     <div class="s4-content is-in" id="s4-content"></div>
     <div class="s4-marv" id="s4-marv">
-      <img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV">
+      <span class="marv-frame glow-card"><img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV"></span>
       <div class="s4-marv-bubbles" id="s4-marv-bubbles">
-        <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+        <div class="s4-marv-bubble glow-bubble" id="s4-marv-bubble"></div>
       </div>
     </div>
     <div class="s4-cta" id="s4-cta"></div>
@@ -667,7 +667,7 @@
       wrap.innerHTML = '';
       texts.forEach(function (t) {
         var b = document.createElement('div');
-        b.className = 's4-marv-bubble is-on';
+        b.className = 's4-marv-bubble glow-bubble is-on';
         b.textContent = t;
         wrap.appendChild(b);
       });

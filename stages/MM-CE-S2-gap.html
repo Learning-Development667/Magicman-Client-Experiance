@@ -233,8 +233,8 @@
       <!-- Left column - MARV and the start button -->
       <div class="gap-marv-col">
         <div class="marv">
-          <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
-          <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
+          <span class="marv-frame glow-card"><img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy"></span>
+          <div class="marv-bubble default glow-bubble" id="gap-marv-bubble" style="display: none;"></div>
         </div>
         <div id="gap-cta-zone"></div>
       </div>
@@ -322,7 +322,7 @@
       if (bubble) {
         if (text) {
           bubble.textContent = text;
-          bubble.className = 'marv-bubble ' + (style || 'default');
+          bubble.className = 'marv-bubble glow-bubble ' + (style || 'default');
           bubble.style.display = '';
         } else {
           bubble.textContent = '';

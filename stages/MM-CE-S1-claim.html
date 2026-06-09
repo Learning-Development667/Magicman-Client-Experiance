@@ -1262,14 +1262,19 @@
     width: 320px;
     max-width: 78vw;
     height: auto;
+    border: 2px solid var(--wasabi);
     border-radius: 16px;
     transform: scale(0.3);
     opacity: 0;
     filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
   }
 
+  /* Materialise first, then settle into the steady wasabi glow pulse. The two
+     animations touch different properties (transform/opacity vs box-shadow)
+     so they run together without clashing. */
   .kb-marv-stage.show .kb-marv-video {
-    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
+    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards,
+               glow-pulse 2.4s ease-in-out 1s infinite;
   }
 
   @keyframes kb-marv-materialise {
@@ -1515,7 +1520,7 @@
     <span class="kb-pulse kb-pulse-delay"></span>
     <video id="kb-marv-video" class="kb-marv-video" muted playsinline preload="auto"
            src="../assets/video/marv_welcome_video.mp4"></video>
-    <div id="kb-marv-bubble" class="kb-marv-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
+    <div id="kb-marv-bubble" class="kb-marv-bubble glow-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
     <div id="kb-showme" class="kb-showme">
       <button type="button" id="continue-btn" class="btn-primary" onclick="goToStage3()">Continue</button>
     </div>

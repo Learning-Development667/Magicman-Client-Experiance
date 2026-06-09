@@ -436,6 +436,31 @@ a {
   to { transform: rotate(360deg); }
 }
 
+/* MARV sprite frame - wraps the white sprite art in a glow card so the figure
+   reads as framed rather than floating unfinished on the navy. Combine with
+   .glow-card on the wrapper. */
+.marv-frame {
+  display: inline-block;
+  padding: 10px;
+  line-height: 0;
+}
+.marv-frame > img,
+.marv-frame > video {
+  position: relative;
+  z-index: 2;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Speech bubble glow - wasabi border, soft pulse and 16px radius while keeping
+   the bubble's own fill and pointer tail (so the circuit-trace pseudo-element
+   is not needed and never clashes with the tail). */
+.glow-bubble {
+  border: 2px solid var(--wasabi);
+  border-radius: 16px;
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
 /* Reduced motion: keep the static wasabi frame, drop the moving parts. */
 @media (prefers-reduced-motion: reduce) {
   .glow-card { animation: none; box-shadow: 0 0 12px rgba(174, 210, 132, 0.4); }
