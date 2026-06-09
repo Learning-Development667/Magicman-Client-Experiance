@@ -1501,6 +1501,16 @@
   .compare-card--new .compare-num { color: #AED284; }
   .compare-label { margin-top: 10px; font-size: 20px; font-weight: 700; color: #ffffff; }
   .compare-sub { margin-top: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+  /* Onboarding explainer card - shared .glow-card frame (wasabi border, glow
+     pulse, circuit trace, 16px radius) from css/main.css, dark navy fill. */
+  .s3-onboard { max-width: 560px; margin: 36px auto 0; padding: 28px 32px; text-align: left; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .s3-onboard.show { opacity: 1; transform: translateY(0); }
+  .s3-onboard h3 { margin: 0 0 16px; color: #AED284; font-size: 22px; font-weight: 800; line-height: 1.25; }
+  .s3-onboard ul { margin: 0 0 18px; padding: 0; list-style: none; }
+  .s3-onboard li { position: relative; padding-left: 26px; margin-bottom: 10px; color: #ffffff; font-size: 16px; }
+  .s3-onboard li:last-child { margin-bottom: 0; }
+  .s3-onboard li::before { content: ''; position: absolute; left: 0; top: 7px; width: 10px; height: 10px; border-radius: 2px; background: #93C847; box-shadow: 0 0 8px rgba(147, 200, 71, 0.7); }
+  .s3-onboard p { margin: 0; color: #ffffff; font-size: 15px; opacity: 0.88; }
   .s3-marv { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .s3-marv.show { opacity: 1; transform: translateY(0); }
   .s3-marv-sprite { width: 120px; height: auto; }
@@ -1709,9 +1719,19 @@
           <div class="compare-sub">One assessment. Instant answer.</div>
         </div>
       </div>
+      <div class="s3-onboard glow-card" id="s3-onboard">
+        <h3>Getting set up with Magicman takes one conversation.</h3>
+        <ul>
+          <li>Your sites and locations.</li>
+          <li>Access requirements.</li>
+          <li>Key contacts.</li>
+          <li>The types of repairs you need.</li>
+        </ul>
+        <p>Your Relationship Manager handles the rest. Once you are set up, every repair request flows through MARV automatically.</p>
+      </div>
       <div class="s3-marv" id="s3-marv">
-        <img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
-        <div class="s3-marv-bubble">One day versus fourteen. Want to see how I do it?</div>
+        <img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident">
+        <div class="s3-marv-bubble">Want to see how I do it?</div>
         <button class="btn-primary" id="s3-show-me" onclick="goToAssessment()">Show me</button>
       </div>
     </div>
@@ -1818,10 +1838,14 @@ function showComparison() {
   var cards = document.querySelectorAll('.compare-card');
   setTimeout(function () { cards.forEach(function (c) { c.classList.add('landed'); }); }, 150);
   setTimeout(function () {
+    var onboard = document.getElementById('s3-onboard');
+    if (onboard) { onboard.classList.add('show'); }
+  }, 1200);
+  setTimeout(function () {
     var marv = document.getElementById('s3-marv');
     if (marv) { marv.classList.add('show'); }
     playChime();
-  }, 1600);
+  }, 2200);
 }
 function goToAssessment() {
   initAudio();
