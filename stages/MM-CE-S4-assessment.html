@@ -152,9 +152,39 @@
       line-height: 0;
     }
     /* Hero size: the machine is driven by viewport height so it dominates the
-       screen yet stays fully visible on desktop, and falls back to a width
-       limit on narrow / portrait screens. */
-    .s4-machine-img { display: block; height: min(86vh, 1000px); width: auto; max-width: 100%; }
+       screen yet stays fully visible on desktop (with room for the scan label
+       above and the progress bar below), and falls back to a width limit on
+       narrow / portrait screens. */
+    .s4-machine-img { display: block; height: min(80vh, 940px); width: auto; max-width: 100%; }
+
+    /* Scanning status label above the machine. */
+    .s4-scanlabel {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #AED284;
+      text-align: center;
+      margin: 0 0 12px;
+      transition: opacity 0.2s ease;
+    }
+    /* Progress bar below the machine, sized to the machine width. */
+    .s4-progress {
+      width: 100%;
+      height: 8px;
+      margin-top: 14px;
+      background: #13294B;
+      border: 1px solid #AED284;
+      border-radius: 4px;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .s4-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #AED284;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
     .s4-machine-overlay {
       position: absolute;
       top: 0;
@@ -164,9 +194,15 @@
     .s4-reel {
       position: absolute;
       overflow: hidden;
-      border-radius: 4px;
-      /* Light scrim so the white reel text reads over the white reels. */
-      background: rgba(13, 20, 33, 0.42);
+      background: #0D4F4F;
+      border: 3px solid #AED284;
+      border-radius: 8px;
+      /* Wasabi glow pulse on every reel at all times. */
+      animation: s4ReelPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes s4ReelPulse {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.5); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.8); }
     }
     /* The reel strip is a vertical column of items, one item tall per window.
        It scrolls with translateY: a looping spin, then an eased settle onto the
@@ -193,12 +229,14 @@
       from { transform: translateY(0); }
       to   { transform: translateY(var(--spin-dist, -200px)); }
     }
-    /* Locked reel border + brief wasabi flash on lock. */
-    .s4-reel.locked { box-shadow: inset 0 0 0 1px rgba(174, 210, 132, 0.55); }
-    .s4-reel.flash { animation: s4ReelFlash 0.45s ease; }
+    /* On lock: a prominent wasabi flash that fades back to the idle pulse over
+       0.5s. The .flash rule overrides the idle pulse for its duration; the JS
+       removes .flash afterwards so s4ReelPulse resumes seamlessly (its baseline
+       matches this animation's end frame). */
+    .s4-reel.flash { animation: s4ReelFlash 0.5s ease forwards; }
     @keyframes s4ReelFlash {
-      0%   { box-shadow: inset 0 0 0 2px rgba(174, 210, 132, 1), 0 0 16px rgba(174, 210, 132, 0.85); }
-      100% { box-shadow: inset 0 0 0 1px rgba(174, 210, 132, 0.55); }
+      0%   { box-shadow: 0 0 24px 10px rgba(174, 210, 132, 1); }
+      100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.5); }
     }
     /* Whole-machine wasabi glow flash once all reels lock. */
     .s4-machine.win-flash .s4-machine-img { animation: s4MachineFlash 0.95s ease; }
@@ -251,14 +289,14 @@
        diagnostic-readout look from MARV's lab: wasabi border, glow pulse,
        and a faint trace running around the edge. ---- */
     @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-    .s4-stat, .s4-vcard, .s4-marv-sprite-frame, .s4-marv-bubble {
+    .s4-stat, .s4-vcard {
       position: relative;
       border: 2px solid #AED284;
       border-radius: 16px;
       box-shadow: 0 0 8px rgba(174, 210, 132, 0.22), inset 0 0 12px rgba(174, 210, 132, 0.06);
       animation: s4Glow 2.6s ease-in-out infinite;
     }
-    .s4-stat::before, .s4-vcard::before, .s4-marv-sprite-frame::before, .s4-marv-bubble::before {
+    .s4-stat::before, .s4-vcard::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -281,6 +319,39 @@
       50% { box-shadow: 0 0 22px rgba(174, 210, 132, 0.5), inset 0 0 18px rgba(174, 210, 132, 0.12); }
     }
     @keyframes s4Trace { to { --s4angle: 360deg; } }
+
+    /* MARV sprite frame + speech bubble - stronger 3px wasabi border, a 2s glow
+       pulse and a brighter, slower (3.5s) circuit trace the eye can follow. */
+    .s4-marv-sprite-frame, .s4-marv-bubble {
+      position: relative;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: s4MarvGlow 2s ease-in-out infinite;
+    }
+    .s4-marv-sprite-frame::before, .s4-marv-bubble::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+                  rgba(174, 210, 132, 0) 0deg,
+                  rgba(174, 210, 132, 0) 250deg,
+                  rgba(174, 210, 132, 0.7) 300deg,
+                  #AED284 335deg,
+                  rgba(174, 210, 132, 0.7) 350deg,
+                  rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes s4MarvGlow {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
+    }
 
     /* ---- S4-intro stat cards ---- */
     .s4-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
@@ -358,6 +429,7 @@
     body.device-mobile .s4-marv-sprite { width: 100px; }
     body.device-mobile .s4-stat { width: 100%; max-width: 280px; }
     body.device-mobile .s4-machine-img { height: auto; width: 92vw; }
+    body.device-mobile .s4-scanlabel { font-size: 16px; }
     body.device-mobile .s4-choices { max-width: 100%; }
   </style>
 </head>
@@ -816,9 +888,11 @@
                '</div>';
       }).join('');
       content.innerHTML =
+        '<div class="s4-scanlabel" id="s4-scanlabel">Scanning: Material type...</div>' +
         '<div class="s4-machine" id="s4-machine">' +
           '<img class="s4-machine-img" id="s4-machine-img" src="../assets/images/fruit_machine.png" alt="MARV assessment fruit machine">' +
           '<div class="s4-machine-overlay" id="s4-machine-overlay">' + reelsHtml + '</div>' +
+          '<div class="s4-progress"><div class="s4-progress-fill" id="s4-progress-fill"></div></div>' +
         '</div>';
       var img = document.getElementById('s4-machine-img');
       if (img) {
@@ -873,8 +947,27 @@
       setTimeout(function () {
         reel.classList.add('locked', 'flash');
         playClunk();
-        setTimeout(function () { reel.classList.remove('flash'); }, 450);
+        setTimeout(function () { reel.classList.remove('flash'); }, 500);
       }, dur);
+    }
+
+    /* Scan label + progress bar, synced to the reel lock sequence. */
+    var SCAN_LABELS = [
+      'Scanning: Damage type...',       // after reel 1 locks
+      'Scanning: Repair viability...',  // after reel 2 locks
+      'Scanning: Technician match...',  // after reel 3 locks
+      'Scanning: Duration estimate...', // after reel 4 locks
+      'Scan complete.'                  // after reel 5 locks
+    ];
+    function setScanLabel(text) {
+      var el = document.getElementById('s4-scanlabel');
+      if (!el) { return; }
+      el.style.opacity = '0';
+      setTimeout(function () { el.textContent = text; el.style.opacity = '1'; }, 200);
+    }
+    function setProgress(pct) {
+      var f = document.getElementById('s4-progress-fill');
+      if (f) { f.style.width = pct + '%'; }
     }
 
     /* ---- Phase 1: spin and lock ---- */
@@ -888,6 +981,11 @@
       var spinTime = 2000, gap = 600, lockDur = 900;
       reels.forEach(function (reel, i) {
         setTimeout(function () { lockReel(reel, lockDur); }, spinTime + i * gap);
+        // As each reel snaps, advance the scan label and fill the bar 20%.
+        setTimeout(function () {
+          setScanLabel(SCAN_LABELS[i]);
+          setProgress((i + 1) * 20);
+        }, spinTime + i * gap + lockDur);
       });
       var lastSnap = spinTime + (reels.length - 1) * gap + lockDur;
       setTimeout(stopSpinNoise, lastSnap - 200);

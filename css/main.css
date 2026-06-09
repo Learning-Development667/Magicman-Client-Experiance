@@ -287,16 +287,27 @@ a {
   height: 210px;        /* 224 x 280 native ratio, scaled */
   object-fit: contain;
   flex-shrink: 0;
+  /* Wasabi framed box with a glow pulse, consistent across all stages. */
+  border: 3px solid #AED284;
+  border-radius: 16px;
+  animation: marvGlowPulse 2s ease-in-out infinite;
 }
 
 .marv-bubble {
   position: relative;
   max-width: 460px;
   padding: 16px 20px;
-  border-radius: 14px;
+  border: 3px solid #AED284;
+  border-radius: 16px;
   font-size: var(--body);
   line-height: 1.5;
-  box-shadow: var(--card-shadow);
+  animation: marvGlowPulse 2s ease-in-out infinite;
+}
+
+/* Shared MARV sprite / speech bubble glow pulse (used by every stage). */
+@keyframes marvGlowPulse {
+  0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+  50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
 }
 
 /* Speech tail */
@@ -314,7 +325,7 @@ a {
 .marv-bubble.default {
   background-color: var(--navy);
   color: var(--white);
-  border: 1px solid rgba(174, 210, 132, 0.4);
+  border: 3px solid #AED284;
 }
 .marv-bubble.default::before {
   border-right-color: var(--navy);

@@ -1262,14 +1262,17 @@
     width: 320px;
     max-width: 78vw;
     height: auto;
+    border: 3px solid #AED284;
     border-radius: 16px;
     transform: scale(0.3);
     opacity: 0;
     filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
   }
 
+  /* Materialise in, then settle into the shared wasabi glow pulse. */
   .kb-marv-stage.show .kb-marv-video {
-    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
+    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards,
+               marvGlowPulse 2s ease-in-out 1s infinite;
   }
 
   @keyframes kb-marv-materialise {
@@ -1284,16 +1287,17 @@
     max-width: 580px;
     background: #FFFFFF;
     color: var(--navy);
+    border: 3px solid #AED284;
     border-radius: 16px;
     padding: 18px 26px;
     font-family: 'Open Sans', sans-serif;
     font-size: 21px;
     font-weight: 600;
     line-height: 1.45;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.5s ease, transform 0.5s ease;
+    animation: marvGlowPulse 2s ease-in-out infinite;
   }
 
   .kb-marv-bubble::before {
