@@ -90,33 +90,82 @@
     /* (Old scan-stage CSS removed - the S4-2 / S4-3 scans are replaced by the
        fruit machine sequence.) */
 
-    /* Phase 2 challenge - option cards stacked in the left column below MARV. */
+    /* Scan box (left column, above MARV): the damaged basin with a moving
+       wasabi scan line. Matches the machine unit border treatment. */
+    .s4-scanbox {
+      position: relative;
+      width: 152px;
+      max-width: 100%;
+      overflow: hidden;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      line-height: 0;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s4-scanbox-img { display: block; width: 100%; height: auto; border-radius: 9px; }
+    .s4-scanline {
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      height: 2px;
+      background: #AED284;
+      box-shadow: 0 0 8px 2px rgba(174, 210, 132, 0.8);
+      animation: s4ScanMove 2s ease-in-out infinite;
+    }
+    @keyframes s4ScanMove {
+      0%, 100% { top: 0; }
+      50%      { top: calc(100% - 2px); }
+    }
+    /* On "Scan complete." the line freezes in place (animation paused, not hidden). */
+    .s4-scanbox.is-frozen .s4-scanline { animation-play-state: paused; }
+
+    /* Phase 2 challenge - horizontal image option cards below the MARV bubble. */
     .s4-choices {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: center;
       gap: 10px;
       width: 100%;
-      max-width: 280px;
-      margin-top: 4px;
+      margin-top: 6px;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 0.35s ease, transform 0.35s ease;
     }
     .s4-choices.is-in { opacity: 1; transform: translateY(0); }
     .s4-choice {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 12px 16px;
-      color: var(--white);
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 10px;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 150px;
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 8px;
+      background: #0D4F4F;
+      border: 3px solid #AED284;
+      border-radius: 12px;
       cursor: pointer;
-      transition: border-color 0.2s ease, transform 0.12s ease, background 0.2s ease;
+      overflow: hidden;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+      transition: transform 0.2s ease;
     }
-    .s4-choice:hover { border-color: var(--wasabi); transform: translateY(-2px); background: rgba(174, 210, 132, 0.12); }
-    .s4-choice:disabled { opacity: 0.5; cursor: default; transform: none; }
+    .s4-choice:hover { transform: scale(1.05); }
+    .s4-choice-img { width: 100%; height: 84px; object-fit: cover; border-radius: 8px 8px 0 0; display: block; }
+    .s4-choice-label {
+      margin-top: 7px;
+      padding: 0 4px;
+      color: var(--white);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.25;
+      text-align: center;
+    }
+    /* Correct selection reuses the reel lock flash; wrong selection flashes red. */
+    .s4-choice.flash { animation: s4ReelFlash 0.5s ease forwards; }
+    .s4-choice.flash-wrong { animation: s4WrongFlash 0.5s ease forwards; }
+    @keyframes s4WrongFlash {
+      0%   { box-shadow: 0 0 24px 10px rgba(192, 57, 43, 1); border-color: #C0392B; }
+      100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); border-color: #AED284; }
+    }
 
     /* Phase 3 verdict card - full width below the columns. White card with the
        shared wasabi glow border treatment (applied via the selector below). */
@@ -144,34 +193,43 @@
        image on load and on every resize, so the five reel windows stay aligned
        at all screen sizes. Reel boxes are percentage positions of the 608 x 832
        source image. */
+    /* Grouped processing unit: scan label, machine (with its reel overlays) and
+       progress bar wrapped tight together inside one wasabi glow border, so they
+       read as a single MARV processing unit. */
+    .s4-unit {
+      display: inline-flex;
+      flex-direction: column;
+      padding: 12px;
+      max-width: 94vw;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
     .s4-machine {
       position: relative;
-      display: inline-block;
-      margin: 0 auto;
-      max-width: 94vw;
       line-height: 0;
     }
     /* Hero size: the machine is driven by viewport height so it dominates the
-       screen yet stays fully visible on desktop (with room for the scan label
-       above and the progress bar below), and falls back to a width limit on
-       narrow / portrait screens. */
-    .s4-machine-img { display: block; height: min(80vh, 940px); width: auto; max-width: 100%; }
+       screen yet stays fully visible on desktop (with room for the unit border,
+       scan label above and progress bar below), and falls back to a width limit
+       on narrow / portrait screens. */
+    .s4-machine-img { display: block; height: min(78vh, 900px); width: auto; max-width: 100%; }
 
-    /* Scanning status label above the machine. */
+    /* Scanning status label, directly above the machine (no gap). */
     .s4-scanlabel {
       font-family: 'Open Sans', sans-serif;
       font-weight: 700;
       font-size: 20px;
       color: #AED284;
       text-align: center;
-      margin: 0 0 12px;
+      margin: 0;
       transition: opacity 0.2s ease;
     }
-    /* Progress bar below the machine, sized to the machine width. */
+    /* Progress bar, directly below the machine (no gap), machine width. */
     .s4-progress {
       width: 100%;
       height: 8px;
-      margin-top: 14px;
+      margin: 0;
       background: #13294B;
       border: 1px solid #AED284;
       border-radius: 4px;
@@ -263,7 +321,7 @@
         "marv machine"
         "verdict verdict"
         "cta cta";
-      align-items: center;
+      align-items: start;
       column-gap: 32px;
       row-gap: 20px;
       max-width: 1180px;
@@ -724,13 +782,24 @@
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 's4-choice';
-        b.textContent = opt.label;
+        b.innerHTML =
+          '<img class="s4-choice-img" src="' + opt.img + '" alt="' + opt.label + '">' +
+          '<span class="s4-choice-label">' + opt.label + '</span>';
         b.addEventListener('click', function () { onPick(opt, b, wrap); });
         wrap.appendChild(b);
       });
       marvRow.appendChild(wrap);
       void wrap.offsetWidth;
       wrap.classList.add('is-in');
+    }
+    // Brief wasabi (correct) or red (wrong) flash on the selected card.
+    function flashChoice(btn, isWrong) {
+      if (!btn) { return; }
+      var cls = isWrong ? 'flash-wrong' : 'flash';
+      btn.classList.remove('flash', 'flash-wrong');
+      void btn.offsetWidth;
+      btn.classList.add(cls);
+      setTimeout(function () { btn.classList.remove(cls); }, 500);
     }
 
     /* ---- S4-1: MARV's world opens ---- */
@@ -888,10 +957,12 @@
                '</div>';
       }).join('');
       content.innerHTML =
-        '<div class="s4-scanlabel" id="s4-scanlabel">Scanning: Material type...</div>' +
-        '<div class="s4-machine" id="s4-machine">' +
-          '<img class="s4-machine-img" id="s4-machine-img" src="../assets/images/fruit_machine.png" alt="MARV assessment fruit machine">' +
-          '<div class="s4-machine-overlay" id="s4-machine-overlay">' + reelsHtml + '</div>' +
+        '<div class="s4-unit" id="s4-unit">' +
+          '<div class="s4-scanlabel" id="s4-scanlabel">Scanning: Material type...</div>' +
+          '<div class="s4-machine" id="s4-machine">' +
+            '<img class="s4-machine-img" id="s4-machine-img" src="../assets/images/fruit_machine.png" alt="MARV assessment fruit machine">' +
+            '<div class="s4-machine-overlay" id="s4-machine-overlay">' + reelsHtml + '</div>' +
+          '</div>' +
           '<div class="s4-progress"><div class="s4-progress-fill" id="s4-progress-fill"></div></div>' +
         '</div>';
       var img = document.getElementById('s4-machine-img');
@@ -981,10 +1052,15 @@
       var spinTime = 2000, gap = 600, lockDur = 900;
       reels.forEach(function (reel, i) {
         setTimeout(function () { lockReel(reel, lockDur); }, spinTime + i * gap);
-        // As each reel snaps, advance the scan label and fill the bar 20%.
+        // As each reel snaps, advance the scan label and fill the bar 20%. On
+        // the final lock ("Scan complete.") freeze the scan line in place.
         setTimeout(function () {
           setScanLabel(SCAN_LABELS[i]);
           setProgress((i + 1) * 20);
+          if (i === reels.length - 1) {
+            var box = document.getElementById('s4-scanbox');
+            if (box) { box.classList.add('is-frozen'); }
+          }
         }, spinTime + i * gap + lockDur);
       });
       var lastSnap = spinTime + (reels.length - 1) * gap + lockDur;
@@ -1009,16 +1085,20 @@
     function askMaterial() {
       setMarv('marvconfident', 'What surface material is this claim about? Pick from these three.');
       showChoices([
-        { label: 'Vitreous china', correct: true },
-        { label: 'uPVC panel', wrong: 'Not quite - uPVC is a polymeric panel, usually found in bathrooms as cladding. This claim is about a ceramic basin. Try again.' },
-        { label: 'Marble', wrong: 'Good thought, but marble has a veined pattern and is usually a worktop or floor. This is a moulded basin - vitreous china. Try again.' }
-      ], function (opt) {
+        { label: 'Vitreous china', img: '../assets/images/material_china.png', correct: true },
+        { label: 'uPVC panel', img: '../assets/images/material_upvc.png', wrong: 'Not quite - uPVC is a polymeric panel, usually found in bathrooms as cladding. This claim is about a ceramic basin. Try again.' },
+        { label: 'Marble', img: '../assets/images/material_marble.png', wrong: 'Good thought, but marble has a veined pattern and is usually a worktop or floor. This is a moulded basin - vitreous china. Try again.' }
+      ], function (opt, btn) {
         if (opt.correct) {
+          flashChoice(btn, false);
           playCorrect();
-          clearChoices();
-          setMarv('marvthumbsup', 'Spot on. You know your surfaces.');
-          setTimeout(askDamage, 1000);
+          setTimeout(function () {
+            clearChoices();
+            setMarv('marvthumbsup', 'Spot on. You know your surfaces.');
+            setTimeout(askDamage, 1000);
+          }, 500);
         } else {
+          flashChoice(btn, true);
           playWrong();
           setMarv('marvdisappointed', opt.wrong);
         }
@@ -1028,16 +1108,20 @@
     function askDamage() {
       setMarv('marvconfident', 'And what type of damage are we looking at?');
       showChoices([
-        { label: 'Impact crack', correct: true },
-        { label: 'Hairline crack', wrong: 'Close - a hairline crack is a fine surface fracture with no material missing. This damage has a clear point of impact and material has broken away. Try again.' },
-        { label: 'Scratch', wrong: 'Not this time - a scratch is surface-level damage that has not penetrated the material. This has cracked through with material loss at the impact point. Try again.' }
-      ], function (opt) {
+        { label: 'Impact crack', img: '../assets/images/damage_crack.png', correct: true },
+        { label: 'Hairline crack', img: '../assets/images/damage_chip.png', wrong: 'Close - a hairline crack is a fine surface fracture with no material missing. This damage has a clear point of impact and material has broken away. Try again.' },
+        { label: 'Scratch', img: '../assets/images/damage_scratch.png', wrong: 'Not this time - a scratch is surface-level damage that has not penetrated the material. This has cracked through with material loss at the impact point. Try again.' }
+      ], function (opt, btn) {
         if (opt.correct) {
+          flashChoice(btn, false);
           playCorrect();
-          clearChoices();
-          setMarv('marvtriumphant', 'At this rate you should apply for the Magicman Academy.');
-          setTimeout(revealVerdict, 1000);
+          setTimeout(function () {
+            clearChoices();
+            setMarv('marvtriumphant', 'At this rate you should apply for the Magicman Academy.');
+            setTimeout(revealVerdict, 1000);
+          }, 500);
         } else {
+          flashChoice(btn, true);
           playWrong();
           setMarv('marvdisappointed', opt.wrong);
         }
@@ -1096,6 +1180,17 @@
       var vid = document.getElementById('s4-video');
       if (vid) { try { vid.pause(); } catch (e) {} }
       marvRow.classList.add('is-on');
+      // Scan box at the top of the left column, above the MARV sprite, with a
+      // continuously moving scan line (frozen once the scan completes).
+      var oldBox = document.getElementById('s4-scanbox');
+      if (oldBox && oldBox.parentNode) { oldBox.parentNode.removeChild(oldBox); }
+      var scanBox = document.createElement('div');
+      scanBox.className = 's4-scanbox';
+      scanBox.id = 's4-scanbox';
+      scanBox.innerHTML =
+        '<img class="s4-scanbox-img" src="../assets/images/basin-before.png" alt="Damaged basin being scanned">' +
+        '<div class="s4-scanline"></div>';
+      marvRow.insertBefore(scanBox, marvRow.firstChild);
       setMarv('marvfocussed', '');
       cta.innerHTML = '';
       fadeSwap(buildMachine, function () {
