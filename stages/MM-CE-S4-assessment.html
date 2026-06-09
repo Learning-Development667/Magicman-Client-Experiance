@@ -199,7 +199,7 @@
     .s4-unit {
       display: inline-flex;
       flex-direction: column;
-      padding: 12px;
+      padding: 8px;
       max-width: 94vw;
       border: 3px solid #AED284;
       border-radius: 16px;
@@ -906,14 +906,14 @@
     /* Each reel cycles through its pool during the spin, then lands on `final`.
        Positions are percentages of the 608 x 832 source image. */
     var SPIN_CYCLES = 6;
-    var MACHINE_REEL_TOP = 32.7;     // y = 272 / 832
-    var MACHINE_REEL_HEIGHT = 18.4;  // 153 / 832
+    var MACHINE_REEL_TOP = 22.7;     // y = 127 / 559
+    var MACHINE_REEL_HEIGHT = 28.4;  // 159 / 559
     var MACHINE_REELS = [
-      { left: 15.1, width: 11.0, cycle: ['Wood', 'uPVC', 'Ceramic', 'Vitreous china', 'Marble', 'Granite', 'Laminate', 'Enamel', 'Stainless steel', 'Metal', 'Glass'], final: 'Vitreous china' },
-      { left: 30.1, width: 10.5, cycle: ['Hairline crack', 'Impact crack', 'Scratch', 'Chip', 'Burn', 'Stain', 'Scuff', 'Gouge', 'Material loss'], final: 'Impact crack' },
-      { left: 45.1, width: 9.9,  cycle: ['Assessing', 'Repair viable', 'Beyond repair', 'Reviewing'], final: 'Repair viable' },
-      { left: 59.7, width: 9.4,  cycle: ['Graduate', 'Technician', 'Senior', 'Specialist', 'Master'], final: 'Specialist' },
-      { left: 74.2, width: 9.6,  cycle: ['1 hour', '2 hours', 'Half day', 'Full day', '2 days'], final: 'Half day' }
+      { left: 12.9, width: 12.0, cycle: ['Wood', 'uPVC', 'Ceramic', 'Vitreous china', 'Marble', 'Granite', 'Laminate', 'Enamel', 'Stainless steel', 'Metal', 'Glass'], final: 'Vitreous china' },
+      { left: 29.2, width: 10.8, cycle: ['Hairline crack', 'Impact crack', 'Scratch', 'Chip', 'Burn', 'Stain', 'Scuff', 'Gouge', 'Material loss'], final: 'Impact crack' },
+      { left: 44.6, width: 11.0, cycle: ['Assessing', 'Repair viable', 'Beyond repair', 'Reviewing'], final: 'Repair viable' },
+      { left: 59.5, width: 11.0, cycle: ['Graduate', 'Technician', 'Senior', 'Specialist', 'Master'], final: 'Specialist' },
+      { left: 74.8, width: 11.1, cycle: ['1 hour', '2 hours', 'Half day', 'Full day', '2 days'], final: 'Half day' }
     ];
 
     var spinStarted = false;
@@ -1147,7 +1147,7 @@
               vitem('Technician', 'Specialist technician') +
               vitem('Duration', 'Half day') +
             '</div>' +
-            '<div class="s4-vcard__badge"><span class="s4-vbadge">12-month Magicman guarantee</span></div>' +
+            '<div class="s4-vcard__badge"><span class="s4-vbadge">Magicman Quality Guaranteed</span></div>' +
           '</div>';
         var card = document.getElementById('s4-vcard');
         void card.offsetWidth;
@@ -1157,7 +1157,15 @@
       // After the card has faded in (0.6s) plus a 2 second pause.
       setTimeout(function () {
         setMarv('marvconfident', 'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
-        showButton('Continue to Stage 5', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
+        // Continue button in the left column, below the MARV speech bubble.
+        var contBtn = document.createElement('button');
+        contBtn.type = 'button';
+        contBtn.className = 's4-btn';
+        contBtn.textContent = 'Continue to Stage 5';
+        contBtn.addEventListener('click', function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
+        marvRow.appendChild(contBtn);
+        void contBtn.offsetWidth;
+        contBtn.classList.add('is-in');
       }, 600 + 2000);
     }
 
