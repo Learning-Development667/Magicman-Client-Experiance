@@ -388,6 +388,61 @@ a {
 }
 
 /* --------------------------------------------------------------------------
+   9a. Futuristic glow card treatment
+   Shared "glow card" frame first used on the Stage 4 fruit machine. A wasabi
+   border with a soft pulsing glow and a faint circuit trace that travels
+   around the border edge. Applied to cards, panels and MARV sprite / speech
+   bubble containers so the white sprite art reads as framed rather than
+   unfinished on the navy background. Border radius 16px throughout.
+   -------------------------------------------------------------------------- */
+.glow-card {
+  position: relative;
+  border: 2px solid var(--wasabi);
+  border-radius: 16px;
+  background-color: rgba(19, 41, 75, 0.55);
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+/* Soft pulsing glow */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(174, 210, 132, 0.32), 0 0 2px rgba(174, 210, 132, 0.2) inset; }
+  50%      { box-shadow: 0 0 22px rgba(174, 210, 132, 0.65), 0 0 6px rgba(174, 210, 132, 0.35) inset; }
+}
+
+/* Circuit trace - a bright arc that travels around the border edge. A rotating
+   conic gradient is masked to the 2px border ring only, so just the edge
+   lights up as the arc sweeps round. */
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from 0deg,
+              rgba(174, 210, 132, 0) 0deg,
+              rgba(147, 200, 71, 0.9) 36deg,
+              rgba(174, 210, 132, 0) 90deg,
+              rgba(174, 210, 132, 0) 360deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+  animation: circuit-trace 4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes circuit-trace {
+  to { transform: rotate(360deg); }
+}
+
+/* Reduced motion: keep the static wasabi frame, drop the moving parts. */
+@media (prefers-reduced-motion: reduce) {
+  .glow-card { animation: none; box-shadow: 0 0 12px rgba(174, 210, 132, 0.4); }
+  .glow-card::before { animation: none; opacity: 0.5; }
+}
+
+/* --------------------------------------------------------------------------
    10. Utility
    -------------------------------------------------------------------------- */
 .visually-hidden {

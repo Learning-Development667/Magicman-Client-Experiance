@@ -145,29 +145,106 @@
     .s4-card-img { width: 100%; height: 96px; object-fit: cover; border-radius: 6px; background: rgba(0, 0, 0, 0.2); }
     .s4-card-label { margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--white); }
 
-    /* Verdict card */
-    .s4-verdict {
-      background: rgba(0, 0, 0, 0.28);
-      border: 2px solid var(--wasabi);
-      border-radius: 12px;
-      padding: 28px 32px;
-      max-width: 560px;
+    /* S4-4 fruit machine verdict. The frame uses the shared .glow-card
+       treatment (wasabi border, glow pulse, circuit trace, 16px radius) from
+       css/main.css. */
+    .s4-machine {
+      position: relative;
+      max-width: 760px;
       margin: 0 auto;
-      text-align: left;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      padding: 26px 26px 30px;
     }
-    .s4-verdict-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; color: var(--wasabi); }
-    .s4-verdict-row {
+    .s4-machine-glow {
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      box-shadow: 0 0 60px 12px rgba(174, 210, 132, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .s4-machine-glow.flash { animation: s4-glow-flash 0.9s ease; }
+    @keyframes s4-glow-flash { 0% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: 0; } }
+
+    .s4-machine-title {
+      position: relative;
+      z-index: 2;
+      margin: 0 0 18px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: var(--wasabi);
+      text-align: center;
+    }
+    .s4-reels {
+      position: relative;
+      z-index: 2;
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 8px 0;
-      font-size: 15px;
-      border-bottom: 1px solid rgba(174, 210, 132, 0.2);
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: nowrap;
     }
-    .s4-verdict-row span:first-child { opacity: 0.8; }
-    .s4-verdict-row span:last-child { font-weight: 700; text-align: right; }
-    .s4-verdict-verdict { margin-top: 18px; font-size: 40px; font-weight: 800; color: var(--wasabi); text-align: center; }
+    .s4-reel {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .s4-reel-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .s4-reel-window {
+      position: relative;
+      height: 96px;
+      border-radius: 10px;
+      background: #0b1730;
+      border: 1px solid rgba(174, 210, 132, 0.22);
+      box-shadow: inset 0 7px 14px rgba(0, 0, 0, 0.6), inset 0 -7px 14px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 8px;
+    }
+    .s4-reel-value {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-align: center;
+      color: var(--white);
+    }
+    .s4-reel.is-spinning .s4-reel-value { color: rgba(255, 255, 255, 0.5); }
+    .s4-reel.is-locked .s4-reel-window { border-color: var(--wasabi); }
+    .s4-reel.is-locked .s4-reel-value { color: var(--wasabi); }
+    .s4-reel.flash .s4-reel-window { animation: s4-reel-flash 0.5s ease; }
+    @keyframes s4-reel-flash {
+      0%   { background: rgba(174, 210, 132, 0.9); box-shadow: 0 0 26px rgba(174, 210, 132, 0.9); }
+      100% { background: #0b1730; box-shadow: inset 0 7px 14px rgba(0, 0, 0, 0.6), inset 0 -7px 14px rgba(0, 0, 0, 0.6); }
+    }
+
+    /* Warranty badge, animates in once all five reels lock */
+    .s4-warranty {
+      margin: 22px auto 0;
+      max-width: 380px;
+      text-align: center;
+      padding: 14px 24px;
+      border-radius: 999px;
+      background: var(--wasabi);
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(10px) scale(0.94);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .s4-warranty.is-in { opacity: 1; transform: translateY(0) scale(1); }
 
     /* MARV row */
     .s4-marv {
@@ -181,6 +258,7 @@
     }
     .s4-marv.is-on { opacity: 1; }
     .s4-marv-sprite { width: 130px; height: auto; flex: 0 0 auto; }
+    .s4-marv-bubbles { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
     .s4-marv-bubble {
       background: var(--white);
       color: var(--navy);
@@ -218,7 +296,9 @@
     body.device-mobile .s4-card { width: 46%; }
     body.device-mobile .s4-marv { flex-direction: column; }
     body.device-mobile .s4-marv-sprite { width: 100px; }
-    body.device-mobile .s4-verdict-verdict { font-size: 32px; }
+    body.device-mobile .s4-marv-bubbles { align-items: stretch; }
+    body.device-mobile .s4-reels { flex-wrap: wrap; }
+    body.device-mobile .s4-reel { flex: 1 1 44%; }
   </style>
 </head>
 <body>
@@ -261,7 +341,9 @@
     <div class="s4-content is-in" id="s4-content"></div>
     <div class="s4-marv" id="s4-marv">
       <img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV">
-      <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      <div class="s4-marv-bubbles" id="s4-marv-bubbles">
+        <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      </div>
     </div>
     <div class="s4-cta" id="s4-cta"></div>
   </main>
@@ -295,6 +377,46 @@
       if (AC) { audioCtx = new AC(); }
     } catch (e) {}
     function unlockAudio() { if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); } }
+
+    /* Synthesised mechanical reel clunk - a low square thud with a sharp
+       high tick layered on top, for the moment a reel locks. */
+    function playReelClunk() {
+      if (!audioCtx) { return; }
+      var t = audioCtx.currentTime;
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(190, t);
+      o.frequency.exponentialRampToValueAtTime(68, t + 0.09);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.15);
+      var o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
+      o2.type = 'triangle';
+      o2.frequency.setValueAtTime(1500, t);
+      g2.gain.setValueAtTime(0.0001, t);
+      g2.gain.exponentialRampToValueAtTime(0.12, t + 0.003);
+      g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      o2.connect(g2); g2.connect(audioCtx.destination);
+      o2.start(t); o2.stop(t + 0.06);
+    }
+
+    /* Short ascending chime for the full-machine win flash. */
+    function playWinChime() {
+      if (!audioCtx) { return; }
+      [880, 1100, 1320].forEach(function (f, i) {
+        var t = audioCtx.currentTime + i * 0.12;
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + 0.36);
+      });
+    }
 
     var SPRITES = '../assets/marv/';
     var sprite = document.getElementById('s4-marv-sprite');
@@ -503,24 +625,111 @@
       });
     }
 
-    /* ---- S4-4: the verdict ---- */
+    /* ---- S4-4: the verdict, as a fruit machine ----
+       Five reels cycle random values, then lock left to right with a
+       mechanical clunk and a wasabi flash. After all five lock, the whole
+       machine flares and the warranty badge animates in. The spin (and its
+       audio) is gated behind the user's "Reveal my verdict" click. */
+    var REELS = [
+      { label: 'Surface',    final: 'Vitreous china',
+        pool: ['Vitreous china', 'Ceramic tile', 'Marble', 'uPVC panel', 'Timber', 'Enamel'] },
+      { label: 'Damage',     final: 'Impact crack with material loss',
+        pool: ['Impact crack with material loss', 'Surface scratch', 'Burn mark', 'Hairline crack', 'Chipped edge', 'Scuff mark'] },
+      { label: 'Verdict',    final: 'Repair viable',
+        pool: ['Repair viable', 'Assessing', 'Calculating', 'Reviewing', 'Cross-checking', 'Matching'] },
+      { label: 'Technician', final: 'Specialist technician',
+        pool: ['Specialist technician', 'Senior technician', 'Field technician', 'Surface expert', 'Academy trained'] },
+      { label: 'Duration',   final: 'Half day',
+        pool: ['Half day', 'One day', 'Two hours', 'Same day', 'Full day'] }
+    ];
+
+    function buildMachine() {
+      var reelsHtml = REELS.map(function (r, i) {
+        return '<div class="s4-reel is-spinning" id="s4-reel-' + i + '">' +
+                 '<div class="s4-reel-label">' + r.label + '</div>' +
+                 '<div class="s4-reel-window"><div class="s4-reel-value" id="s4-reel-val-' + i + '">' + r.pool[0] + '</div></div>' +
+               '</div>';
+      }).join('');
+      content.innerHTML =
+        '<div class="s4-machine glow-card" id="s4-machine">' +
+          '<div class="s4-machine-glow" id="s4-machine-glow"></div>' +
+          '<h2 class="s4-machine-title">MARV Assessment - CLM-2026-047821</h2>' +
+          '<div class="s4-reels">' + reelsHtml + '</div>' +
+        '</div>' +
+        '<div class="s4-warranty" id="s4-warranty">12-month Magicman guarantee</div>';
+    }
+
+    /* Stacked MARV speech bubbles for the closing sequence. */
+    function setMarvBubbles(emotion, texts) {
+      if (sprite) { sprite.src = SPRITES + emotion + '.png'; sprite.alt = 'MARV looking ' + emotion; }
+      var wrap = document.getElementById('s4-marv-bubbles');
+      if (!wrap) { return; }
+      wrap.innerHTML = '';
+      texts.forEach(function (t) {
+        var b = document.createElement('div');
+        b.className = 's4-marv-bubble is-on';
+        b.textContent = t;
+        wrap.appendChild(b);
+      });
+    }
+
+    function runMachine(done) {
+      var timers = [];
+      REELS.forEach(function (r, i) {
+        var valEl = document.getElementById('s4-reel-val-' + i);
+        var k = 0;
+        timers[i] = setInterval(function () {
+          k = (k + 1) % r.pool.length;
+          if (valEl) { valEl.textContent = r.pool[k]; }
+        }, 70 + i * 6);
+      });
+
+      REELS.forEach(function (r, i) {
+        setTimeout(function () {
+          clearInterval(timers[i]);
+          var reelEl = document.getElementById('s4-reel-' + i);
+          var valEl = document.getElementById('s4-reel-val-' + i);
+          if (valEl) { valEl.textContent = r.final; }
+          if (reelEl) {
+            reelEl.classList.remove('is-spinning');
+            reelEl.classList.add('is-locked', 'flash');
+            setTimeout(function () { reelEl.classList.remove('flash'); }, 520);
+          }
+          playReelClunk();
+
+          if (i === REELS.length - 1) {
+            setTimeout(function () {
+              var glow = document.getElementById('s4-machine-glow');
+              if (glow) { glow.classList.add('flash'); }
+              playWinChime();
+              var warranty = document.getElementById('s4-warranty');
+              if (warranty) { setTimeout(function () { warranty.classList.add('is-in'); }, 350); }
+              setTimeout(done, 1100);
+            }, 480);
+          }
+        }, 1100 + i * 650);
+      });
+    }
+
     function startS44() {
       setMarv('marvconfident', '');
-      fadeSwap(function () {
-        content.innerHTML =
-          '<div class="s4-verdict">' +
-            '<h2 class="s4-verdict-h">MARV Assessment - CLM-2026-047821</h2>' +
-            '<div class="s4-verdict-row"><span>Surface</span><span>Vitreous china pedestal basin</span></div>' +
-            '<div class="s4-verdict-row"><span>Damage</span><span>Severe impact - portion of basin wall lost</span></div>' +
-            '<div class="s4-verdict-verdict">Repair viable.</div>' +
-          '</div>';
-      }, function () {
-        setMarv('marvconfident',
-          'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
-        setTimeout(function () {
-          setMarv('marvtriumphant', 'That took me three seconds. Thirty years of experience will do that.');
-          showButton('Continue', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
-        }, 2000);
+      fadeSwap(buildMachine, function () {
+        setMarv('marvconfident', 'Now watch closely. Thirty years of expertise, in one spin.');
+        showButton('Reveal my verdict', false, function () {
+          unlockAudio();
+          cta.innerHTML = '';
+          setMarv('marvfocussed', '');
+          runMachine(function () {
+            setMarvBubbles('marvtriumphant', ['That took me three seconds. Thirty years of experience will do that.']);
+            setTimeout(function () {
+              setMarvBubbles('marvconfident', [
+                'That took me three seconds. Thirty years of experience will do that.',
+                'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.'
+              ]);
+              showButton('Continue', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
+            }, 2000);
+          });
+        });
       });
     }
 
