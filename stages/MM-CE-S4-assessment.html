@@ -213,7 +213,7 @@
     /* Hero size: the machine is driven by viewport height so it dominates the
        screen yet stays fully visible on desktop, and falls back to a width
        limit on narrow / portrait screens. */
-    .s4-machine-img { display: block; height: min(82vh, 820px); width: auto; max-width: 100%; }
+    .s4-machine-img { display: block; height: min(86vh, 1000px); width: auto; max-width: 100%; }
     .s4-machine-overlay {
       position: absolute;
       top: 0;
@@ -493,6 +493,10 @@
     var content = document.getElementById('s4-content');
     var cta = document.getElementById('s4-cta');
     var machineResizeBound = false;
+    // Set once the verdict scene opens. Any in-flight S4-intro beats check this
+    // and bail, so they cannot append bubbles or overwrite content after S4-4
+    // has started (e.g. when the DEV jump button skips the intro mid-sequence).
+    var verdictReached = false;
 
     /* ---- Background clock (ported from the previous Stage 4) ----
        Positioned over the cover-scaled lab background. IMG_W/H are the natural
@@ -724,14 +728,17 @@
       b.classList.add('is-on');
     }
     function startIntro() {
+      if (verdictReached) { return; }
       introBeat('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
       setTimeout(introBeat2, 2000);
     }
     function introBeat2() {
+      if (verdictReached) { return; }
       introBeat('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
       setTimeout(introBeat3, 2000);
     }
     function introBeat3() {
+      if (verdictReached) { return; }
       content.innerHTML = '<div class="s4-stats">' +
         statCard('ti-clock', '35+ Years', 'of Magicman craft intelligence, built in') +
         statCard('ti-calendar', '24/7', 'available, no capacity limits, no waiting') +
@@ -745,10 +752,12 @@
       setTimeout(introBeat4, 1000 + 500 + 1000);
     }
     function introBeat4() {
+      if (verdictReached) { return; }
       introBeat('marvconfident', 'Every decision I make is reviewed by a Magicman expert. When they agree, I learn. When they know better, I learn faster.');
       setTimeout(introBeat5, 2000);
     }
     function introBeat5() {
+      if (verdictReached) { return; }
       introBeat('marvtriumphant', 'Right. Let us look at that claim.');
       cta.innerHTML = '';
       var b = document.createElement('button');
@@ -854,7 +863,13 @@
     }
 
     function startS44() {
-      setMarv('marvconfident', '');
+      verdictReached = true;
+      // Clear every previous MARV bubble - the stacked S4-intro beats and the
+      // single scan-stage bubble - so the left column starts completely empty.
+      Array.prototype.forEach.call(document.querySelectorAll('.s4-intro-bubble'), function (el) {
+        if (el.parentNode) { el.parentNode.removeChild(el); }
+      });
+      if (bubble) { bubble.textContent = ''; bubble.classList.remove('is-on'); }
       // Enter the verdict scene: the body.s4-verdict class lays the scene out as
       // two columns and force-hides every persistent S4-1 to S4-3 decoration
       // (transition video, lab backdrop, spinning clock) via display:none, so
@@ -863,14 +878,12 @@
       var vid = document.getElementById('s4-video');
       if (vid) { try { vid.pause(); } catch (e) {} }
       marvRow.classList.add('is-on');
+      setMarv('marvtriumphant', '');
       fadeSwap(buildMachine, function () {
         positionMachine();
-        setMarv('marvconfident',
-          'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
-        setTimeout(function () {
-          setMarv('marvtriumphant', 'That took me three seconds. Thirty years of experience will do that.');
-          showButton('Continue', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
-        }, 2000);
+        // Left column: the verdict sprite and a single speech bubble. Nothing else.
+        setMarv('marvtriumphant', 'That took me three seconds. Thirty years of experience will do that.');
+        showButton('Continue', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
       });
     }
 
