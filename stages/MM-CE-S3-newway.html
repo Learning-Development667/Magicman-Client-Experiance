@@ -33,64 +33,6 @@
     overflow-x: hidden;
   }
 
-  /* ---- PROGRESS BAR ---- */
-  #progress-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: rgba(19,41,75,0.95);
-    backdrop-filter: blur(8px);
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid rgba(174,210,132,0.2);
-  }
-
-  .progress-logo {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--white);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .progress-logo span {
-    color: var(--wasabi);
-  }
-
-  .progress-stages {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .stage-pip {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-    transition: background 0.4s ease;
-  }
-
-  .stage-pip.active {
-    background: var(--wasabi);
-  }
-
-  .stage-pip.done {
-    background: var(--hunter);
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
   /* ---- MAIN WRAPPER ---- */
   #stage-wrapper {
     padding-top: 0;
@@ -817,7 +759,6 @@
   }
 
   @media (max-width: 480px) {
-    .progress-logo { display: none; }
     .marv-sprite { width: 160px; height: 200px; }
     .marv-speech { width: 220px; font-size: 13px; }
   }
