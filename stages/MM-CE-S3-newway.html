@@ -1526,15 +1526,25 @@
   .s3-acc-continue { margin-top: 18px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
   .s3-acc-continue.show { opacity: 1; transform: translateY(0); }
 
-  .s3-onb-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 34px 40px; max-width: 640px; margin: 0 auto; text-align: center; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .s3-onb-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 24px 40px; max-width: 640px; margin: 0 auto; text-align: center; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .s3-onb-card.show { opacity: 1; transform: translateY(0); animation: wasabiGlow 2.4s ease-in-out infinite; }
   .s3-onb-card h2 { color: #AED284; font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 22px; font-family: 'Open Sans', sans-serif; }
   .s3-onb-list { list-style: none; padding: 0; margin: 0 auto 20px; max-width: 420px; text-align: left; }
   .s3-onb-list li { position: relative; padding-left: 30px; margin: 0 0 12px; font-size: 17px; font-weight: 600; color: #FFFFFF; font-family: 'Open Sans', sans-serif; }
   .s3-onb-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: #AED284; }
   .s3-onb-sub { color: #CDD7E4; font-size: 15px; line-height: 1.5; margin: 0; font-family: 'Open Sans', sans-serif; }
-  .s3-onb-marv { margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-onb-marv { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
   .s3-onb-marv.show { opacity: 1; transform: translateY(0); }
+
+  /* Fit the desktop simulations within a 1280x800 (F11) viewport. zoom scales
+     the frame, screenshots and the percentage-positioned click overlays together
+     so the simulation stays aligned, just smaller. Tuned by measurement. */
+  #scene-fnol .desktop-sim { zoom: 0.85; }
+  /* The website screenshots are tall full-page captures and the click target on
+     the estimate page sits ~57% down, so the whole image must stay on screen.
+     Capping the frame width scales the screenshot (and its percentage-positioned
+     click overlays) down together to fit 800px tall. */
+  #scene-website .desktop-sim { max-width: 690px; margin-left: auto; margin-right: auto; }
 
 </style>
 </head>

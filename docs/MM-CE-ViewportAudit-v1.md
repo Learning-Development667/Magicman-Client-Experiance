@@ -6,8 +6,31 @@
 **Branch:** `claude/happy-bardeen-Qx9h7`
 **Scope:** Every scene in S1 to S4.
 
-### Method and caveat
-This is a **static analysis** of the layout CSS and the script-driven DOM (no live headless browser was run in this environment). Fixed/absolute sizing, `vh`/`vw` units, `min-height`, image `object-fit`, and the stacked height of script-injected content were assessed by hand against an 800px tall, 1280px wide viewport. Items marked **VERIFY** depend on rendered image dimensions or accumulated dynamic content and should be confirmed live. F11 is assumed (full 800px usable height, no toolbar).
+### Status: live measurement pass complete (09 June 2026)
+The static predictions below were confirmed with a **headless Chromium pass at 1280x800** (Playwright), driving each stage to its key scene states and measuring `document.scrollHeight`/`scrollWidth` and element bounding boxes. Real overflows were found and **fixed**; every measured scene now reports `doc = 1280 x 800` with no page scroll and nothing cut off. See "Live measurement results and fixes" immediately below. The original static analysis is retained after it for reference.
+
+### Live measurement results and fixes
+
+| Scene | Before (measured) | After | Fix applied |
+|---|---|---|---|
+| S1-5 MARV beat 3 | OK (stack ~606px) | OK | none needed |
+| S2 page | scrolled 9px (809) | 800 | `.gap-wrap` padding-bottom 64 to 44px |
+| S3-1 CMS sim | content 855px (cut 107) | 800 | `#scene-fnol .desktop-sim { zoom: 0.85 }` (scales frame + animation layers + thumbnails together) |
+| S3-2 browser sim (home) | 1015px (cut) | 800 | `#scene-website .desktop-sim { max-width: 690px }` |
+| S3-2 browser sim (estimate) | 1090px (cut 290) | 800 | same `max-width` cap; click overlay at 57% stays aligned (verified by screenshot) |
+| S3-4 account (new) | OK | OK | none needed |
+| S3-5 onboarding (new) | content 767px (cut 19) | 800 | trimmed `.s3-onb-card` padding 34 to 24, `.s3-onb-marv` margin-top 28 to 20 |
+| S4-2 intro (beat 5) | scrolled 18px (818) | 800 | `.s4-wrap` padding-bottom 72 to 24px |
+| S4-3 fruit machine | scrolled 142px (942) | 800 | `.s4-machine-img` height `min(78vh,900px)` to `min(54vh,620px)` (reels re-align via `positionMachine()`) |
+| S4-5 verdict | scrolled 312px (1112) | 800 | machine height (above) + `.s4-marv-sprite` 130 to 100px + verdict sprite 72px + verdict bubble 13px/1.38 + `.s4-scanbox` 152 to 92px + `.s4-vcard`/`.s4-vitem` padding + value font 16 to 14 + `.s4-stamp`/`.s4-confidence-box` padding + grid row-gap 20 to 12 + `.s4-wrap` min-height offset 60 to 66px |
+
+Notes from the live pass:
+- The S3 desktop simulations were only height-capped/scaled (no content or behaviour changed); the CMS animation layers and the browser click overlays scale with their frame and stay aligned (screenshot-verified).
+- The S4 fruit-machine reel overlays are re-derived from the rendered image by `positionMachine()`, so reducing the machine height keeps them aligned (screenshot-verified mid-spin and at lock).
+- `zoom` proved unreliable on the `width:100%` browser-sim screenshot in Chromium (it ballooned the layout box), so that scene uses a `max-width` cap instead; `zoom` works correctly on the div-based CMS.
+
+### Original static method and caveat (pre-fix)
+This was a **static analysis** of the layout CSS and the script-driven DOM. Fixed/absolute sizing, `vh`/`vw` units, `min-height`, image `object-fit`, and the stacked height of script-injected content were assessed by hand against an 800px tall, 1280px wide viewport. Items marked **VERIFY** depend on rendered image dimensions or accumulated dynamic content and should be confirmed live. F11 is assumed (full 800px usable height, no toolbar).
 
 ### Severity key
 - **OK** - fits comfortably, no scroll, nothing clipped.
