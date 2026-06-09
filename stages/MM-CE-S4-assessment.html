@@ -206,12 +206,14 @@
     .s4-machine {
       position: relative;
       display: inline-block;
-      width: 400px;
-      max-width: 90vw;
       margin: 0 auto;
+      max-width: 94vw;
       line-height: 0;
     }
-    .s4-machine-img { display: block; width: 100%; height: auto; }
+    /* Hero size: the machine is driven by viewport height so it dominates the
+       screen yet stays fully visible on desktop, and falls back to a width
+       limit on narrow / portrait screens. */
+    .s4-machine-img { display: block; height: min(82vh, 820px); width: auto; max-width: 100%; }
     .s4-machine-overlay {
       position: absolute;
       top: 0;
@@ -355,7 +357,7 @@
     body.device-mobile .s4-verdict-verdict { font-size: 32px; }
     body.device-mobile .s4-stat { width: 100%; max-width: 280px; }
     body.device-mobile .s4-progress { width: 280px; }
-    body.device-mobile .s4-machine { width: 86vw; }
+    body.device-mobile .s4-machine-img { height: auto; width: 92vw; }
   </style>
 </head>
 <body>
@@ -806,6 +808,12 @@
 
     function startS44() {
       setMarv('marvconfident', '');
+      // Clear the lab backdrop and the spinning clock from the scan stages so
+      // the fruit machine is the only thing in the verdict scene.
+      var lab = document.getElementById('s4-lab');
+      if (lab) { lab.classList.remove('is-on'); }
+      var clock = document.getElementById('clock-overlay');
+      if (clock) { clock.classList.remove('visible'); }
       fadeSwap(buildMachine, function () {
         positionMachine();
         setMarv('marvconfident',
