@@ -178,13 +178,42 @@
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
     .s4-vcard.is-in { opacity: 1; transform: translateY(0); }
-    .s4-vcard__row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .s4-vitem { flex: 1 1 0; min-width: 130px; text-align: center; padding: 6px 12px; }
+    .s4-vcard__row { display: flex; gap: 12px; justify-content: center; flex-wrap: nowrap; }
+    .s4-vitem { flex: 1 1 0; min-width: 0; text-align: center; padding: 6px 8px; }
     .s4-vitem + .s4-vitem { border-left: 1px solid rgba(19, 41, 75, 0.12); }
     .s4-vitem__label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #5b6b80; margin-bottom: 6px; }
     .s4-vitem__value { font-size: 16px; font-weight: 800; color: var(--navy); line-height: 1.25; }
     .s4-vcard__badge { text-align: center; margin-top: 18px; }
     .s4-vbadge { display: inline-block; background: var(--wasabi); color: var(--navy); font-weight: 800; font-size: 16px; padding: 10px 24px; border-radius: 999px; }
+
+    /* Left column confidence stamp + paired confidence boxes (below the bubble). */
+    .s4-stamp {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 2px solid #AED284;
+      border-radius: 8px;
+      color: #AED284;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      text-align: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s4-confidence { display: flex; gap: 8px; width: 100%; }
+    .s4-confidence-box {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 12px;
+      background: #0D4F4F;
+      border: 2px solid #AED284;
+      border-radius: 8px;
+      color: #FFFFFF;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
 
     /* ---- S4-4 fruit machine (static positioning - step one) ----
        The machine art is a real <img> in a wrapper, following the same
@@ -275,12 +304,13 @@
       justify-content: center;
       text-align: center;
       padding: 0 5%;
+      overflow: hidden;
       color: var(--white);
       font-family: 'Open Sans', sans-serif;
       font-weight: 700;
-      font-size: var(--reel-fs, 12px);
+      font-size: clamp(9px, 1.8vw, 14px);
       line-height: 1.1;
-      word-break: break-word;
+      word-break: keep-all;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
     @keyframes reelSpin {
@@ -331,7 +361,7 @@
       margin-top: 0;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
     }
     body.s4-verdict #s4-content { grid-area: machine; margin: 0; }
     body.s4-verdict #s4-verdict-slot { grid-area: verdict; width: 100%; }
@@ -919,8 +949,8 @@
     var spinStarted = false;
 
     /* Size the overlay to the rendered image and set each reel's item height
-       (--reel-h) and font size (--reel-fs). Runs on load and on every resize,
-       so the reel strips stay aligned with the image at all screen sizes. */
+       (--reel-h). Reel font size is handled in CSS via clamp(). Runs on load
+       and on every resize, so the reel strips stay aligned at all screen sizes. */
     function positionMachine() {
       var img = document.getElementById('s4-machine-img');
       var overlay = document.getElementById('s4-machine-overlay');
@@ -930,9 +960,8 @@
       overlay.style.width = w + 'px';
       overlay.style.height = h + 'px';
       Array.prototype.forEach.call(overlay.querySelectorAll('.s4-reel'), function (reel) {
-        var rh = reel.clientHeight, rw = reel.clientWidth;
+        var rh = reel.clientHeight;
         reel.style.setProperty('--reel-h', rh + 'px');
-        reel.style.setProperty('--reel-fs', Math.max(9, Math.min(15, rw * 0.20)) + 'px');
         // Keep an already-locked reel pinned to its final value across resizes.
         if (reel.classList.contains('locked')) {
           var strip = reel.querySelector('.s4-reel-strip');
@@ -1146,18 +1175,32 @@
               vitem('Verdict', 'Repair viable') +
               vitem('Technician', 'Specialist technician') +
               vitem('Duration', 'Half day') +
+              vitem('Price', 'Priced against your agreed account terms') +
             '</div>' +
-            '<div class="s4-vcard__badge"><span class="s4-vbadge">Magicman Quality Guaranteed</span></div>' +
           '</div>';
         var card = document.getElementById('s4-vcard');
         void card.offsetWidth;
         playVerdictTone();
         card.classList.add('is-in');
       }
-      // After the card has faded in (0.6s) plus a 2 second pause.
+      // After the card has faded in (0.6s) plus a 2 second pause, build the left
+      // column tail: verdict dialogue, confidence stamp, paired confidence boxes,
+      // then the Continue button.
       setTimeout(function () {
         setMarv('marvconfident', 'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
-        // Continue button in the left column, below the MARV speech bubble.
+
+        var stamp = document.createElement('div');
+        stamp.className = 's4-stamp';
+        stamp.textContent = 'Magicman Quality Guaranteed';
+        marvRow.appendChild(stamp);
+
+        var conf = document.createElement('div');
+        conf.className = 's4-confidence';
+        conf.innerHTML =
+          '<div class="s4-confidence-box">MARV assesses.</div>' +
+          '<div class="s4-confidence-box">A Magicman Master Technician validates.</div>';
+        marvRow.appendChild(conf);
+
         var contBtn = document.createElement('button');
         contBtn.type = 'button';
         contBtn.className = 's4-btn';
