@@ -196,6 +196,51 @@
     .s4-verdict-row span:last-child { font-weight: 700; text-align: right; }
     .s4-verdict-verdict { margin-top: 18px; font-size: 40px; font-weight: 800; color: var(--wasabi); text-align: center; }
 
+    /* ---- S4-4 fruit machine (static positioning - step one) ----
+       The machine art is a real <img> in a wrapper, following the same
+       rendered-image overlay pattern used for the lab background / clock above.
+       positionMachine() in the script sizes the overlay layer to the rendered
+       image on load and on every resize, so the five reel windows stay aligned
+       at all screen sizes. Reel boxes are percentage positions of the 608 x 832
+       source image. */
+    .s4-machine {
+      position: relative;
+      display: inline-block;
+      width: 400px;
+      max-width: 90vw;
+      margin: 0 auto;
+      line-height: 0;
+    }
+    .s4-machine-img { display: block; width: 100%; height: auto; }
+    .s4-machine-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    .s4-reel {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 4px;
+      /* Light scrim so the white reel text reads over the white reels while the
+         positioning is reviewed. */
+      background: rgba(13, 20, 33, 0.42);
+    }
+    .s4-reel__text {
+      width: 100%;
+      padding: 0 5%;
+      text-align: center;
+      color: var(--white);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      line-height: 1.12;
+      word-break: break-word;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
     /* ---- Glow-card border treatment (stat cards + verdict) - a warm
        diagnostic-readout look from MARV's lab: wasabi border, glow pulse,
        and a faint trace running around the edge. ---- */
@@ -310,6 +355,7 @@
     body.device-mobile .s4-verdict-verdict { font-size: 32px; }
     body.device-mobile .s4-stat { width: 100%; max-width: 280px; }
     body.device-mobile .s4-progress { width: 280px; }
+    body.device-mobile .s4-machine { width: 86vw; }
   </style>
 </head>
 <body>
@@ -397,6 +443,7 @@
     var marvRow = document.getElementById('s4-marv');
     var content = document.getElementById('s4-content');
     var cta = document.getElementById('s4-cta');
+    var machineResizeBound = false;
 
     /* ---- Background clock (ported from the previous Stage 4) ----
        Positioned over the cover-scaled lab background. IMG_W/H are the natural
@@ -694,18 +741,73 @@
       });
     }
 
-    /* ---- S4-4: the verdict ---- */
+    /* ---- S4-4: the verdict, shown on a fruit machine (step one - static) ----
+       Five reel windows, positioned as percentages of the 608 x 832 machine
+       image. Each reel shows its final value as static centred text. No spin
+       animation or sound yet - that is step two. */
+    var MACHINE_REELS = [
+      { left: 15.1, width: 11.0, text: 'Vitreous china' },
+      { left: 30.1, width: 10.5, text: 'Impact crack with material loss' },
+      { left: 45.1, width: 9.9,  text: 'Repair viable' },
+      { left: 59.7, width: 9.4,  text: 'Specialist technician' },
+      { left: 74.2, width: 9.6,  text: 'Half day' }
+    ];
+    var MACHINE_REEL_TOP = 32.7;     // y = 272 / 832
+    var MACHINE_REEL_HEIGHT = 18.4;  // 153 / 832
+
+    /* Size the overlay to the rendered machine image and shrink each reel's
+       text until it fits its window. Runs on load and on every resize so the
+       reel overlays stay aligned at all screen sizes. */
+    function positionMachine() {
+      var img = document.getElementById('s4-machine-img');
+      var overlay = document.getElementById('s4-machine-overlay');
+      if (!img || !overlay) { return; }
+      var w = img.clientWidth, h = img.clientHeight;
+      if (!w || !h) { return; }
+      overlay.style.width = w + 'px';
+      overlay.style.height = h + 'px';
+      var base = Math.max(8, w * 0.034);
+      Array.prototype.forEach.call(overlay.querySelectorAll('.s4-reel'), function (reel) {
+        var t = reel.querySelector('.s4-reel__text');
+        if (!t) { return; }
+        var size = base;
+        t.style.fontSize = size + 'px';
+        var guard = 0;
+        while ((t.scrollHeight > reel.clientHeight || t.scrollWidth > reel.clientWidth) && size > 7 && guard < 48) {
+          size -= 0.5;
+          t.style.fontSize = size + 'px';
+          guard++;
+        }
+      });
+    }
+
+    function buildMachine() {
+      var reels = MACHINE_REELS.map(function (r) {
+        return '<div class="s4-reel" style="left:' + r.left + '%;width:' + r.width +
+               '%;top:' + MACHINE_REEL_TOP + '%;height:' + MACHINE_REEL_HEIGHT + '%;">' +
+                 '<div class="s4-reel__text">' + r.text + '</div>' +
+               '</div>';
+      }).join('');
+      content.innerHTML =
+        '<div class="s4-machine" id="s4-machine">' +
+          '<img class="s4-machine-img" id="s4-machine-img" src="../assets/images/fruit_machine.png" alt="MARV verdict fruit machine">' +
+          '<div class="s4-machine-overlay" id="s4-machine-overlay">' + reels + '</div>' +
+        '</div>';
+      var img = document.getElementById('s4-machine-img');
+      if (img) {
+        img.addEventListener('load', positionMachine);
+        if (img.complete) { positionMachine(); }
+      }
+      if (!machineResizeBound) {
+        window.addEventListener('resize', positionMachine);
+        machineResizeBound = true;
+      }
+    }
+
     function startS44() {
       setMarv('marvconfident', '');
-      fadeSwap(function () {
-        content.innerHTML =
-          '<div class="s4-verdict">' +
-            '<h2 class="s4-verdict-h">MARV Assessment - CLM-2026-047821</h2>' +
-            '<div class="s4-verdict-row"><span>Surface</span><span>Vitreous china pedestal basin</span></div>' +
-            '<div class="s4-verdict-row"><span>Damage</span><span>Severe impact - portion of basin wall lost</span></div>' +
-            '<div class="s4-verdict-verdict">Repair viable.</div>' +
-          '</div>';
-      }, function () {
+      fadeSwap(buildMachine, function () {
+        positionMachine();
         setMarv('marvconfident',
           'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
         setTimeout(function () {
