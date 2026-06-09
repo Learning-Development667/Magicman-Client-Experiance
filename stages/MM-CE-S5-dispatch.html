@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magicman | The Repair Journey - Stage 5 Dispatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="../js/main.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { background: var(--navy); color: var(--white); font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
+
+    .ph-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 24px 96px;
+      min-height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 26px;
+    }
+    .ph-marv { padding: 12px; }
+    .ph-marv > img { width: 150px; height: auto; }
+    .ph-count { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(174, 210, 132, 0.85); }
+    .ph-stage-name { margin: 0; font-size: 64px; font-weight: 800; line-height: 1.05; color: var(--wasabi); }
+    .ph-soon { margin: 0; font-size: 20px; color: var(--white); opacity: 0.9; }
+    .ph-btn {
+      background: var(--wasabi);
+      color: var(--navy);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .ph-btn:hover { transform: translateY(-2px); }
+
+    body.device-mobile .ph-stage-name { font-size: 42px; }
+    body.device-mobile .ph-marv > img { width: 120px; }
+  </style>
+</head>
+<body>
+
+  <!-- Progress indicator - 7 stages, Stage 5 Dispatch active. Class only,
+       no id="progress-steps", so the shell's main.js never re-renders it. -->
+  <header class="progress-bar" aria-label="Journey progress - Stage 5 of 7">
+    <div class="progress-bar__inner">
+      <span class="label-accent">Magicman</span>
+      <ol class="progress-steps">
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+        <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="ph-wrap">
+    <span class="ph-marv marv-frame glow-card"><img src="../assets/marv/marvthinking.png" alt="MARV thinking"></span>
+    <p class="ph-count">Stage 5 of 7</p>
+    <h1 class="ph-stage-name">Dispatch</h1>
+    <p class="ph-soon">Coming soon.</p>
+    <button class="ph-btn" type="button" onclick="window.location.href='MM-CE-S6-repair.html'">Continue</button>
+  </main>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+      <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
+      <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
+      <a class="dev-nav__btn" href="MM-CE-S5-dispatch.html">Stage 5 - Dispatch</a>
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - Repair</a>
+      <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - Outcome</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+</body>
+</html>
