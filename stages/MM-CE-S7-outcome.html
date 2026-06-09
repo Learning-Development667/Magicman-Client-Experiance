@@ -201,28 +201,6 @@
       transition: opacity 0.6s ease;
     }
     .s7-closing-video.show { opacity: 1; }
-    .s7-logo {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.8s ease;
-      z-index: 4;
-    }
-    .s7-logo.show { opacity: 1; }
-    /* Placeholder logo - replace with the real Magicman logo PNG when added. */
-    .s7-logo-ph {
-      background: #FFFFFF;
-      color: #13294B;
-      font-weight: 800;
-      font-size: 56px;
-      letter-spacing: 0.5px;
-      padding: 28px 56px;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-    }
     .s7-navy-out {
       position: absolute;
       inset: 0;
@@ -264,11 +242,10 @@
       </div>
     </section>
 
-    <!-- SCENE 2 - KEN BURNS CLOSING MONTAGE
-         Image filenames mapped to the existing "after" repair photos in
-         assets/images/ (the names in the brief did not exist in the repo):
-           basin-after.png, marble-after.png, tile-after.png,
-           sideboard-after.png, window-after.png, cabinet-after.png -->
+    <!-- SCENE 2 - KEN BURNS CLOSING MONTAGE - repaired-surface "after" photos:
+           basin-after.png, lobby_floor_tile_scratch_after.png,
+           counter_chip_after.png, Scorch_mark_after.png,
+           window-after.png, cabinet-after.png -->
     <section class="s7-scene s7-kb" id="s7-scene-kb">
       <div class="s7-kb-panel" data-kb>
         <img class="s7-kb-img" src="../assets/images/basin-after.png" alt="Repaired vitreous china basin">
@@ -279,7 +256,7 @@
         </div>
       </div>
       <div class="s7-kb-panel" data-kb>
-        <img class="s7-kb-img" src="../assets/images/marble-after.png" alt="Repaired marble floor tile">
+        <img class="s7-kb-img" src="../assets/images/lobby_floor_tile_scratch_after.png" alt="Repaired marble floor tile">
         <div class="s7-kb-caption">
           <span><strong>Surface:</strong> Marble floor tile</span>
           <span><strong>Issue:</strong> Surface scratches</span>
@@ -287,7 +264,7 @@
         </div>
       </div>
       <div class="s7-kb-panel" data-kb>
-        <img class="s7-kb-img" src="../assets/images/tile-after.png" alt="Repaired marble worktop">
+        <img class="s7-kb-img" src="../assets/images/counter_chip_after.png" alt="Repaired marble worktop">
         <div class="s7-kb-caption">
           <span><strong>Surface:</strong> Marble worktop</span>
           <span><strong>Issue:</strong> Chip to edge</span>
@@ -295,7 +272,7 @@
         </div>
       </div>
       <div class="s7-kb-panel" data-kb>
-        <img class="s7-kb-img" src="../assets/images/sideboard-after.png" alt="Repaired timber surface">
+        <img class="s7-kb-img" src="../assets/images/Scorch_mark_after.png" alt="Repaired timber surface">
         <div class="s7-kb-caption">
           <span><strong>Surface:</strong> Timber surface</span>
           <span><strong>Issue:</strong> Scorch mark</span>
@@ -369,21 +346,11 @@
 
     <!-- SCENE 6 - CLOSING VIDEO SEQUENCE -->
     <section class="s7-scene s7-closing" id="s7-scene-closing">
-      <!-- VIDEO PLACEHOLDER - replace with file when ready: assets/video/marv_world_reverse.mp4
-           The <video> tag below already points at the final path, so it will play
-           the moment the file is uploaded. Until then the navy background shows. -->
-      <video class="s7-closing-video" id="s7-closing-1" playsinline preload="none">
-        <source src="../assets/video/marv_world_reverse.mp4" type="video/mp4">
+      <!-- Closing transition video. Plays full screen; when it ends the scene
+           fades to navy and holds - the end of the experience. -->
+      <video class="s7-closing-video" id="s7-closing-video" playsinline preload="none">
+        <source src="../assets/video/marv_transition_out.mp4" type="video/mp4">
       </video>
-      <!-- VIDEO PLACEHOLDER - replace with file when ready: assets/video/claymation_logo.mp4 -->
-      <video class="s7-closing-video" id="s7-closing-2" playsinline preload="none">
-        <source src="../assets/video/claymation_logo.mp4" type="video/mp4">
-      </video>
-      <!-- LOGO PLACEHOLDER - no logo PNG exists in the repo yet. Replace this div
-           with <img src="../assets/images/magicman_logo.png"> once the file is added. -->
-      <div class="s7-logo" id="s7-logo">
-        <div class="s7-logo-ph">Magicman</div>
-      </div>
       <div class="s7-navy-out" id="s7-navy-out"></div>
     </section>
 
@@ -520,45 +487,38 @@
       });
     }
 
-    /* ---- Scene 6: closing video sequence + logo ---- */
-    var closing1 = document.getElementById('s7-closing-1');
-    var closing2 = document.getElementById('s7-closing-2');
-    var logo = document.getElementById('s7-logo');
+    /* ---- Scene 6: closing transition video, then fade to navy ---- */
+    var closingVideo = document.getElementById('s7-closing-video');
     var navyOut = document.getElementById('s7-navy-out');
     var closingDone = false;
-
-    function playClosingVideo(vid, onDone) {
-      if (!vid) { onDone(); return; }
-      var advanced = false;
-      function go() { if (advanced) { return; } advanced = true; onDone(); }
-      vid.addEventListener('ended', go);
-      // A missing placeholder file errors out - advance after a short navy beat.
-      vid.addEventListener('error', function () { setTimeout(go, 1200); });
-      vid.classList.add('show');
-      var p = vid.play();
-      if (p && p.catch) { p.catch(function () {
-        vid.muted = true;
-        var p2 = vid.play();
-        if (p2 && p2.catch) { p2.catch(function () { setTimeout(go, 1200); }); }
-      }); }
-      // Safety net in case neither event fires (e.g. a stalled placeholder).
-      setTimeout(go, 20000);
-    }
 
     function startClosing() {
       if (closingDone) { return; }
       closingDone = true;
       showScene('closing');
-      playClosingVideo(closing1, function () {
-        if (closing1) { closing1.classList.remove('show'); }
-        playClosingVideo(closing2, function () {
-          if (closing2) { closing2.classList.remove('show'); }
-          if (logo) { logo.classList.add('show'); }       // real logo fades in
-          setTimeout(function () {
-            if (navyOut) { navyOut.classList.add('show'); } // hold 3s, fade to navy
-          }, 3000);
-        });
-      });
+      function fadeToNavy() { if (navyOut) { navyOut.classList.add('show'); } }
+      if (!closingVideo) { fadeToNavy(); return; }
+      var finished = false;
+      function finish() { if (finished) { return; } finished = true; fadeToNavy(); }
+      closingVideo.addEventListener('ended', finish);
+      // If the file is missing or playback is blocked, still end on navy.
+      closingVideo.addEventListener('error', function () { setTimeout(finish, 600); });
+      closingVideo.classList.add('show');
+      var p = closingVideo.play();
+      if (p && p.catch) { p.catch(function () {
+        closingVideo.muted = true;
+        var p2 = closingVideo.play();
+        if (p2 && p2.catch) { p2.catch(function () { setTimeout(finish, 600); }); }
+      }); }
+      // Watchdog: if nothing is actually playing shortly after (e.g. the file is
+      // missing or blocked, and no 'ended' will ever fire), end on navy. A real
+      // video that is playing (currentTime advancing) is left alone for 'ended'.
+      setTimeout(function () {
+        if (!finished && (closingVideo.error || closingVideo.readyState === 0 ||
+            (closingVideo.paused && closingVideo.currentTime === 0))) {
+          finish();
+        }
+      }, 3500);
     }
 
     /* ---- First user gesture: unlock audio and, if waiting, start the advert ---- */
