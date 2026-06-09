@@ -300,6 +300,7 @@
     .s4-btn.is-in { opacity: 1; }
     .s4-btn:hover { transform: translateY(-2px); }
     .s4-btn--retry { background: transparent; color: var(--white); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .s4-btn--tryagain { display: block; width: 100%; max-width: 560px; min-height: 60px; margin: 0 auto; }
 
     /* Mobile */
     body.device-mobile .s4-claim-img { width: 280px; }
@@ -504,6 +505,7 @@
 
     function showCards(cards, onAnswer) {
       var row = document.getElementById('s4-cards');
+      row.classList.remove('is-in');
       row.innerHTML = '';
       cards.forEach(function (c) {
         var card = document.createElement('button');
@@ -535,6 +537,19 @@
       b.classList.add('is-in');
     }
 
+    // Large pulsing wasabi "Try again" button shown below MARV after a wrong answer.
+    function showTryAgain(onClick) {
+      cta.innerHTML = '';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 's4-btn s4-btn--tryagain s4-btn--pulse';
+      b.textContent = 'Try again';
+      b.addEventListener('click', function () { cta.innerHTML = ''; onClick(); });
+      cta.appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('is-in');
+    }
+
     /* ---- A quiz scene (used for material and damage scans) ---- */
     function runQuiz(opts) {
       function handleAnswer(card, row) {
@@ -544,12 +559,12 @@
           setMarv('marvthumbsup', opts.success);
           setTimeout(opts.next, 2600);
         } else {
-          setCardsEnabled(row, false);
+          // Hide all cards completely, show the disappointed feedback and a
+          // prominent Try again button below MARV.
+          row.innerHTML = '';
           setMarv('marvdisappointed', card.wrong);
-          showButton('Retry', true, function () {
-            cta.innerHTML = '';
+          showTryAgain(function () {
             setMarv('marvconfident', opts.prompt);
-            // Rebuild the cards so they are always fresh, enabled and clickable.
             showCards(opts.cards, handleAnswer);
           });
         }
