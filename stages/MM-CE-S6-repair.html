@@ -244,7 +244,9 @@
     }
     /* Full-width header image: fixed height, cover-cropped, top corners follow
        the card radius (via the card's overflow: hidden). */
-    .s6-game-img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    /* contain (not cover) so the full game artwork is visible without cropping;
+       navy fills any letterbox gaps. */
+    .s6-game-img { width: 100%; height: 240px; object-fit: contain; background: #13294B; display: block; }
     .s6-game-body { padding: 26px; display: flex; flex-direction: column; gap: 14px; flex: 1 1 auto; }
     .s6-game-card h3 { color: #AED284; font-weight: 800; font-size: 22px; margin: 0; }
     .s6-game-card p { color: #FFFFFF; font-weight: 400; font-size: 15px; line-height: 1.55; margin: 0; flex: 1 1 auto; }
@@ -765,12 +767,15 @@
   </script>
 
   <script>
-    /* Stop the ambient track cleanly whenever the user leaves this stage
-       (button, skip, or DEV panel link). Also covers the back/forward cache
-       case where the audio could otherwise keep playing after navigation. */
+    /* Stop every audio and video on this stage cleanly whenever the user leaves
+       by any method (skip, continue, DEV link, back button). Also covers the
+       back/forward cache case where media could otherwise keep playing. This
+       includes the ambient track and the bath repair video. */
     window.addEventListener('pagehide', function () {
-      var m = document.getElementById('s6-music');
-      if (m) { try { m.pause(); m.currentTime = 0; } catch (e) {} }
+      var media = document.querySelectorAll('audio, video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].currentTime = 0; } catch (e) {}
+      }
     });
   </script>
 

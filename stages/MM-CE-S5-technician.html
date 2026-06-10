@@ -448,5 +448,17 @@
   })();
   </script>
 
+  <script>
+    /* Stop every audio and video on this stage cleanly whenever the user leaves
+       by any method (skip, continue, DEV link, back button). Also covers the
+       back/forward cache case where media could otherwise keep playing. */
+    window.addEventListener('pagehide', function () {
+      var media = document.querySelectorAll('audio, video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].currentTime = 0; } catch (e) {}
+      }
+    });
+  </script>
+
 </body>
 </html>
