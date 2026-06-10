@@ -203,6 +203,31 @@
       transition: opacity 0.6s ease;
     }
     .s7-closing-video.show { opacity: 1; }
+
+    /* Full-screen text overlay layered over the closing video. Same technique
+       as the vintage TV overlay - absolute positioning, z-index above the
+       video (below the final navy-out wash), navy semi-transparent background,
+       centred white text. Fades in when the video starts and out before it
+       ends, driven by the video's own playing / timeupdate events. */
+    .s7-world-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      background: rgba(19, 41, 75, 0.55);
+      color: #FFFFFF;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(28px, 6vw, 48px);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+    }
+    .s7-world-overlay.is-on { opacity: 1; }
     .s7-navy-out {
       position: absolute;
       inset: 0;
@@ -378,6 +403,7 @@
       <video class="s7-closing-video" id="s7-closing-video" playsinline preload="none">
         <source src="../assets/video/marv_transition_out.mp4" type="video/mp4">
       </video>
+      <div class="s7-world-overlay" id="s7-world-overlay">Leaving MARV's world</div>
       <div class="s7-navy-out" id="s7-navy-out"></div>
     </section>
 
@@ -563,6 +589,17 @@
       closingVideo.addEventListener('ended', finish);
       // If the file is missing or playback is blocked, still end on navy.
       closingVideo.addEventListener('error', function () { setTimeout(finish, 600); });
+      // Text overlay: fade in when the video starts, fade out before it ends.
+      var worldOverlay = document.getElementById('s7-world-overlay');
+      if (worldOverlay) {
+        closingVideo.addEventListener('playing', function () { worldOverlay.classList.add('is-on'); });
+        closingVideo.addEventListener('timeupdate', function () {
+          if (closingVideo.duration && closingVideo.currentTime >= closingVideo.duration - 1.2) {
+            worldOverlay.classList.remove('is-on');
+          }
+        });
+        closingVideo.addEventListener('ended', function () { worldOverlay.classList.remove('is-on'); });
+      }
       closingVideo.classList.add('show');
       var p = closingVideo.play();
       if (p && p.catch) { p.catch(function () {
