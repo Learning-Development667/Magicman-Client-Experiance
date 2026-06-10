@@ -1723,7 +1723,9 @@ window.addEventListener('load', () => {
   }
 
   var current = 0;
+  var montageStopped = false;
   function advance() {
+    if (montageStopped) { return; }
     if (current >= KB_PANELS.length) {
       // All panels shown - run the title card, then reveal MARV directly.
       panelEls[panelEls.length - 1].classList.remove('active');
@@ -1783,6 +1785,12 @@ window.addEventListener('load', () => {
   if (marvNextBtn) { marvNextBtn.addEventListener('click', advanceMarv); }
 
   function revealMarv() {
+    // Hard-stop the montage and tear its layers down so MARV is the only thing
+    // showing. Without this, skipping mid-montage can leave a montage panel or
+    // the navy/black title card layered against the reveal.
+    montageStopped = true;
+    panelEls.forEach(function (p) { p.classList.remove('active'); });
+    if (titleCard) { titleCard.classList.remove('show'); }
     if (marvStage) { marvStage.classList.add('show'); }
     if (marvVideo) {
       marvVideo.currentTime = 0;
@@ -1831,7 +1839,7 @@ window.addEventListener('load', () => {
     devClearTimers();
     devReset();
     var key = DEV_ORDER[i];
-    if (key === 'cinematic') { current = 0; advance(); }
+    if (key === 'cinematic') { montageStopped = false; current = 0; advance(); }
     else if (key === 'marv') { revealMarv(); }
   }
   function devCur() {
