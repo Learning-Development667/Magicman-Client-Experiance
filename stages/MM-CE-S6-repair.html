@@ -98,20 +98,30 @@
     /* Click-to-progress buttons carry the wasabi glow pulse. */
     .s6-pulse { animation: marvGlowPulse 2s ease-in-out infinite; margin-top: 4px; }
 
-    /* ---- SCENE 2 - CAPABILITY SHOWCASE (2 x 5 grid of square cards) ---- */
-    .s6-cap-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-      width: 100%;
+    /* ---- SCENE 2 - CAPABILITY SHOWCASE (rolodex carousel) ---- */
+    .s6-carousel { position: relative; width: 100%; max-width: 1100px; }
+    /* The viewport carries the 3D perspective and clips the off-stage cards. */
+    .s6-carousel-viewport {
+      position: relative;
+      height: 540px;
+      perspective: 1400px;
+      overflow: hidden;
     }
-    .s6-cap-card {
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+    /* Each card is centred (left 50% + translate(-50%)) and offset/scaled/rotated
+       by JS depending on its distance from the active card. */
+    .s6-cab {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 300px;
+      transform: translate(-50%, 0);
+      transform-origin: center center;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      will-change: transform, opacity;
+      cursor: pointer;
     }
-    .s6-cap-card.show { opacity: 1; transform: translateY(0); }
-    .s6-cap-media {
+    .s6-cab-title { color: #FFFFFF; font-weight: 800; font-size: 18px; line-height: 1.2; margin: 0 0 8px; text-align: center; }
+    .s6-cab-media {
       position: relative;
       aspect-ratio: 1 / 1;           /* square, matching the 1:1 source videos */
       background: #13294B;
@@ -122,9 +132,50 @@
       align-items: center;
       justify-content: center;
     }
-    .s6-cap-ph { color: #AED284; font-weight: 700; font-size: 14px; line-height: 1.3; text-align: center; padding: 8px; }
-    .s6-cap-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .s6-cap-label { margin-top: 8px; color: #FFFFFF; font-size: 13px; font-weight: 600; text-align: center; }
+    .s6-cab.is-active .s6-cab-media { box-shadow: 0 0 18px rgba(174, 210, 132, 0.55); }
+    .s6-cab-ph { color: #AED284; font-weight: 700; font-size: 15px; line-height: 1.3; text-align: center; padding: 8px; }
+    .s6-cab-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    /* Fixed-height list area so every card is the same height and the media
+       squares stay aligned across the three visible cards. The list is hidden
+       instantly on the flanking cards (visibility), and its items animate in
+       line by line on the active card. */
+    .s6-cab-list { list-style: none; margin: 12px 0 0; padding: 0 6px; height: 188px; text-align: left; }
+    .s6-cab:not(.is-active) .s6-cab-list { visibility: hidden; }
+    .s6-cab-list li {
+      position: relative;
+      color: #FFFFFF;
+      font-size: 12.5px;
+      line-height: 1.35;
+      padding: 0 0 0 16px;
+      margin-bottom: 2px;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .s6-cab-list li::before { content: '+'; position: absolute; left: 0; top: 0; color: #AED284; font-weight: 700; }
+    .s6-cab-list li.show { opacity: 1; transform: translateX(0); }
+    /* Navigation arrows - either side of the carousel, level with the media. */
+    .s6-carousel-arrow {
+      position: absolute;
+      top: 175px;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: #AED284;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s6-arrow-prev { left: 0; }
+    .s6-arrow-next { right: 0; }
+    .s6-carousel-arrow__tri { width: 0; height: 0; border-style: solid; }
+    .s6-arrow-prev .s6-carousel-arrow__tri { border-width: 10px 14px 10px 0; border-color: transparent #13294B transparent transparent; margin-right: 3px; }
+    .s6-arrow-next .s6-carousel-arrow__tri { border-width: 10px 0 10px 14px; border-color: transparent transparent transparent #13294B; margin-left: 3px; }
 
     /* ---- SCENE 3 - BATH REPAIR VIDEO ---- */
     .s6-bath-stage {
@@ -224,8 +275,9 @@
     .s6-game-card .btn { align-self: flex-start; }
     .s6-games-note { color: rgba(255, 255, 255, 0.6); font-size: 13px; text-align: center; margin: 0; }
 
-    /* ---- Mobile - grids and rows stack to a single column ---- */
-    body.device-mobile .s6-cap-grid { grid-template-columns: 1fr; }
+    /* ---- Mobile - rows stack to a single column; carousel cards shrink ---- */
+    body.device-mobile .s6-cab { width: min(300px, 78vw); }
+    body.device-mobile .s6-carousel-arrow { top: 150px; }
     body.device-mobile .s6-sliders,
     body.device-mobile .s6-games { flex-direction: column; }
     body.device-mobile .s6-marv { flex-direction: column; text-align: center; }
@@ -271,17 +323,10 @@
     <!-- SCENE 2 - CAPABILITY SHOWCASE -->
     <section class="s6-scene" id="s6-scene-2">
       <h1 class="s6-headline">Whatever the surface - we have it covered.</h1>
-      <div class="s6-cap-grid">
-        <div class="s6-cap-card" data-video="capability-bathroom.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Bathroom</div></div><div class="s6-cap-label">Bathroom</div></div>
-        <div class="s6-cap-card" data-video="capability-kitchen.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Kitchen</div></div><div class="s6-cap-label">Kitchen</div></div>
-        <div class="s6-cap-card" data-video="capability-flooring.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Flooring</div></div><div class="s6-cap-label">Flooring</div></div>
-        <div class="s6-cap-card" data-video="capability-window.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Windows</div></div><div class="s6-cap-label">Windows</div></div>
-        <div class="s6-cap-card" data-video="capability-door.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Doors</div></div><div class="s6-cap-label">Doors</div></div>
-        <div class="s6-cap-card" data-video="capability-furniture.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Furniture</div></div><div class="s6-cap-label">Furniture</div></div>
-        <div class="s6-cap-card" data-video="capability-stone.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Stone and Marble</div></div><div class="s6-cap-label">Stone and Marble</div></div>
-        <div class="s6-cap-card" data-video="capability-cladding.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Wall Cladding and IPS</div></div><div class="s6-cap-label">Wall Cladding and IPS</div></div>
-        <div class="s6-cap-card" data-video="capability-spraying.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Spraying and Recolouring</div></div><div class="s6-cap-label">Spraying and Recolouring</div></div>
-        <div class="s6-cap-card" data-video="capability-worktop.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Worktops and Counters</div></div><div class="s6-cap-label">Worktops and Counters</div></div>
+      <div class="s6-carousel" id="s6-carousel">
+        <button type="button" class="s6-carousel-arrow s6-arrow-prev" id="s6-cap-prev" aria-label="Previous surface"><span class="s6-carousel-arrow__tri"></span></button>
+        <div class="s6-carousel-viewport" id="s6-carousel-viewport"></div>
+        <button type="button" class="s6-carousel-arrow s6-arrow-next" id="s6-cap-next" aria-label="Next surface"><span class="s6-carousel-arrow__tri"></span></button>
       </div>
       <button type="button" id="s6-cta-2" class="btn btn-primary s6-pulse">Watch the repair</button>
     </section>
@@ -439,51 +484,161 @@
       current = n;
       var m = MARV[n];
       if (m) { setMarv(m[0], m[1]); }
-      if (n === 2) { staggerCaps(); }
+      if (n === 2) { setCapActive(0); }   // open on Bathroom, the first card
       if (n === 3) { resetBath(); }
       if (stage) { stage.scrollTop = 0; }
     }
 
-    /* ---- Scene 2: capability cards stagger in (50ms between each) ---- */
-    function staggerCaps() {
-      var cards = document.querySelectorAll('.s6-cap-card');
-      cards.forEach(function (c) { c.classList.remove('show'); });
-      cards.forEach(function (c, i) { setTimeout(function () { c.classList.add('show'); }, i * 50); });
+    /* ---- Scene 2: capability rolodex carousel ----
+       Card content (title + repair list) for the ten surface categories.
+       Items are listed explicitly (not split from a string) because several
+       contain their own commas. ---- */
+    var CAPS = [
+      { file: 'capability-bathroom.mp4', name: 'Bathroom', title: 'Bathroom repairs',
+        items: ['Acrylic and enamel baths', 'Basins and sinks', 'Toilet cisterns and pans', 'Shower trays and enclosures', 'Tiles and grout', 'Mirrors and glass', 'Chrome fittings and rails', 'IPS and wall cladding panels'] },
+      { file: 'capability-kitchen.mp4', name: 'Kitchen', title: 'Kitchen repairs',
+        items: ['Worktops and counters', 'Cabinet doors and drawer fronts', 'Laminate and vinyl surfaces', 'Ceramic and porcelain tiles', 'Splashbacks and upstands', 'Sinks and taps', 'Appliance panels', 'Flooring and skirting'] },
+      { file: 'capability-flooring.mp4', name: 'Flooring', title: 'Flooring repairs',
+        items: ['Hardwood and engineered timber', 'Laminate and luxury vinyl', 'Ceramic and porcelain tiles', 'Stone and marble flooring', 'Parquet and block wood', 'Vinyl and safety flooring', 'Threshold strips and edging'] },
+      { file: 'capability-window.mp4', name: 'Windows', title: 'Window repairs',
+        items: ['uPVC frames and sills', 'Timber window frames', 'Double glazed units', 'Glass scratches and chips', 'Window handles and fittings', 'Casement and sash frames', 'Bay and bow window frames'] },
+      { file: 'capability-door.mp4', name: 'Doors', title: 'Door repairs',
+        items: ['uPVC and composite doors', 'Timber and fire doors', 'Door frames and architraves', 'Glass panels and sidelights', 'Door handles and furniture', 'Garage and roller doors', 'Bi-fold and sliding doors'] },
+      { file: 'capability-furniture.mp4', name: 'Furniture', title: 'Furniture repairs',
+        items: ['Timber and veneer furniture', 'Upholstered chairs and sofas', 'Cabinet and wardrobe doors', 'Beds and headboards', 'Desks and tables', 'Lacquered and painted surfaces', 'Hotel and hospitality furniture'] },
+      { file: 'capability-stone.mp4', name: 'Stone and Marble', title: 'Stone and marble repairs',
+        items: ['Marble worktops and vanities', 'Granite and quartz surfaces', 'Natural stone flooring', 'Limestone and travertine', 'Chips, cracks and scratches', 'Staining and discolouration', 'Exterior stone and masonry'] },
+      { file: 'capability-cladding.mp4', name: 'Wall Cladding and IPS', title: 'Wall cladding and IPS repairs',
+        items: ['IPS and duct panelling', 'Laminate wall cladding', 'Wet wall and shower panels', 'uPVC and PVC cladding', 'Aluminium composite panels', 'Scratches, chips and impact damage', 'Colour fading and discolouration'] },
+      { file: 'capability-spraying.mp4', name: 'Spraying and Recolouring', title: 'Spraying and recolouring',
+        items: ['Kitchen unit respraying', 'Door and frame recolouring', 'uPVC colour changes', 'Radiator and pipework respraying', 'Furniture recolouring', 'Colour matching to any RAL or BS shade', 'In-situ spraying - no removal needed'] },
+      { file: 'capability-worktop.mp4', name: 'Worktops and Counters', title: 'Worktops and counters',
+        items: ['Laminate and Formica worktops', 'Solid wood and timber counters', 'Granite, marble and quartz', 'Corian and solid surface', 'Chips, burns and scratches', 'Water damage and swelling', 'Joins, edges and upstands'] }
+    ];
+
+    /* Capability videos: the card only ever creates a <video> for a file that
+       actually exists, so no missing asset is requested and the console stays
+       clean. When a capability video is uploaded to ../assets/video/, add its
+       filename below (e.g. 'capability-bathroom.mp4': true) and that card will
+       play its muted, looping clip whenever it is the active centre card. */
+    var CAP_VIDEOS_AVAILABLE = {};
+
+    var capViewport = document.getElementById('s6-carousel-viewport');
+    var capCards = [];
+    var capVideos = [];
+    var capActive = 0;
+    var capListTimers = [];
+
+    function buildCarousel() {
+      if (!capViewport) { return; }
+      CAPS.forEach(function (cap, i) {
+        var card = document.createElement('div');
+        card.className = 's6-cab';
+
+        var title = document.createElement('h3');
+        title.className = 's6-cab-title';
+        title.textContent = cap.title;
+        card.appendChild(title);
+
+        var media = document.createElement('div');
+        media.className = 's6-cab-media';
+        var video = null;
+        if (CAP_VIDEOS_AVAILABLE[cap.file]) {
+          video = document.createElement('video');
+          video.className = 's6-cab-video';
+          video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'metadata';
+          var src = document.createElement('source');
+          src.src = '../assets/video/' + cap.file; src.type = 'video/mp4';
+          video.appendChild(src);
+          media.appendChild(video);
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 's6-cab-ph';
+          ph.textContent = cap.name;
+          media.appendChild(ph);
+        }
+        card.appendChild(media);
+
+        var list = document.createElement('ul');
+        list.className = 's6-cab-list';
+        cap.items.forEach(function (it) {
+          var li = document.createElement('li');
+          li.textContent = it;
+          list.appendChild(li);
+        });
+        card.appendChild(list);
+
+        card.addEventListener('click', function () { if (i !== capActive) { setCapActive(i); } });
+
+        capViewport.appendChild(card);
+        capCards.push(card);
+        capVideos.push(video);
+      });
     }
 
-    /* ---- Capability video swap. The placeholder is only ever replaced for a
-       file that actually exists, so no missing asset is requested and the
-       console stays clean. When a capability video is uploaded to
-       ../assets/video/, add its filename below (e.g.
-       'capability-bathroom.mp4': true) and that card will play the muted,
-       looping clip on hover (desktop) or tap (mobile). ---- */
-    var CAP_VIDEOS_AVAILABLE = {};
-    function initCapVideos() {
-      var cards = document.querySelectorAll('.s6-cap-card');
-      var isMobile = document.body.classList.contains('device-mobile');
-      cards.forEach(function (card) {
-        var file = card.getAttribute('data-video');
-        if (!file || !CAP_VIDEOS_AVAILABLE[file]) { return; }
-        var media = card.querySelector('.s6-cap-media');
-        var ph = card.querySelector('.s6-cap-ph');
-        var v = document.createElement('video');
-        v.className = 's6-cap-video';
-        v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
-        var s = document.createElement('source');
-        s.src = '../assets/video/' + file; s.type = 'video/mp4';
-        v.appendChild(s);
-        media.appendChild(v);
-        if (ph) { ph.style.display = 'none'; }
-        if (isMobile) {
-          card.addEventListener('click', function () {
-            if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
-            else { v.pause(); }
-          });
+    /* Position every card relative to the active one (wrapping, rolodex-style):
+       centre = full size, flanks = 70% scale + perspective turn + dimmed,
+       everything else hidden off to the side. */
+    function layoutCarousel() {
+      var n = capCards.length;
+      capCards.forEach(function (card, i) {
+        var p = i - capActive;
+        if (p > n / 2) { p -= n; }
+        if (p < -n / 2) { p += n; }
+        var ap = Math.abs(p);
+        if (ap === 0) {
+          card.style.transform = 'translate(-50%, 0) scale(1) rotateY(0deg)';
+          card.style.opacity = '1';
+          card.style.zIndex = '3';
+          card.style.pointerEvents = 'auto';
+          card.classList.add('is-active');
+        } else if (ap === 1) {
+          var dir = p < 0 ? -1 : 1;
+          card.style.transform = 'translate(calc(-50% ' + (dir < 0 ? '- ' : '+ ') + '170px), 0) scale(0.7) rotateY(' + (dir < 0 ? 28 : -28) + 'deg)';
+          card.style.opacity = '0.6';
+          card.style.zIndex = '2';
+          card.style.pointerEvents = 'auto';
+          card.classList.remove('is-active');
         } else {
-          card.addEventListener('mouseenter', function () { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } });
-          card.addEventListener('mouseleave', function () { v.pause(); v.currentTime = 0; });
+          var d2 = p < 0 ? -1 : 1;
+          card.style.transform = 'translate(calc(-50% ' + (d2 < 0 ? '- ' : '+ ') + '320px), 0) scale(0.5) rotateY(' + (d2 < 0 ? 34 : -34) + 'deg)';
+          card.style.opacity = '0';
+          card.style.zIndex = '1';
+          card.style.pointerEvents = 'none';
+          card.classList.remove('is-active');
         }
       });
+    }
+
+    function animateList(card) {
+      capListTimers.forEach(function (t) { clearTimeout(t); });
+      capListTimers = [];
+      var items = card.querySelectorAll('.s6-cab-list li');
+      items.forEach(function (li) { li.classList.remove('show'); });
+      items.forEach(function (li, idx) {
+        capListTimers.push(setTimeout(function () { li.classList.add('show'); }, idx * 100));
+      });
+    }
+
+    function setCapActive(i) {
+      var n = capCards.length;
+      if (n === 0) { return; }
+      capActive = ((i % n) + n) % n;
+      layoutCarousel();
+      // Only the active centre card plays; all others pause and reset.
+      capVideos.forEach(function (v, idx) {
+        if (!v) { return; }
+        if (idx === capActive) { var pr = v.play(); if (pr && pr.catch) { pr.catch(function () {}); } }
+        else { v.pause(); try { v.currentTime = 0; } catch (e) {} }
+      });
+      // Repair lists on the flanks vanish instantly (visibility); the active
+      // card's items animate in line by line.
+      capCards.forEach(function (c, idx) {
+        if (idx !== capActive) {
+          c.querySelectorAll('.s6-cab-list li').forEach(function (li) { li.classList.remove('show'); });
+        }
+      });
+      animateList(capCards[capActive]);
     }
 
     /* ---- Scene 3: gated bath repair video ---- */
@@ -549,10 +704,19 @@
     // same target as the pending auto-navigate timer, so a click just gets
     // there sooner.
 
+    /* ---- Carousel navigation: arrows + keyboard (only while on Scene 2) ---- */
+    on('s6-cap-prev', function () { setCapActive(capActive - 1); });
+    on('s6-cap-next', function () { setCapActive(capActive + 1); });
+    document.addEventListener('keydown', function (e) {
+      if (current !== 2) { return; }
+      if (e.key === 'ArrowLeft') { setCapActive(capActive - 1); }
+      else if (e.key === 'ArrowRight') { setCapActive(capActive + 1); }
+    });
+
     /* ---- Go ---- */
     function start() {
       initSliders();
-      initCapVideos();
+      buildCarousel();
       goScene(1);
     }
     if (document.readyState === 'loading') {
