@@ -144,6 +144,29 @@
     }
     #s7-marv-cta { display: block; margin: 28px auto 0; }
 
+    /* ---- FINAL SCENE - CONTACT US ---- */
+    .s7-contact-logo { height: 56px; width: auto; display: block; margin: 0 auto 22px; }
+    .s7-contact-headline { color: #AED284; font-weight: 800; font-size: 44px; line-height: 1.15; margin: 0 0 26px; }
+    .s7-contact-sprite {
+      width: auto;
+      height: 220px;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s7-contact-card {
+      position: relative;
+      max-width: 420px;
+      margin: 26px auto 0;
+      padding: 22px 28px;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      background: rgba(19, 41, 75, 0.55);
+      text-align: center;
+    }
+    .s7-contact-card p { color: #FFFFFF; font-weight: 400; font-size: 16px; line-height: 1.6; margin: 0; }
+    .s7-contact-card p + p { margin-top: 10px; }
+
     /* ---- SCENE 5 - YELLOW PAGES ADVERT ---- */
     .s7-tv-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
     .s7-tv {
@@ -244,7 +267,7 @@
     @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
     .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
     .s7-cred-card { position: relative; }
-    .s4-frame::after, .s7-cred-card::after {
+    .s4-frame::after, .s7-cred-card::after, .s7-contact-card::after {
       content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
       background: conic-gradient(from var(--s4angle, 0deg),
         rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
@@ -407,6 +430,21 @@
       <div class="s7-navy-out" id="s7-navy-out"></div>
     </section>
 
+    <!-- FINAL SCENE - CONTACT US. Revealed once the closing video has faded to
+         navy. No continue button - this is the end of the experience. -->
+    <section class="s7-scene" id="s7-scene-contact">
+      <div class="s7-inner">
+        <img class="s7-contact-logo" src="../assets/images/magicman-white.png" alt="Magicman">
+        <h2 class="s7-contact-headline">Ready to make problems disappear?</h2>
+        <span class="s4-frame"><img class="s7-contact-sprite" src="../assets/marv/marvtriumphant.png" alt="MARV, triumphant"></span>
+        <div class="s7-contact-card">
+          <p>Phone: Add details</p>
+          <p>Email: Add details</p>
+          <p>Web: Add details</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
@@ -484,7 +522,8 @@
       cred:    document.getElementById('s7-scene-cred'),
       marv:    document.getElementById('s7-scene-marv'),
       yp:      document.getElementById('s7-scene-yp'),
-      closing: document.getElementById('s7-scene-closing')
+      closing: document.getElementById('s7-scene-closing'),
+      contact: document.getElementById('s7-scene-contact')
     };
     var current = null;
     function showScene(key) {
@@ -582,7 +621,11 @@
       if (closingDone) { return; }
       closingDone = true;
       showScene('closing');
-      function fadeToNavy() { if (navyOut) { navyOut.classList.add('show'); } }
+      function fadeToNavy() {
+        if (navyOut) { navyOut.classList.add('show'); }
+        // Once the navy wash has settled, reveal the final contact scene.
+        setTimeout(function () { showScene('contact'); }, 1200);
+      }
       if (!closingVideo) { fadeToNavy(); return; }
       var finished = false;
       function finish() { if (finished) { return; } finished = true; fadeToNavy(); }
@@ -645,7 +688,7 @@
     /* ---- DEV scene stepper (Prev/Next/Replay), exposed for the dev panel.
        Each scene's entrance animations replay from the start without the
        first-load auto-advance, so navigation lands on the chosen scene. ---- */
-    var DEV_ORDER = ['title', 'kb', 'cred', 'marv', 'yp', 'closing'];
+    var DEV_ORDER = ['title', 'kb', 'cred', 'marv', 'yp', 'closing', 'contact'];
     function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
     function devPlayKb() {
       showScene('kb');
@@ -678,6 +721,7 @@
       else if (key === 'marv') { showScene('marv'); }
       else if (key === 'yp') { ypStarted = false; if (ypHint) { ypHint.style.display = ''; } showScene('yp'); if (audioUnlocked) { playYellowPages(); } }
       else if (key === 'closing') { closingDone = false; startClosing(); }
+      else if (key === 'contact') { showScene('contact'); }
     }
     function devCur() { var i = DEV_ORDER.indexOf(current); return i < 0 ? 0 : i; }
     window.__devPrevScene = function () { devGo(devCur() - 1); };
