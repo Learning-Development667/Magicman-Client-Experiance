@@ -340,6 +340,7 @@
     var video = document.getElementById('s5-video');
     var videoHint = document.getElementById('s5-video-hint');
     var videoStarted = false;
+    if (video) { video.volume = 0.3; }   // keep the marketing audio at a gentle level
     function playVideo() {
       if (videoStarted || !video) { return; }
       videoStarted = true;
