@@ -119,7 +119,7 @@
        wasabi scan line. Matches the machine unit border treatment. */
     .s4-scanbox {
       position: relative;
-      width: 92px;
+      width: 150px;
       max-width: 100%;
       overflow: hidden;
       border: 3px solid #AED284;
@@ -351,6 +351,21 @@
       0%   { box-shadow: 0 0 24px 10px rgba(174, 210, 132, 1); }
       100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.5); }
     }
+
+    /* Masked reels show a wasabi question mark until the user reveals MARV's
+       matching answer. The mark dissolves out and the answer snaps in. */
+    .s4-reel-mask { color: #AED284; }
+    .s4-reel-dissolve { animation: s4ReelDissolve 0.3s ease forwards; }
+    .s4-reel-revealed { animation: s4ReelReveal 0.4s ease forwards; }
+    @keyframes s4ReelDissolve {
+      from { opacity: 1; transform: scale(1); filter: blur(0); }
+      to   { opacity: 0; transform: scale(0.35); filter: blur(4px); }
+    }
+    @keyframes s4ReelReveal {
+      0%   { opacity: 0; transform: scale(0.35); filter: blur(4px); }
+      60%  { opacity: 1; transform: scale(1.12); filter: blur(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
     /* Whole-machine wasabi glow flash once all reels lock. */
     .s4-machine.win-flash .s4-machine-img { animation: s4MachineFlash 0.95s ease; }
     @keyframes s4MachineFlash {
@@ -503,7 +518,7 @@
       transition: opacity 0.5s ease;
     }
     .s4-marv.is-on { opacity: 1; }
-    .s4-marv-sprite { width: 100px; height: auto; display: block; }
+    .s4-marv-sprite { width: 150px; height: auto; display: block; }
     .s4-marv-sprite-frame { flex: 0 0 auto; padding: 8px; background: rgba(6, 14, 26, 0.5); line-height: 0; }
     .s4-marv-bubble {
       background: var(--white);
@@ -519,6 +534,26 @@
     .s4-marv-bubble.is-on { opacity: 1; }
     .s4-marv-bubble:empty { display: none; }
     .s4-marv-bubbles { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+
+    /* Intro bubbles snap in with a brief digital glitch - chromatic flicker and
+       static tears that resolve to clean, matching MARV's high-tech world. */
+    .s4-intro-bubble.is-on { animation: s4Glitch 0.5s linear 1; }
+    @keyframes s4Glitch {
+      0%   { opacity: 0; transform: translateX(-7px) skewX(6deg); text-shadow: 3px 0 rgba(174, 210, 132, 0.9), -3px 0 rgba(255, 68, 68, 0.7); clip-path: inset(0 0 62% 0); }
+      18%  { opacity: 1; transform: translateX(5px); text-shadow: -4px 0 rgba(174, 210, 132, 0.9), 4px 0 rgba(255, 68, 68, 0.6); clip-path: inset(48% 0 0 0); }
+      34%  { transform: translateX(-3px); text-shadow: 2px 0 rgba(174, 210, 132, 0.7); clip-path: inset(0 0 28% 0); }
+      52%  { transform: translateX(2px); text-shadow: -2px 0 rgba(174, 210, 132, 0.5); clip-path: inset(22% 0 8% 0); }
+      70%  { transform: translateX(-1px); text-shadow: 1px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+    }
+
+    /* Key words carry a pulsing wasabi highlight - navy text stays readable on
+       the white bubble while the highlight glows. */
+    .s4-kw { color: var(--navy); font-weight: 800; padding: 0 4px; border-radius: 4px; animation: s4KwPulse 1.8s ease-in-out infinite; }
+    @keyframes s4KwPulse {
+      0%, 100% { background: rgba(174, 210, 132, 0.28); box-shadow: 0 0 0 rgba(174, 210, 132, 0); }
+      50%      { background: rgba(174, 210, 132, 0.85); box-shadow: 0 0 10px rgba(174, 210, 132, 0.6); }
+    }
 
     /* Buttons */
     .s4-cta { margin-top: 26px; text-align: center; min-height: 56px; }
@@ -922,24 +957,33 @@
 
     // Intro bubbles stack: update the sprite and add a new bubble below the
     // previous ones without removing any.
+    // Wrap key brand/identity words so they carry the pulsing wasabi highlight.
+    // Operates on our own controlled strings only, longest phrase first so
+    // shorter matches never land inside an already-wrapped phrase.
+    function highlightKeywords(text) {
+      var kws = ['MAterial Repair Validator', 'Magicman', 'MARV'];
+      var out = text;
+      kws.forEach(function (kw) { out = out.split(kw).join('[[KW]]' + kw + '[[/KW]]'); });
+      return out.split('[[KW]]').join('<span class="s4-kw">').split('[[/KW]]').join('</span>');
+    }
     function introBeat(emotion, text) {
       var img = document.getElementById('s4-marv-sprite');
       if (img) { img.src = SPRITES + emotion + '.png'; img.alt = 'MARV looking ' + emotion; }
       var b = document.createElement('div');
       b.className = 's4-marv-bubble s4-intro-bubble';
-      b.textContent = text;
+      b.innerHTML = highlightKeywords(text);
       document.getElementById('s4-marv-bubbles').appendChild(b);
       void b.offsetWidth;
       b.classList.add('is-on');
     }
     function startIntro() {
       if (verdictReached) { return; }
-      introBeat('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
+      introBeat('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
       setTimeout(introBeat2, 2000);
     }
     function introBeat2() {
       if (verdictReached) { return; }
-      introBeat('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
+      introBeat('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
       setTimeout(introBeat3, 2000);
     }
     function introBeat3() {
@@ -989,8 +1033,8 @@
     var MACHINE_REEL_TOP = 22.7;     // y = 127 / 559
     var MACHINE_REEL_HEIGHT = 28.4;  // 159 / 559
     var MACHINE_REELS = [
-      { left: 12.9, width: 12.0, cycle: ['Wood', 'uPVC', 'Ceramic', 'Vitreous china', 'Marble', 'Granite', 'Laminate', 'Enamel', 'Stainless steel', 'Metal', 'Glass'], final: 'Vitreous china' },
-      { left: 29.2, width: 10.8, cycle: ['Hairline crack', 'Impact crack', 'Scratch', 'Chip', 'Burn', 'Stain', 'Scuff', 'Gouge', 'Material loss'], final: 'Impact crack' },
+      { left: 12.9, width: 12.0, cycle: ['Wood', 'uPVC', 'Ceramic', 'Vitreous china', 'Marble', 'Granite', 'Laminate', 'Enamel', 'Stainless steel', 'Metal', 'Glass'], final: 'Vitreous china', masked: true },
+      { left: 29.2, width: 10.8, cycle: ['Hairline crack', 'Impact crack', 'Scratch', 'Chip', 'Burn', 'Stain', 'Scuff', 'Gouge', 'Material loss'], final: 'Impact crack', masked: true },
       { left: 44.6, width: 11.0, cycle: ['Assessing', 'Repair viable', 'Beyond repair', 'Reviewing'], final: 'Repair viable' },
       { left: 59.5, width: 11.0, cycle: ['Graduate', 'Technician', 'Senior', 'Specialist', 'Master'], final: 'Specialist' },
       { left: 74.8, width: 11.1, cycle: ['1 hour', '2 hours', 'Half day', 'Full day', '2 days'], final: 'Half day' }
@@ -1029,7 +1073,7 @@
         for (var k = 0; k < SPIN_CYCLES; k++) {
           r.cycle.forEach(function (v) { items += '<div class="s4-reel-item">' + v + '</div>'; });
         }
-        items += '<div class="s4-reel-item">' + r.final + '</div>';
+        items += '<div class="s4-reel-item' + (r.masked ? ' s4-reel-mask' : '') + '">' + (r.masked ? '?' : r.final) + '</div>';
         return '<div class="s4-reel" data-cycle="' + r.cycle.length + '" style="left:' + r.left + '%;width:' + r.width +
                '%;top:' + MACHINE_REEL_TOP + '%;height:' + MACHINE_REEL_HEIGHT + '%;">' +
                  '<div class="s4-reel-strip">' + items + '</div>' +
@@ -1099,6 +1143,26 @@
         playClunk();
         setTimeout(function () { reel.classList.remove('flash'); }, 500);
       }, dur);
+    }
+
+    /* Reveal a masked reel: the question mark dissolves and MARV's real answer
+       (which matched the user's pick) locks in with a flash. */
+    function revealReel(index) {
+      var reels = document.querySelectorAll('#s4-machine-overlay .s4-reel');
+      var reel = reels[index];
+      if (!reel) { return; }
+      var strip = reel.querySelector('.s4-reel-strip');
+      if (!strip || !strip.children.length) { return; }
+      var item = strip.children[strip.children.length - 1];
+      item.classList.add('s4-reel-dissolve');
+      setTimeout(function () {
+        item.textContent = MACHINE_REELS[index].final;
+        item.classList.remove('s4-reel-mask', 's4-reel-dissolve');
+        item.classList.add('s4-reel-revealed');
+        reel.classList.add('flash');
+        playClunk();
+        setTimeout(function () { reel.classList.remove('flash'); }, 500);
+      }, 300);
     }
 
     /* Scan label + progress bar, synced to the reel lock sequence. */
@@ -1174,6 +1238,7 @@
           setTimeout(function () {
             clearChoices();
             setMarv('marvthumbsup', 'Spot on. You know your surfaces.');
+            revealReel(0);
             setTimeout(askDamage, 1000);
           }, 500);
         } else {
@@ -1197,6 +1262,7 @@
           setTimeout(function () {
             clearChoices();
             setMarv('marvtriumphant', 'At this rate you should apply for the Magicman Academy.');
+            revealReel(1);
             setTimeout(revealVerdict, 1000);
           }, 500);
         } else {
