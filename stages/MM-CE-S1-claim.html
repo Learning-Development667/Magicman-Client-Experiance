@@ -1637,7 +1637,6 @@ function activateMarv() {
     showSiteView('mm-view-home');
     const url = document.getElementById('mm-url');
     if (url) { url.textContent = 'magicman.co.uk'; }
-    showScene('scene-website');
   }, 400);
 }
 
@@ -1673,7 +1672,6 @@ function goToEstimate() {
 function selectClientEnquiry() {
   initAudio();
   playProcessingHum();
-  showScene('scene-transition');
   runTransition();
 }
 
@@ -2153,7 +2151,6 @@ function testSkip() {
   if (!active) { return; }
 
   if (active.id === 'scene-intro' || active.id === 'scene-fnol') {
-    if (active.id === 'scene-intro') { showScene('scene-fnol'); }
     revealFnolButton();
     return;
   }

@@ -1481,11 +1481,11 @@
      the frame, screenshots and the percentage-positioned click overlays together
      so the simulation stays aligned, just smaller. Tuned by measurement. */
   #scene-fnol .desktop-sim { zoom: 0.85; }
-  /* The website screenshots are tall full-page captures and the click target on
-     the estimate page sits ~57% down, so the whole image must stay on screen.
-     Capping the frame width scales the screenshot (and its percentage-positioned
-     click overlays) down together to fit 800px tall. */
-  #scene-website .desktop-sim { max-width: 690px; margin-left: auto; margin-right: auto; }
+  /* The website simulation fills the full content width so it reads like a real
+     webpage rather than a small screenshot. The images keep their aspect ratio
+     (width 100%, height auto) and the percentage-positioned click overlays scale
+     with them. */
+  #scene-website .desktop-sim { max-width: 1100px; margin-left: auto; margin-right: auto; }
 
   /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the
      wasabi border the MARV sprites, bubbles and account/onboarding cards carry.
