@@ -25,7 +25,7 @@
       width: 100%;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 16px 24px 64px;
+      padding: 16px 24px 44px;
     }
 
     .gap-back {
@@ -197,6 +197,27 @@
     body.device-mobile .day-counter__num { font-size: 56px; }
     body.device-mobile .email { max-width: 100%; }
     body.device-mobile .gap-cta { width: 100%; }
+
+    /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace added over
+       the wasabi border that the MARV sprite, bubble and day-card carry. The
+       trace is a masked ::after so it adds no layout box. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+    .marv-bubble, .day-card { position: relative; }
+    .day-card { animation: marvGlowPulse 2s ease-in-out infinite; }
+    .s4-frame::after, .marv-bubble::after, .day-card::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+        rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+        rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+        rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite; pointer-events: none;
+    }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
   </style>
 </head>
 <body>
@@ -205,14 +226,14 @@
        id="progress-steps" so the shell's main.js never re-renders it. -->
   <header class="progress-bar" aria-label="Journey progress">
     <div class="progress-bar__inner">
-      <span class="label-accent">Magicman</span>
+      <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
       <ol class="progress-steps">
         <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
         <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
-        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. Assessment</span></li>
-        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Dispatch</span></li>
-        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Repair</span></li>
-        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Quality</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+        <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
         <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
       </ol>
     </div>
@@ -233,7 +254,7 @@
       <!-- Left column - MARV and the start button -->
       <div class="gap-marv-col">
         <div class="marv">
-          <img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy">
+          <span class="s4-frame"><img class="marv-sprite" id="gap-marv-sprite" src="../assets/marv/marvwincing.png" alt="MARV looking uneasy"></span>
           <div class="marv-bubble default" id="gap-marv-bubble" style="display: none;"></div>
         </div>
         <div id="gap-cta-zone"></div>
@@ -263,13 +284,19 @@
   <div class="dev-nav" id="dev-nav">
     <div class="dev-nav__panel">
       <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
       <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
       <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
       <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
       <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+      <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair</a>
+      <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
+      <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
     </div>
     <button class="dev-nav__tab" type="button"
             onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
@@ -475,6 +502,26 @@
     } else {
       boot();
     }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. This stage is
+       one continuous timeline, so it has two scenes: the opening state (Day 1 +
+       prompt) and the escalation (the email chain that plays to the decision
+       gap). Each replays from the start exactly as on first load. ---- */
+    var DEV_ORDER = ['intro', 'escalation'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devCur() { return (chain && chain.children.length > 0) ? 1 : 0; }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      if (chain) { chain.innerHTML = ''; }
+      if (ctaZone) { ctaZone.innerHTML = ''; }
+      if (betterZone) { betterZone.innerHTML = ''; }
+      boot();
+      if (i === 1) { startChain(); }
+    }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
   })();
   </script>
 

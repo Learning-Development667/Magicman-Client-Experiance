@@ -199,6 +199,19 @@ a {
   box-shadow: none;
 }
 
+/* Persistent user-facing Back control. Fixed just below the sticky progress
+   bar, top left. z-index sits above stage content but below full-screen
+   transitions (e.g. the S4 intro video at z-index 1000), so it stays hidden
+   during a transition and visible during the stage itself. */
+.stage-back {
+  position: fixed;
+  top: 72px;
+  left: 16px;
+  z-index: 40;
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
 /* --------------------------------------------------------------------------
    7. Progress indicator
    -------------------------------------------------------------------------- */
@@ -218,6 +231,15 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Magicman logo - sits where the text pill used to, on the left of the bar,
+   sized to fit the bar height without overflow. */
+.progress-bar__logo {
+  height: 30px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
 }
 
 .progress-steps {
@@ -263,6 +285,9 @@ a {
 
 .progress-step.is-active .progress-step__dot {
   background-color: var(--wasabi);
+  /* Wasabi glow pulse, the same marvGlowPulse effect used on MARV sprites,
+     so the current stage draws the eye. */
+  animation: marvGlowPulse 2s ease-in-out infinite;
 }
 
 .progress-step.is-complete {
@@ -287,16 +312,27 @@ a {
   height: 210px;        /* 224 x 280 native ratio, scaled */
   object-fit: contain;
   flex-shrink: 0;
+  /* Wasabi framed box with a glow pulse, consistent across all stages. */
+  border: 3px solid #AED284;
+  border-radius: 16px;
+  animation: marvGlowPulse 2s ease-in-out infinite;
 }
 
 .marv-bubble {
   position: relative;
   max-width: 460px;
   padding: 16px 20px;
-  border-radius: 14px;
-  font-size: var(--body);
+  border: 3px solid #AED284;
+  border-radius: 16px;
+  font-size: 18px;
   line-height: 1.5;
-  box-shadow: var(--card-shadow);
+  animation: marvGlowPulse 2s ease-in-out infinite;
+}
+
+/* Shared MARV sprite / speech bubble glow pulse (used by every stage). */
+@keyframes marvGlowPulse {
+  0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+  50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
 }
 
 /* Speech tail */
@@ -314,7 +350,7 @@ a {
 .marv-bubble.default {
   background-color: var(--navy);
   color: var(--white);
-  border: 1px solid rgba(174, 210, 132, 0.4);
+  border: 3px solid #AED284;
 }
 .marv-bubble.default::before {
   border-right-color: var(--navy);

@@ -33,68 +33,10 @@
     overflow-x: hidden;
   }
 
-  /* ---- PROGRESS BAR ---- */
-  #progress-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: rgba(19,41,75,0.95);
-    backdrop-filter: blur(8px);
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid rgba(174,210,132,0.2);
-  }
-
-  .progress-logo {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--white);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .progress-logo span {
-    color: var(--wasabi);
-  }
-
-  .progress-stages {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .stage-pip {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-    transition: background 0.4s ease;
-  }
-
-  .stage-pip.active {
-    background: var(--wasabi);
-  }
-
-  .stage-pip.done {
-    background: var(--hunter);
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
   /* ---- MAIN WRAPPER ---- */
   #stage-wrapper {
-    padding-top: 52px;
-    min-height: 100vh;
+    padding-top: 0;
+    min-height: calc(100vh - 52px);
     display: flex;
     flex-direction: column;
   }
@@ -415,15 +357,15 @@
     color: var(--dark);
     border: none;
     border-radius: 8px;
-    padding: 12px 24px;
-    font-size: 14px;
+    padding: 14px 32px;
+    font-size: 16px;
     font-weight: 800;
     cursor: pointer;
     white-space: nowrap;
     font-family: 'Open Sans', sans-serif;
     transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
     box-shadow: 0 0 0 0 rgba(174,210,132,0.4);
-    animation: ctaPulse 1.4s ease-in-out infinite;
+    animation: marvGlowPulse 2s ease-in-out infinite;
   }
 
   .ask-marv-btn:hover {
@@ -684,6 +626,10 @@
     transform: translateY(0);
   }
 
+  /* Wasabi glow pulse for action buttons that require a click to progress, so
+     they draw the eye. Same marvGlowPulse used on MARV sprites. */
+  .btn-pulse { animation: marvGlowPulse 2s ease-in-out infinite; }
+
   .btn-hidden {
     opacity: 0;
     pointer-events: none;
@@ -817,9 +763,8 @@
   }
 
   @media (max-width: 480px) {
-    .progress-logo { display: none; }
     .marv-sprite { width: 160px; height: 200px; }
-    .marv-speech { width: 220px; font-size: 13px; }
+    .marv-speech { width: 220px; font-size: 18px; }
   }
 
   /* ---- HANDLER DECISION BUTTONS (STATE 1) ---- */
@@ -1088,10 +1033,10 @@
 
   /* View 2: Client Enquiry box (right-hand option in the estimate form) */
   .mm-overlay--client {
-    top: 57%;
-    left: 66.5%;
-    width: 20%;
-    height: 8%;
+    top: 57.7%;
+    left: 67.3%;
+    width: 17.2%;
+    height: 6.3%;
   }
 
   /* Animated pointer drawing attention to the Client Enquiry card */
@@ -1118,10 +1063,13 @@
 
   #scene-fnol {
     background: #1A1A1A;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 
   #scene-fnol .scene-inner {
     position: relative;
+    max-width: 1340px;
   }
 
   /* =========================================================
@@ -1491,39 +1439,111 @@
 
   /* ---- SCENE 3 - COMPARISON AND MARV ---- */
   #scene-comparison .scene-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 160px); }
-  .compare-wrap { display: flex; gap: 32px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
-  .compare-card { background: #0e1f38; border: 2px solid #888888; border-radius: 14px; padding: 40px 48px; text-align: center; min-width: 240px; opacity: 0; transform: scale(0.9); transition: opacity 0.6s ease, transform 0.6s ease; }
+  /* The one-day resolution is the hero; the old way sits alongside as a small,
+     de-emphasised contrast so the difference in speed is felt, not just read. */
+  .compare-wrap { display: flex; gap: 48px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .compare-card { background: #0e1f38; border-radius: 16px; text-align: center; opacity: 0; transform: scale(0.9); transition: opacity 0.6s ease, transform 0.6s ease; }
   .compare-card.landed { opacity: 1; transform: scale(1); }
-  .compare-card--old { border-color: #FF4444; }
-  .compare-card--new { border-color: #AED284; }
-  .compare-num { font-size: 96px; font-weight: 800; line-height: 1; }
-  .compare-card--old .compare-num { color: #FF4444; }
-  .compare-card--new .compare-num { color: #AED284; }
-  .compare-label { margin-top: 10px; font-size: 20px; font-weight: 700; color: #ffffff; }
-  .compare-sub { margin-top: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+
+  /* HERO - MARV's one-day resolution: large, wasabi, unmissable. */
+  .compare-card--new { border: 3px solid #AED284; padding: 52px 72px; background: rgba(174, 210, 132, 0.08); }
+  .compare-card--new.landed { animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .compare-card--new .compare-num { font-size: clamp(140px, 20vw, 224px); font-weight: 800; line-height: 0.9; color: #AED284; text-shadow: 0 0 34px rgba(174, 210, 132, 0.55); }
+  .compare-card--new .compare-label { margin-top: 8px; font-size: 30px; font-weight: 800; color: #AED284; }
+  .compare-card--new .compare-sub { margin-top: 10px; font-size: 17px; font-weight: 600; color: #FFFFFF; }
+
+  /* CONTRAST - the old way, small and muted. */
+  .compare-card--old { border: 2px solid rgba(255, 68, 68, 0.55); padding: 26px 34px; }
+  .compare-card--old .compare-num { font-size: 66px; font-weight: 800; line-height: 1; color: #FF6B6B; }
+  .compare-card--old .compare-label { margin-top: 8px; font-size: 16px; font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+  .compare-card--old .compare-sub { margin-top: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.45); }
   .s3-marv { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .s3-marv.show { opacity: 1; transform: translateY(0); }
-  .s3-marv-sprite { width: 120px; height: auto; }
-  .s3-marv-bubble { background: #ffffff; color: #13294b; border-radius: 14px; padding: 14px 20px; font-size: 16px; font-weight: 600; max-width: 420px; text-align: center; }
+  .s3-marv-sprite { width: 120px; height: auto; border: 3px solid #AED284; border-radius: 16px; animation: marvGlowPulse 2s ease-in-out infinite; }
+  .s3-marv-bubble { background: #ffffff; color: #13294b; border: 3px solid #AED284; border-radius: 16px; padding: 14px 20px; font-size: 18px; font-weight: 600; max-width: 420px; text-align: center; animation: marvGlowPulse 2s ease-in-out infinite; }
+
+  /* ---- SCENE: CLIENT ACCOUNT BLOCK + ONBOARDING CARD ---- */
+  @keyframes wasabiGlow {
+    0%, 100% { box-shadow: 0 0 16px rgba(174, 210, 132, 0.30); }
+    50%      { box-shadow: 0 0 30px rgba(174, 210, 132, 0.70); }
+  }
+  #scene-account .scene-inner,
+  #scene-onboard .scene-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 160px); }
+
+  .s3-acc-heading { color: #AED284; font-size: 26px; font-weight: 800; line-height: 1.3; text-align: center; margin: 0 0 30px; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-row { display: flex; gap: 24px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+  .s3-acc-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 26px 24px; width: 280px; max-width: 280px; text-align: center; opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-card.show { opacity: 1; transform: translateY(0) scale(1); animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .s3-acc-icon { font-size: 34px; line-height: 1; margin-bottom: 12px; }
+  .s3-acc-card h3 { color: #AED284; font-size: 19px; font-weight: 800; margin: 0 0 10px; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-card p { color: #FFFFFF; font-size: 15px; line-height: 1.5; margin: 0; font-family: 'Open Sans', sans-serif; }
+  .s3-acc-marv { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-marv.show { opacity: 1; transform: translateY(0); }
+  .s3-acc-continue { margin-top: 18px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-acc-continue.show { opacity: 1; transform: translateY(0); }
+
+  .s3-onb-card { background: #0E1F38; color: #FFFFFF; border: 3px solid #AED284; border-radius: 16px; padding: 24px 40px; max-width: 640px; margin: 0 auto; text-align: center; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .s3-onb-card.show { opacity: 1; transform: translateY(0); animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .s3-onb-card h2 { color: #AED284; font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 22px; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-list { list-style: none; padding: 0; margin: 0 auto 20px; max-width: 420px; text-align: left; }
+  .s3-onb-list li { position: relative; padding-left: 30px; margin: 0 0 12px; font-size: 17px; font-weight: 600; color: #FFFFFF; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: #AED284; }
+  .s3-onb-sub { color: #CDD7E4; font-size: 15px; line-height: 1.5; margin: 0; font-family: 'Open Sans', sans-serif; }
+  .s3-onb-marv { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .s3-onb-marv.show { opacity: 1; transform: translateY(0); }
+
+  /* Fit the desktop simulations within a 1280x800 (F11) viewport. zoom scales
+     the frame, screenshots and the percentage-positioned click overlays together
+     so the simulation stays aligned, just smaller. Tuned by measurement. */
+  #scene-fnol .desktop-sim { zoom: 0.95; }
+  /* The website simulation fills the full content width so it reads like a real
+     webpage rather than a small screenshot. The images keep their aspect ratio
+     (width 100%, height auto) and the percentage-positioned click overlays scale
+     with them. */
+  #scene-website .desktop-sim { max-width: 1100px; margin-left: auto; margin-right: auto; }
+
+  /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the
+     wasabi border the MARV sprites, bubbles and account/onboarding cards carry.
+     The trace is a masked ::after, so it adds no layout box. ---- */
+  @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+  .s3-marv-bubble, .s3-acc-card, .s3-onb-card { position: relative; }
+  .s4-frame::after, .s3-marv-bubble::after, .s3-acc-card::after, .s3-onb-card::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+    background: conic-gradient(from var(--s4angle, 0deg),
+      rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+      rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+      rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: s4Trace 3.5s linear infinite; pointer-events: none;
+  }
+  @keyframes s4Trace { to { --s4angle: 360deg; } }
 
 </style>
 </head>
 <body>
 
-<!-- PROGRESS BAR -->
-<nav id="progress-bar">
-  <div class="progress-logo">magic<span>man</span></div>
-  <div class="progress-stages">
-    <div class="stage-pip done" id="pip-1" title="Claim"></div>
-    <div class="stage-pip done" id="pip-2" title="The Decision Gap"></div>
-    <div class="stage-pip active" id="pip-3" title="The New Way"></div>
-    <div class="stage-pip" id="pip-4" title="Assessment"></div>
-    <div class="stage-pip" id="pip-5" title="Dispatch"></div>
-    <div class="stage-pip" id="pip-6" title="Repair"></div>
-    <div class="stage-pip" id="pip-7" title="Outcome"></div>
+<!-- Progress indicator - 7 stages, Stage 3 The New Way active. Class only, no
+     id="progress-steps", so the shell's main.js never re-renders it. -->
+<header class="progress-bar" aria-label="Journey progress">
+  <div class="progress-bar__inner">
+    <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
+    <ol class="progress-steps">
+      <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+      <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+      <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+    </ol>
   </div>
-  <div class="progress-label" id="progress-label">Stage 3 of 7</div>
-</nav>
+</header>
+
+<a class="btn btn-ghost stage-back" href="MM-CE-S2-gap.html">Back to Stage 2</a>
 
 <!-- STAGE WRAPPER -->
 <div id="stage-wrapper">
@@ -1632,7 +1652,7 @@
                   <div class="ask-marv-info">
                     <div class="panel-title">
                       <img class="marv-icon" src="../assets/marv/marvconfident.png" alt="MARV">
-                      MARV &nbsp;&bull;&nbsp; AI Repair Viability Check
+                      MARV &nbsp;&bull;&nbsp; Repair Viability Check
                     </div>
                     <div class="panel-sub">Powered by Magicman &bull; Instant surface repair assessment &bull; Integrated into your workflow</div>
                   </div>
@@ -1698,21 +1718,73 @@
   <section id="scene-comparison" class="scene">
     <div class="scene-inner">
       <div class="compare-wrap">
-        <div class="compare-card compare-card--old">
-          <div class="compare-num">14</div>
-          <div class="compare-label">Days. The old way.</div>
-          <div class="compare-sub">Four people. No resolution.</div>
-        </div>
         <div class="compare-card compare-card--new">
           <div class="compare-num">1</div>
           <div class="compare-label">Day. With Magicman.</div>
           <div class="compare-sub">One assessment. Instant answer.</div>
         </div>
+        <div class="compare-card compare-card--old">
+          <div class="compare-num">14</div>
+          <div class="compare-label">Days. The old way.</div>
+          <div class="compare-sub">Four people. No resolution.</div>
+        </div>
       </div>
       <div class="s3-marv" id="s3-marv">
-        <img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
-        <div class="s3-marv-bubble">One day versus fourteen. Want to see how I do it?</div>
-        <button class="btn-primary" id="s3-show-me" onclick="goToAssessment()">Show me</button>
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited"></span>
+        <div class="s3-marv-bubble">One day versus fourteen. Let me show you how it all fits together.</div>
+        <button class="btn-primary" id="s3-show-me" onclick="goToAccount()">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: CLIENT ACCOUNT BLOCK -->
+  <section id="scene-account" class="scene">
+    <div class="scene-inner">
+      <h2 class="s3-acc-heading">Every Magicman client gets their own identity in MARV.</h2>
+      <div class="s3-acc-row">
+        <div class="s3-acc-card" id="s3-acc-1">
+          <div class="s3-acc-icon">&#127991;</div>
+          <h3>Your client code</h3>
+          <p>A unique code that tags every job to your account. Reporting, history and invoicing all kept together, on your terms.</p>
+        </div>
+        <div class="s3-acc-card" id="s3-acc-2">
+          <div class="s3-acc-icon">&#128682;</div>
+          <h3>Your portal</h3>
+          <p>A single place for your sites to raise a repair and upload photos, set up for the way your organisation works.</p>
+        </div>
+        <div class="s3-acc-card" id="s3-acc-3">
+          <div class="s3-acc-icon">&#128193;</div>
+          <h3>Your client record</h3>
+          <p>Your sites, contacts, access notes and agreed terms held in one place. We are not re-gathering them every time.</p>
+        </div>
+      </div>
+      <div class="s3-acc-marv" id="s3-acc-marv">
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident"></span>
+        <div class="s3-marv-bubble">One account. Every site. Every job. All in one place.</div>
+      </div>
+      <div class="s3-acc-continue" id="s3-acc-continue">
+        <button class="btn-primary btn-pulse" onclick="goToOnboard()">And getting set up?</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: ONBOARDING CARD -->
+  <section id="scene-onboard" class="scene">
+    <div class="scene-inner">
+      <div class="s3-onb-card" id="s3-onb-card">
+        <h2>Getting set up with Magicman takes one conversation.</h2>
+        <ul class="s3-onb-list">
+          <li>Your sites and locations</li>
+          <li>Access requirements</li>
+          <li>Key contacts</li>
+          <li>The types of repairs you need</li>
+        </ul>
+        <p class="s3-onb-sub">All we really need is location, access and contact. Everything else MARV works out from the photos.</p>
+      </div>
+      <div class="s3-onb-marv" id="s3-onb-marv">
+        <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident"></span>
+        <div class="s3-marv-bubble">Want to see how I do it?</div>
+        <button class="btn-primary btn-pulse" id="s3-show-me-final" onclick="goToAssessment()">Show me</button>
       </div>
     </div>
   </section>
@@ -1726,7 +1798,21 @@ function initAudio() {
   if (!audioCtx) {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
   }
+  if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
 }
+// Unlock the AudioContext on the first user interaction. Browser autoplay
+// policy does not carry the navigation gesture from the previous stage across
+// pages, so the first interaction here (e.g. the "Visit the Magicman Website"
+// button click) resumes the context.
+function unlockAudioOnce() {
+  initAudio();
+  document.removeEventListener('pointerdown', unlockAudioOnce);
+  document.removeEventListener('keydown', unlockAudioOnce);
+  document.removeEventListener('touchstart', unlockAudioOnce);
+}
+document.addEventListener('pointerdown', unlockAudioOnce);
+document.addEventListener('keydown', unlockAudioOnce);
+document.addEventListener('touchstart', unlockAudioOnce);
 function playTone(freq, duration, type, vol) {
   if (!audioCtx) { return; }
   var o = audioCtx.createOscillator(), g = audioCtx.createGain();
@@ -1829,6 +1915,55 @@ function goToAssessment() {
   setTimeout(function () { window.location.href = 'MM-CE-S4-assessment.html'; }, 180);
 }
 
+// ---- SCENE: CLIENT ACCOUNT BLOCK ----
+function goToAccount() {
+  initAudio();
+  playButtonClick();
+  showScene('scene-account');
+  revealAccount();
+}
+function revealAccount() {
+  // Each card animates in one at a time, then MARV speaks, then the continue
+  // button appears once all three are visible.
+  var cardIds = ['s3-acc-1', 's3-acc-2', 's3-acc-3'];
+  cardIds.forEach(function (id, i) {
+    setTimeout(function () {
+      var card = document.getElementById(id);
+      if (card) { card.classList.add('show'); }
+      playTone(680 + i * 130, 0.08, 'sine', 0.05);
+    }, 300 + i * 650);
+  });
+  var afterCards = 300 + cardIds.length * 650;
+  setTimeout(function () {
+    var marv = document.getElementById('s3-acc-marv');
+    if (marv) { marv.classList.add('show'); }
+    playChime();
+  }, afterCards);
+  setTimeout(function () {
+    var cont = document.getElementById('s3-acc-continue');
+    if (cont) { cont.classList.add('show'); }
+  }, afterCards + 550);
+}
+
+// ---- SCENE: ONBOARDING CARD ----
+function goToOnboard() {
+  initAudio();
+  playButtonClick();
+  showScene('scene-onboard');
+  revealOnboard();
+}
+function revealOnboard() {
+  setTimeout(function () {
+    var card = document.getElementById('s3-onb-card');
+    if (card) { card.classList.add('show'); }
+  }, 200);
+  setTimeout(function () {
+    var marv = document.getElementById('s3-onb-marv');
+    if (marv) { marv.classList.add('show'); }
+    playChime();
+  }, 900);
+}
+
 // ---- INIT ----
 window.addEventListener('load', function () {
   var dot = document.getElementById('inbox-dot');
@@ -1843,17 +1978,67 @@ window.addEventListener('load', function () {
 <div class="dev-nav" id="dev-nav">
   <div class="dev-nav__panel">
     <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+    </div>
     <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
     <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
     <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
     <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+    <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
+    <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair</a>
+    <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
+    <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
   </div>
   <button class="dev-nav__tab" type="button"
           onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
 </div>
+
+<!-- DEV scene stepper (Prev/Next/Replay) - remove before launch with the dev panel -->
+<script>
+(function () {
+  var ORDER = ['scene-fnol', 'scene-website', 'scene-comparison', 'scene-account', 'scene-onboard'];
+  function clearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+  function rm(id, cls) { var e = document.getElementById(id); if (e) { e.classList.remove(cls); } }
+  function reset(id) {
+    if (id === 'scene-fnol') {
+      rm('fnol-caption', 'visible'); rm('fnol-toast', 'visible');
+      var b = document.getElementById('decision-buttons'); if (b) { b.classList.remove('arrive', 'fade-out'); b.classList.add('pre-enter'); b.style.display = ''; }
+      var t = document.getElementById('handler-thought'); if (t) { t.classList.remove('pop-in', 'fade-away'); t.style.display = 'none'; }
+      var p = document.getElementById('ask-marv-panel'); if (p) { p.classList.remove('revealed'); p.classList.add('pre-reveal'); }
+    } else if (id === 'scene-comparison') {
+      var cards = document.querySelectorAll('#scene-comparison .compare-card');
+      for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('landed'); }
+      rm('s3-marv', 'show');
+    } else if (id === 'scene-account') {
+      ['s3-acc-1', 's3-acc-2', 's3-acc-3', 's3-acc-marv', 's3-acc-continue'].forEach(function (x) { rm(x, 'show'); });
+    } else if (id === 'scene-onboard') {
+      rm('s3-onb-card', 'show'); rm('s3-onb-marv', 'show');
+    }
+  }
+  function play(id) {
+    if (id === 'scene-fnol' && window.runCms) { runCms(); }
+    else if (id === 'scene-website' && window.showSiteView) { showSiteView('mm-view-home'); }
+    else if (id === 'scene-comparison' && window.showComparison) { showComparison(); }
+    else if (id === 'scene-account' && window.revealAccount) { revealAccount(); }
+    else if (id === 'scene-onboard' && window.revealOnboard) { revealOnboard(); }
+  }
+  function cur() { var a = document.querySelector('.scene.active'); var i = a ? ORDER.indexOf(a.id) : -1; return i < 0 ? 0 : i; }
+  function go(i) {
+    if (i < 0 || i >= ORDER.length) { return; }
+    clearTimers();
+    var id = ORDER[i];
+    reset(id);
+    if (window.showScene) { showScene(id); }
+    play(id);
+  }
+  window.__devPrevScene = function () { go(cur() - 1); };
+  window.__devNextScene = function () { go(cur() + 1); };
+  window.__devReplayScene = function () { go(cur()); };
+})();
+</script>
 
 </body>
 </html>

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magicman | The Repair Journey - Stage 7 The Outcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <!-- Shared shell stylesheet + device detection, loaded before this stage's own
+       <style> so the stage's bespoke styles win the cascade. -->
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="../js/main.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      background: #13294B;
+      color: #FFFFFF;
+      overflow: hidden;            /* the journey is complete - no page scroll */
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    /* The stage fills whatever height remains under the sticky progress bar, so
+       every scene is laid out against the real 1280x800 (F11) viewport with no
+       scroll. Scenes are stacked and crossfade via opacity. */
+    .s7-stage {
+      position: relative;
+      flex: 1 1 auto;
+      width: 100%;
+      overflow: hidden;
+      background: #13294B;
+    }
+    .s7-scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    .s7-scene.active { opacity: 1; pointer-events: auto; }
+
+    .s7-inner { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+    /* ---- SCENE 1 - TITLE CARD ---- */
+    .s7-title-1 { color: #FFFFFF; font-weight: 800; font-size: 48px; line-height: 1.15; margin: 0; }
+    .s7-title-2 { color: #AED284; font-weight: 800; font-size: 32px; line-height: 1.2; margin: 16px 0 0; }
+
+    /* ---- SCENE 2 - KEN BURNS CLOSING MONTAGE ---- */
+    .s7-kb { padding: 0; }
+    .s7-kb-panel {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s ease;     /* 1 second crossfade between panels */
+      overflow: hidden;
+    }
+    .s7-kb-panel.active { opacity: 1; }
+    .s7-kb-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: s7kbA 9s ease-out both;
+      animation-play-state: paused;    /* slow pan/zoom runs only while shown */
+    }
+    .s7-kb-panel:nth-child(even) .s7-kb-img { animation-name: s7kbB; }
+    .s7-kb-panel.active .s7-kb-img { animation-play-state: running; }
+    @keyframes s7kbA { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.12) translate(-2%, -1.5%); } }
+    @keyframes s7kbB { from { transform: scale(1.12) translate(2%, 1.5%); } to { transform: scale(1) translate(0, 0); } }
+
+    /* Caption styled to match the Stage 1 Ken Burns report - centred, large,
+       white with a soft shadow, no background bar. */
+    .s7-kb-caption {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      width: calc(100% - 64px);
+      max-width: 700px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #FFFFFF;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+      opacity: 0;                       /* fades in 1s after the panel appears */
+      transition: opacity 0.4s ease;
+    }
+    .s7-kb-caption.show { opacity: 1; }
+    .s7-kb-caption span { display: block; }
+    .s7-kb-caption strong { color: #AED284; font-weight: 700; }
+
+    /* ---- SCENE 3 - CREDENTIALS CARDS ---- */
+    .s7-cred-heading { color: #AED284; font-weight: 800; font-size: 28px; line-height: 1.25; margin: 0 0 26px; }
+    .s7-cred-row { display: flex; gap: 22px; justify-content: center; align-items: stretch; }
+    .s7-cred-card {
+      flex: 1 1 0;
+      min-width: 0;
+      background: #FFFFFF;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: left;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .s7-cred-card.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: s7CardGlow 2.4s ease-in-out infinite;
+    }
+    @keyframes s7CardGlow {
+      0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18), 0 0 8px rgba(174, 210, 132, 0.30); }
+      50%      { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18), 0 0 26px rgba(174, 210, 132, 0.75); }
+    }
+    .s7-cred-card h3 { color: #13294B; font-weight: 800; font-size: 18px; line-height: 1.3; margin: 0 0 12px; }
+    .s7-cred-card p { color: #333333; font-weight: 400; font-size: 14px; line-height: 1.55; margin: 0; }
+    /* Proceed button - the user must click it to continue (no auto-advance). It
+       pulses with the shared wasabi glow and fades in once the cards have landed. */
+    .s7-cred-cta { display: block; margin: 32px auto 0; opacity: 0; transition: opacity 0.5s ease; animation: marvGlowPulse 2s ease-in-out infinite; }
+    .s7-cred-cta.show { opacity: 1; }
+
+    /* ---- SCENE 4 - MARV CLOSING ---- */
+    .s7-marv-line { color: #FFFFFF; font-weight: 800; font-size: 48px; line-height: 1.15; margin: 0 0 26px; }
+    .s7-marv-sprite {
+      width: auto;
+      height: 320px;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    #s7-marv-cta { display: block; margin: 28px auto 0; animation: marvGlowPulse 2s ease-in-out infinite; }
+
+    /* ---- FINAL SCENE - CONTACT US ---- */
+    .s7-contact-logo { height: 56px; width: auto; display: block; margin: 0 auto 22px; }
+    .s7-contact-headline { color: #AED284; font-weight: 800; font-size: 44px; line-height: 1.15; margin: 0 0 26px; }
+    .s7-contact-sprite {
+      width: auto;
+      height: 220px;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s7-contact-card {
+      position: relative;
+      max-width: 420px;
+      margin: 26px auto 0;
+      padding: 22px 28px;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      background: rgba(19, 41, 75, 0.55);
+      text-align: center;
+    }
+    .s7-contact-card p { color: #FFFFFF; font-weight: 400; font-size: 16px; line-height: 1.6; margin: 0; }
+    .s7-contact-card p + p { margin-top: 10px; }
+
+    /* ---- SCENE 5 - YELLOW PAGES ADVERT ---- */
+    .s7-tv-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .s7-tv {
+      position: relative;
+      width: min(1100px, 92vw);
+      aspect-ratio: 1920 / 1080;
+    }
+    .s7-tv-video {
+      position: absolute;
+      /* The screen cut-out of old_tv.png (a 1920x1080 frame), as percentages.
+         Sized to fill the screen aperture so there is no gap at the bottom. */
+      left: 12.5%;
+      top: 10.5%;
+      width: 59.5%;
+      height: 80%;
+      object-fit: cover;
+      background: #000000;
+      border-radius: 6px;
+    }
+    .s7-tv-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .s7-tv-hint {
+      position: absolute;
+      left: 12.5%;
+      top: 10.5%;
+      width: 59.5%;
+      height: 80%;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #AED284;
+      font-weight: 700;
+      font-size: 17px;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 6px;
+      cursor: pointer;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s7-tv-caption { color: #FFFFFF; font-style: italic; font-size: 20px; line-height: 1.4; margin: 0; max-width: 760px; }
+
+    /* ---- SCENE 6 - CLOSING VIDEO SEQUENCE ---- */
+    .s7-closing { padding: 0; }
+    .s7-closing-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #13294B;            /* navy placeholder until the file is added */
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .s7-closing-video.show { opacity: 1; }
+
+    /* Full-screen text overlay layered over the closing video. Same technique
+       as the vintage TV overlay - absolute positioning, z-index above the
+       video (below the final navy-out wash), navy semi-transparent background,
+       centred white text. Fades in when the video starts and out before it
+       ends, driven by the video's own playing / timeupdate events. */
+    .s7-world-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      background: rgba(19, 41, 75, 0.55);
+      color: #AED284;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(28px, 6vw, 48px);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      /* Own compositing layer so the text stays above the playing video. */
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    .s7-world-overlay.is-on { opacity: 1; animation: s7Glitch 2.5s linear 1; }
+    /* Digital glitch entrance - chromatic split, static tears, x-jitter
+       resolving to clean. Matches the Stage 4 intro text (s4Glitch). */
+    @keyframes s7Glitch {
+      0%   { opacity: 0; transform: translateX(-7px) translateZ(0) skewX(6deg); text-shadow: 3px 0 rgba(174, 210, 132, 0.9), -3px 0 rgba(255, 68, 68, 0.7); clip-path: inset(0 0 62% 0); }
+      18%  { opacity: 1; transform: translateX(5px) translateZ(0); text-shadow: -4px 0 rgba(174, 210, 132, 0.9), 4px 0 rgba(255, 68, 68, 0.6); clip-path: inset(48% 0 0 0); }
+      34%  { transform: translateX(-3px) translateZ(0); text-shadow: 2px 0 rgba(174, 210, 132, 0.7); clip-path: inset(0 0 28% 0); }
+      52%  { transform: translateX(2px) translateZ(0); text-shadow: -2px 0 rgba(174, 210, 132, 0.5); clip-path: inset(22% 0 8% 0); }
+      70%  { transform: translateX(-1px) translateZ(0); text-shadow: 1px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0) translateZ(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+    }
+    .s7-navy-out {
+      position: absolute;
+      inset: 0;
+      background: #13294B;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .s7-navy-out.show { opacity: 1; }
+
+    /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the
+       wasabi border that the MARV sprite and credential cards already carry. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-frame { position: relative; display: inline-block; line-height: 0; border-radius: 16px; }
+    .s7-cred-card { position: relative; }
+    .s4-frame::after, .s7-cred-card::after, .s7-contact-card::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+        rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+        rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+        rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite; pointer-events: none;
+    }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient music for the Ken Burns montage. Started on the first user
+       interaction with the page (never autoplays); loops and fades out when the
+       montage ends. -->
+  <audio id="s7-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
+
+  <!-- Progress indicator - Stage 7 of 7, the journey complete. No id on the list
+       so the shell's main.js never re-renders it. -->
+  <header class="progress-bar" aria-label="Journey progress">
+    <div class="progress-bar__inner">
+      <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
+      <ol class="progress-steps">
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+        <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
+        <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <a class="btn btn-ghost stage-back" href="MM-CE-S6-repair.html">Back to Stage 6</a>
+
+  <main class="s7-stage" id="s7-stage">
+
+    <!-- SCENE 1 - TITLE CARD -->
+    <section class="s7-scene" id="s7-scene-title">
+      <div class="s7-inner">
+        <h1 class="s7-title-1">A decision in a day.</h1>
+        <p class="s7-title-2">A Magicman quality guarantee.</p>
+      </div>
+    </section>
+
+    <!-- SCENE 2 - KEN BURNS CLOSING MONTAGE - repaired-surface "after" photos:
+           basinafter.png, lobby_floor_tile_scratch_after.png,
+           counter_chip_after.png, Scorch_mark_after.png,
+           windowafter.png, cabinet_after.png -->
+    <section class="s7-scene s7-kb" id="s7-scene-kb">
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/basinafter.png" alt="Repaired vitreous china basin">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> Vitreous china basin</span>
+          <span><strong>Issue:</strong> Impact crack with material loss</span>
+          <span><strong>Resolved in:</strong> 4 days</span>
+        </div>
+      </div>
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/lobby_floor_tile_scratch_after.png" alt="Repaired marble floor tile">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> Marble floor tile</span>
+          <span><strong>Issue:</strong> Surface scratches</span>
+          <span><strong>Resolved in:</strong> 3 days</span>
+        </div>
+      </div>
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/counter_chip_after.png" alt="Repaired marble worktop">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> Marble worktop</span>
+          <span><strong>Issue:</strong> Chip to edge</span>
+          <span><strong>Resolved in:</strong> 2 days</span>
+        </div>
+      </div>
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/Scorch_mark_after.png" alt="Repaired timber surface">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> Timber surface</span>
+          <span><strong>Issue:</strong> Scorch mark</span>
+          <span><strong>Resolved in:</strong> 4 days</span>
+        </div>
+      </div>
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/windowafter.png" alt="Repaired uPVC window frame">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> uPVC window frame</span>
+          <span><strong>Issue:</strong> Surface scratch and scuff</span>
+          <span><strong>Resolved in:</strong> 3 days</span>
+        </div>
+      </div>
+      <div class="s7-kb-panel" data-kb>
+        <img class="s7-kb-img" src="../assets/images/cabinet_after.png" alt="Repaired laminate cabinet">
+        <div class="s7-kb-caption">
+          <span><strong>Surface:</strong> Laminate cabinet</span>
+          <span><strong>Issue:</strong> Chip and edge peel</span>
+          <span><strong>Resolved in:</strong> 2 days</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 3 - CREDENTIALS CARDS -->
+    <section class="s7-scene" id="s7-scene-cred">
+      <div class="s7-inner">
+        <h2 class="s7-cred-heading">Thirty years of surface repair expertise.</h2>
+        <div class="s7-cred-row">
+          <div class="s7-cred-card" data-cred>
+            <h3>Expert surface repair since 1993</h3>
+            <p>Over thirty years of craft knowledge built into every assessment and every repair.</p>
+          </div>
+          <div class="s7-cred-card" data-cred>
+            <h3>Magicman Academy trained</h3>
+            <p>Every technician trained and assessed to the Magicman standard before they work on your sites.</p>
+          </div>
+          <div class="s7-cred-card" data-cred>
+            <h3>National coverage across the UK</h3>
+            <p>Directly employed technicians covering every region. Wherever your sites are, we are there.</p>
+          </div>
+          <div class="s7-cred-card" data-cred>
+            <h3>Quality guaranteed on every repair</h3>
+            <p>Every job closed with a Magicman guarantee. If it is not right, we make it right.</p>
+          </div>
+        </div>
+        <button type="button" id="s7-cred-cta" class="btn btn-primary s7-cred-cta">A little nostalgia</button>
+      </div>
+    </section>
+
+    <!-- SCENE 4 - MARV CLOSING -->
+    <section class="s7-scene" id="s7-scene-marv">
+      <div class="s7-inner">
+        <h2 class="s7-marv-line">Every claim. Every surface. Every time.</h2>
+        <span class="s4-frame"><img class="s7-marv-sprite" src="../assets/marv/marvtriumphant.png" alt="MARV, triumphant"></span>
+        <button type="button" id="s7-marv-cta" class="btn btn-primary">See how far we've come</button>
+      </div>
+    </section>
+
+    <!-- SCENE 5 - YELLOW PAGES ADVERT (vintage TV) -->
+    <section class="s7-scene" id="s7-scene-yp">
+      <div class="s7-tv-wrap">
+        <div class="s7-tv">
+          <video class="s7-tv-video" id="s7-yp-video" playsinline preload="auto">
+            <source src="../assets/video/yp_advert_1991.mp4" type="video/mp4">
+          </video>
+          <div class="s7-tv-hint" id="s7-yp-hint">Click anywhere to play</div>
+          <img class="s7-tv-frame" src="../assets/images/old_tv.png" alt="">
+        </div>
+        <p class="s7-tv-caption">The craft has never changed. Everything around it just got smarter.</p>
+      </div>
+    </section>
+
+    <!-- SCENE 6 - CLOSING VIDEO SEQUENCE -->
+    <section class="s7-scene s7-closing" id="s7-scene-closing">
+      <!-- Closing transition video. Plays full screen; when it ends the scene
+           fades to navy and holds - the end of the experience. -->
+      <video class="s7-closing-video" id="s7-closing-video" playsinline preload="none">
+        <source src="../assets/video/marv_transition_out.mp4" type="video/mp4">
+      </video>
+      <div class="s7-world-overlay" id="s7-world-overlay">Leaving MARV's world</div>
+      <div class="s7-navy-out" id="s7-navy-out"></div>
+    </section>
+
+    <!-- FINAL SCENE - CONTACT US. Revealed once the closing video has faded to
+         navy. No continue button - this is the end of the experience. -->
+    <section class="s7-scene" id="s7-scene-contact">
+      <div class="s7-inner">
+        <img class="s7-contact-logo" src="../assets/images/magicman-white.png" alt="Magicman">
+        <h2 class="s7-contact-headline">Ready to make problems disappear?</h2>
+        <span class="s4-frame"><img class="s7-contact-sprite" src="../assets/marv/marvtriumphant.png" alt="MARV, triumphant"></span>
+        <div class="s7-contact-card">
+          <p>Name: Tony Kinch</p>
+          <p>Phone: 07747 488283</p>
+          <p>Email: Tony.kinch@nhcc.uk.com</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+      <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
+      <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
+      <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
+      <!-- Back navigation to Stage 6. Stage 6 does not exist in the repo yet. -->
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair (back)</a>
+      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - The Outcome (current)</span>
+      <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---- Audio unlock (AudioContext pattern shared with the other stages) ----
+       The Yellow Pages advert audio is gated behind a user gesture. The first
+       click (or key) anywhere unlocks it; if the user has already clicked by the
+       time Scene 5 opens, the advert plays with sound automatically. */
+    var audioCtx = null;
+    var audioUnlocked = false;
+    function unlockAudio() {
+      audioUnlocked = true;
+      try {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) { audioCtx = new AC(); }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+      } catch (e) {}
+    }
+
+    /* ---- Ambient music for the Ken Burns montage. Attempted when the montage
+       scene opens; the browser gates playback behind the first user interaction
+       (also covered by onFirstGesture). Loops, then fades out when the montage
+       ends. Same treatment as Stage 1. ---- */
+    var music = document.getElementById('s7-music');
+    if (music) { music.volume = 0.3; }
+    var musicFade = null;
+    var montageMusicDone = false;
+    function startMusic() {
+      if (!music) { return; }
+      if (musicFade) { clearInterval(musicFade); musicFade = null; }
+      music.volume = 0.3;
+      var p = music.play();
+      if (p && p.catch) { p.catch(function () {}); }
+    }
+    function fadeOutMusic() {
+      montageMusicDone = true;   // the montage has ended; do not start music after this
+      if (!music || music.paused) { return; }
+      if (musicFade) { clearInterval(musicFade); }
+      musicFade = setInterval(function () {
+        var v = music.volume - 0.015;
+        if (v <= 0) { music.volume = 0; music.pause(); clearInterval(musicFade); musicFade = null; }
+        else { music.volume = v; }
+      }, 60);
+    }
+
+    var scenes = {
+      title:   document.getElementById('s7-scene-title'),
+      kb:      document.getElementById('s7-scene-kb'),
+      cred:    document.getElementById('s7-scene-cred'),
+      marv:    document.getElementById('s7-scene-marv'),
+      yp:      document.getElementById('s7-scene-yp'),
+      closing: document.getElementById('s7-scene-closing'),
+      contact: document.getElementById('s7-scene-contact')
+    };
+    var current = null;
+    function showScene(key) {
+      Object.keys(scenes).forEach(function (k) {
+        if (scenes[k]) { scenes[k].classList.toggle('active', k === key); }
+      });
+      current = key;
+    }
+
+    /* ---- Scene 1: title card ---- */
+    function start() {
+      showScene('title');
+      setTimeout(startKenBurns, 3000);   // hold 3s, then the montage begins
+    }
+
+    /* ---- Scene 2: Ken Burns montage ---- */
+    var PANEL_HOLD = 4000;       // each panel displays for 4 seconds
+    var CAPTION_DELAY = 1000;    // caption fades in 1s after the panel appears
+    function startKenBurns() {
+      showScene('kb');
+      // The montage is the audio scene: attempt the ambient music here. The
+      // browser gates playback behind the first user interaction, which
+      // onFirstGesture also handles, so it starts as soon as the user interacts.
+      startMusic();
+      var panels = scenes.kb.querySelectorAll('[data-kb]');
+      function showPanel(i) {
+        panels.forEach(function (p, idx) {
+          p.classList.toggle('active', idx === i);
+          if (idx !== i) {
+            var c = p.querySelector('.s7-kb-caption');
+            if (c) { c.classList.remove('show'); }
+          }
+        });
+        var cap = panels[i].querySelector('.s7-kb-caption');
+        setTimeout(function () { if (cap) { cap.classList.add('show'); } }, CAPTION_DELAY);
+      }
+      panels.forEach(function (p, i) {
+        setTimeout(function () { showPanel(i); }, i * PANEL_HOLD);
+      });
+      setTimeout(startCredentials, panels.length * PANEL_HOLD);
+    }
+
+    /* ---- Scene 3: credentials cards ---- */
+    function startCredentials() {
+      showScene('cred');
+      fadeOutMusic();   // the Ken Burns montage has ended
+
+      var cards = scenes.cred.querySelectorAll('[data-cred]');
+      cards.forEach(function (card, i) {
+        setTimeout(function () { card.classList.add('show'); }, 300 + i * 500);
+      });
+      // Once the cards have landed, reveal the proceed button. The user clicks
+      // it to continue to the MARV scene - no auto-advance.
+      var credCta = document.getElementById('s7-cred-cta');
+      if (credCta) {
+        setTimeout(function () { credCta.classList.add('show'); }, 300 + cards.length * 500 + 200);
+      }
+    }
+
+    /* ---- Scene 4: MARV closing ---- */
+    function startMarv() {
+      showScene('marv');
+      // The advert is reached when the user clicks the "See how far we've come"
+      // button (wired below), not by a timer.
+    }
+
+    /* ---- Scene 5: Yellow Pages advert ---- */
+    var ypVideo = document.getElementById('s7-yp-video');
+    var ypHint = document.getElementById('s7-yp-hint');
+    var ypStarted = false;
+    function playYellowPages() {
+      if (ypStarted || !ypVideo) { return; }
+      ypStarted = true;
+      if (ypHint) { ypHint.style.display = 'none'; }
+      ypVideo.muted = false;
+      var p = ypVideo.play();
+      if (p && p.catch) { p.catch(function () {
+        // If sound playback is blocked, fall back to a muted play so the
+        // sequence still advances on the next gesture.
+        ypStarted = false;
+        if (ypHint) { ypHint.style.display = ''; }
+      }); }
+    }
+    function startYellowPages() {
+      showScene('yp');
+      if (audioUnlocked) { playYellowPages(); }
+      else if (ypHint) { ypHint.style.display = ''; }   // wait for a click
+    }
+    if (ypVideo) {
+      ypVideo.addEventListener('ended', startClosing);
+      ypVideo.addEventListener('error', function () {
+        // Missing/blocked advert should not stall the finale.
+        if (current === 'yp') { setTimeout(startClosing, 800); }
+      });
+    }
+
+    /* ---- Scene 6: closing transition video, then fade to navy ---- */
+    var closingVideo = document.getElementById('s7-closing-video');
+    var navyOut = document.getElementById('s7-navy-out');
+    var closingDone = false;
+
+    function startClosing() {
+      if (closingDone) { return; }
+      closingDone = true;
+      showScene('closing');
+      function fadeToNavy() {
+        if (navyOut) { navyOut.classList.add('show'); }
+        // Once the navy wash has settled, reveal the final contact scene.
+        setTimeout(function () { showScene('contact'); }, 1200);
+      }
+      if (!closingVideo) { fadeToNavy(); return; }
+      var finished = false;
+      function finish() { if (finished) { return; } finished = true; fadeToNavy(); }
+      closingVideo.addEventListener('ended', finish);
+      // If the file is missing or playback is blocked, still end on navy.
+      closingVideo.addEventListener('error', function () { setTimeout(finish, 600); });
+      // Text overlay: fade in as the closing sequence begins, fade out before
+      // the video ends. Adding is-on directly (not on the 'playing' event) so it
+      // shows even when autoplay is blocked and 'playing' never fires.
+      var worldOverlay = document.getElementById('s7-world-overlay');
+      if (worldOverlay) {
+        worldOverlay.classList.add('is-on');
+        // Fade out after a short hold so it reads as a title then clears,
+        // regardless of whether the video is actually playing (timeupdate is
+        // unreliable when autoplay is blocked).
+        setTimeout(function () { worldOverlay.classList.remove('is-on'); }, 3500);
+        closingVideo.addEventListener('ended', function () { worldOverlay.classList.remove('is-on'); });
+      }
+      closingVideo.classList.add('show');
+      var p = closingVideo.play();
+      if (p && p.catch) { p.catch(function () {
+        closingVideo.muted = true;
+        var p2 = closingVideo.play();
+        if (p2 && p2.catch) { p2.catch(function () { setTimeout(finish, 600); }); }
+      }); }
+      // Watchdog: if nothing is actually playing shortly after (e.g. the file is
+      // missing or blocked, and no 'ended' will ever fire), end on navy. A real
+      // video that is playing (currentTime advancing) is left alone for 'ended'.
+      setTimeout(function () {
+        if (!finished && (closingVideo.error || closingVideo.readyState === 0 ||
+            (closingVideo.paused && closingVideo.currentTime === 0))) {
+          finish();
+        }
+      }, 3500);
+    }
+
+    /* ---- First user gesture: unlock audio, start the gated montage music,
+       and (if waiting) start the advert ---- */
+    function onFirstGesture() {
+      unlockAudio();
+      // Ambient music is gated behind the first interaction. Only start it while
+      // the Ken Burns montage (or its title lead-in) is still running.
+      if (!montageMusicDone && music && music.paused) { startMusic(); }
+      if (current === 'yp' && !ypStarted) { playYellowPages(); }
+    }
+    document.addEventListener('click', onFirstGesture);
+    document.addEventListener('keydown', onFirstGesture);
+
+    // The "A little nostalgia" button on the credentials scene goes straight to
+    // the YP advert (the MARV scene is no longer in the forward flow).
+    var credCtaBtn = document.getElementById('s7-cred-cta');
+    if (credCtaBtn) { credCtaBtn.addEventListener('click', startYellowPages); }
+
+    // The "See how far we've come" button on the MARV scene proceeds to the advert.
+    var marvCta = document.getElementById('s7-marv-cta');
+    if (marvCta) { marvCta.addEventListener('click', startYellowPages); }
+
+    /* ---- Go - the montage starts automatically on load; the ambient music is
+       gated behind the first user interaction (so it never autoplays). ---- */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay), exposed for the dev panel.
+       Each scene's entrance animations replay from the start without the
+       first-load auto-advance, so navigation lands on the chosen scene. ---- */
+    var DEV_ORDER = ['title', 'kb', 'cred', 'marv', 'yp', 'closing', 'contact'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devPlayKb() {
+      showScene('kb');
+      var panels = scenes.kb.querySelectorAll('[data-kb]');
+      panels.forEach(function (p) { p.classList.remove('active'); var c = p.querySelector('.s7-kb-caption'); if (c) { c.classList.remove('show'); } });
+      panels.forEach(function (p, i) {
+        setTimeout(function () {
+          panels.forEach(function (q, j) {
+            q.classList.toggle('active', j === i);
+            if (j !== i) { var cc = q.querySelector('.s7-kb-caption'); if (cc) { cc.classList.remove('show'); } }
+          });
+          var cap = panels[i].querySelector('.s7-kb-caption');
+          setTimeout(function () { if (cap) { cap.classList.add('show'); } }, CAPTION_DELAY);
+        }, i * PANEL_HOLD);
+      });
+    }
+    function devPlayCred() {
+      showScene('cred');
+      var cards = scenes.cred.querySelectorAll('[data-cred]');
+      cards.forEach(function (c) { c.classList.remove('show'); });
+      cards.forEach(function (card, i) { setTimeout(function () { card.classList.add('show'); }, 300 + i * 500); });
+      var credCta = document.getElementById('s7-cred-cta');
+      if (credCta) {
+        credCta.classList.remove('show');
+        setTimeout(function () { credCta.classList.add('show'); }, 300 + cards.length * 500 + 200);
+      }
+    }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      var key = DEV_ORDER[i];
+      if (key === 'title') { showScene('title'); }
+      else if (key === 'kb') { devPlayKb(); }
+      else if (key === 'cred') { devPlayCred(); }
+      else if (key === 'marv') { showScene('marv'); }
+      else if (key === 'yp') { ypStarted = false; if (ypHint) { ypHint.style.display = ''; } showScene('yp'); if (audioUnlocked) { playYellowPages(); } }
+      else if (key === 'closing') { closingDone = false; startClosing(); }
+      else if (key === 'contact') { showScene('contact'); }
+    }
+    function devCur() { var i = DEV_ORDER.indexOf(current); return i < 0 ? 0 : i; }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
+  })();
+  </script>
+
+  <script>
+    /* Stop every audio and video on this stage cleanly whenever the user leaves
+       by any method (skip, continue, DEV link, back button). Also covers the
+       back/forward cache case where media could otherwise keep playing. This
+       includes the ambient track, the advert video and the closing video. */
+    window.addEventListener('pagehide', function () {
+      var media = document.querySelectorAll('audio, video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].currentTime = 0; } catch (e) {}
+      }
+    });
+  </script>
+
+</body>
+</html>

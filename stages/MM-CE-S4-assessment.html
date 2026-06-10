@@ -6,6 +6,7 @@
   <title>Magicman | The Repair Journey - Stage 4 Assessment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
   <!-- Shared shell stylesheet + device detection, loaded before this stage's own
        <style> so the stage's bespoke styles win the cascade. -->
   <link rel="stylesheet" href="../css/main.css">
@@ -33,6 +34,50 @@
     }
     .s4-transition.is-out { opacity: 0; }
     .s4-video { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Full-screen text overlay layered over the transition video. Same
+       technique as the vintage TV overlay - absolute positioning, z-index
+       above the video, navy semi-transparent wash, centred white text.
+       Fades in when the video starts and out before it ends (driven by the
+       video's own playing / timeupdate events). */
+    .s4-world-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      background: rgba(19, 41, 75, 0.55);
+      color: #AED284;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(28px, 6vw, 48px);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      /* Own compositing layer so the text stays above the playing video. */
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    .s4-world-overlay.is-on { opacity: 1; }
+    /* Only the text glitches - not the full-screen navy container. */
+    .s4-world-overlay__text { display: inline-block; }
+    .s4-world-overlay.is-on .s4-world-overlay__text { animation: s4GlitchOverlay 2.5s linear 1; }
+    /* Dramatic glitch entrance for the transition overlay - wide chromatic
+       split, deep clip-path tears, strong x-jitter, resolving to clean white.
+       translateZ(0) per keyframe keeps it on its own layer above the video. */
+    @keyframes s4GlitchOverlay {
+      0%   { opacity: 0; transform: translateX(-22px) translateZ(0) skewX(12deg); text-shadow: 11px 0 rgba(174, 210, 132, 0.95), -11px 0 rgba(255, 68, 68, 0.9); clip-path: inset(0 0 72% 0); }
+      12%  { opacity: 1; transform: translateX(18px) translateZ(0) skewX(-8deg); text-shadow: -14px 0 rgba(174, 210, 132, 0.95), 14px 0 rgba(255, 68, 68, 0.85); clip-path: inset(60% 0 0 0); }
+      24%  { transform: translateX(-16px) translateZ(0); text-shadow: 12px 0 rgba(174, 210, 132, 0.9), -12px 0 rgba(255, 68, 68, 0.8); clip-path: inset(0 0 48% 0); }
+      38%  { transform: translateX(14px) translateZ(0) skewX(5deg); text-shadow: -10px 0 rgba(174, 210, 132, 0.85), 10px 0 rgba(255, 68, 68, 0.7); clip-path: inset(38% 0 26% 0); }
+      52%  { transform: translateX(-10px) translateZ(0); text-shadow: 8px 0 rgba(174, 210, 132, 0.8), -8px 0 rgba(255, 68, 68, 0.6); clip-path: inset(0 0 20% 0); }
+      66%  { transform: translateX(7px) translateZ(0) skewX(-3deg); text-shadow: -5px 0 rgba(174, 210, 132, 0.6), 5px 0 rgba(255, 68, 68, 0.4); clip-path: inset(14% 0 8% 0); }
+      82%  { transform: translateX(-3px) translateZ(0); text-shadow: 3px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0) translateZ(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+    }
 
     /* MARV's lab background, revealed when the transition ends */
     .s4-lab {
@@ -75,8 +120,8 @@
       z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 28px 24px 72px;
-      min-height: calc(100vh - 60px);
+      padding: 28px 24px 24px;
+      min-height: calc(100vh - 66px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -86,88 +131,400 @@
     .s4-content { width: 100%; text-align: center; opacity: 0; transition: opacity 0.45s ease; }
     .s4-content.is-in { opacity: 1; }
 
-    /* Claim image + scan box */
-    .s4-imgwrap { position: relative; display: inline-block; }
-    .s4-claim-img { display: block; width: 380px; max-width: 100%; height: auto; border-radius: 8px; }
+    /* (Old scan-stage CSS removed - the S4-2 / S4-3 scans are replaced by the
+       fruit machine sequence.) */
+
+    /* Scan box (left column, above MARV): the damaged basin with a moving
+       wasabi scan line. Matches the machine unit border treatment. */
     .s4-scanbox {
-      position: absolute;
-      inset: 0;
-      border: 2px solid var(--wasabi);
-      border-radius: 8px;
+      position: relative;
+      width: 150px;
+      max-width: 100%;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(19, 41, 75, 0.28);
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      line-height: 0;
+      animation: marvGlowPulse 2s ease-in-out infinite;
     }
+    .s4-scanbox-img { display: block; width: 100%; height: auto; border-radius: 9px; }
     .s4-scanline {
       position: absolute;
       left: 0; right: 0;
       top: 0;
       height: 2px;
-      background: var(--wasabi);
-      box-shadow: 0 0 12px var(--wasabi);
-      animation: s4scan 1.4s linear infinite;
+      background: #AED284;
+      box-shadow: 0 0 8px 2px rgba(174, 210, 132, 0.8);
+      animation: s4ScanMove 2s ease-in-out infinite;
     }
-    @keyframes s4scan { 0% { top: 0; } 100% { top: 100%; } }
-    .s4-scanbox.s4-stopped .s4-scanline { display: none; }
-    .s4-scan-text {
-      font-weight: 800;
-      font-size: 26px;
-      letter-spacing: 0.06em;
-      color: var(--wasabi);
-      text-shadow: 0 0 10px rgba(174, 210, 132, 0.6);
+    @keyframes s4ScanMove {
+      0%, 100% { top: 0; }
+      50%      { top: calc(100% - 2px); }
     }
+    /* On "Scan complete." the line freezes in place (animation paused, not hidden). */
+    .s4-scanbox.is-frozen .s4-scanline { animation-play-state: paused; }
 
-    /* Option cards */
-    .s4-cards {
+    /* Phase 2 challenge - horizontal image option cards below the MARV bubble. */
+    .s4-choices {
       display: flex;
-      gap: 16px;
+      flex-direction: row;
       justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 24px;
+      gap: 10px;
+      width: 100%;
+      margin-top: 6px;
       opacity: 0;
-      transition: opacity 0.45s ease;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
     }
-    .s4-cards.is-in { opacity: 1; }
-    .s4-card {
-      width: 160px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      padding: 12px;
-      cursor: pointer;
-      font-family: 'Open Sans', sans-serif;
-      transition: border-color 0.2s ease, transform 0.12s ease, opacity 0.2s ease;
-    }
-    .s4-card:hover:not(:disabled) { border-color: var(--wasabi); transform: translateY(-3px); }
-    .s4-card:disabled { cursor: default; opacity: 0.5; }
-    .s4-card-img { width: 100%; height: 96px; object-fit: cover; border-radius: 6px; background: rgba(0, 0, 0, 0.2); }
-    .s4-card-label { margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--white); }
-
-    /* Verdict card */
-    .s4-verdict {
-      background: rgba(0, 0, 0, 0.28);
-      border: 2px solid var(--wasabi);
-      border-radius: 12px;
-      padding: 28px 32px;
-      max-width: 560px;
-      margin: 0 auto;
-      text-align: left;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    }
-    .s4-verdict-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; color: var(--wasabi); }
-    .s4-verdict-row {
+    .s4-choices.is-in { opacity: 1; transform: translateY(0); }
+    .s4-choice {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 150px;
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 8px 0;
-      font-size: 15px;
-      border-bottom: 1px solid rgba(174, 210, 132, 0.2);
+      flex-direction: column;
+      padding: 0 0 8px;
+      background: #0D4F4F;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+      transition: transform 0.2s ease;
     }
-    .s4-verdict-row span:first-child { opacity: 0.8; }
-    .s4-verdict-row span:last-child { font-weight: 700; text-align: right; }
-    .s4-verdict-verdict { margin-top: 18px; font-size: 40px; font-weight: 800; color: var(--wasabi); text-align: center; }
+    .s4-choice:hover { transform: scale(1.05); }
+    .s4-choice-img { width: 100%; height: 84px; object-fit: cover; border-radius: 8px 8px 0 0; display: block; }
+    .s4-choice-label {
+      margin-top: 7px;
+      padding: 0 4px;
+      color: var(--white);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.25;
+      text-align: center;
+    }
+    /* Correct selection reuses the reel lock flash; wrong selection flashes red. */
+    .s4-choice.flash { animation: s4ReelFlash 0.5s ease forwards; }
+    .s4-choice.flash-wrong { animation: s4WrongFlash 0.5s ease forwards; }
+    @keyframes s4WrongFlash {
+      0%   { box-shadow: 0 0 24px 10px rgba(192, 57, 43, 1); border-color: #C0392B; }
+      100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); border-color: #AED284; }
+    }
+
+    /* Phase 3 verdict card - full width below the columns. White card with the
+       shared wasabi glow border treatment (applied via the selector below). */
+    .s4-vcard {
+      background: #ffffff;
+      color: var(--navy);
+      padding: 10px 18px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .s4-vcard.is-in { opacity: 1; transform: translateY(0); }
+    .s4-vcard__row { display: flex; gap: 12px; justify-content: center; flex-wrap: nowrap; }
+    .s4-vitem { flex: 1 1 0; min-width: 0; text-align: center; padding: 4px 6px; }
+    .s4-vitem + .s4-vitem { border-left: 1px solid rgba(19, 41, 75, 0.12); }
+    .s4-vitem__label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #5b6b80; margin-bottom: 6px; }
+    .s4-vitem__value { font-size: 14px; font-weight: 800; color: var(--navy); line-height: 1.25; }
+    .s4-vcard__badge { text-align: center; margin-top: 18px; }
+    .s4-vbadge { display: inline-block; background: var(--wasabi); color: var(--navy); font-weight: 800; font-size: 16px; padding: 10px 24px; border-radius: 999px; }
+
+    /* Left column confidence stamp + paired confidence boxes (below the bubble). */
+    .s4-stamp {
+      width: 100%;
+      padding: 7px;
+      background: transparent;
+      border: 2px solid #AED284;
+      border-radius: 8px;
+      color: #AED284;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      text-align: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s4-confidence { display: flex; gap: 8px; width: 100%; }
+    .s4-confidence-box {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 9px;
+      background: #0D4F4F;
+      border: 2px solid #AED284;
+      border-radius: 8px;
+      color: #FFFFFF;
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+
+    /* ---- S4-4 fruit machine (static positioning - step one) ----
+       The machine art is a real <img> in a wrapper, following the same
+       rendered-image overlay pattern used for the lab background / clock above.
+       positionMachine() in the script sizes the overlay layer to the rendered
+       image on load and on every resize, so the five reel windows stay aligned
+       at all screen sizes. Reel boxes are percentage positions of the 608 x 832
+       source image. */
+    /* Grouped processing unit: scan label, machine (with its reel overlays) and
+       progress bar wrapped tight together inside one wasabi glow border, so they
+       read as a single MARV processing unit. */
+    .s4-unit {
+      display: inline-flex;
+      flex-direction: column;
+      padding: 8px;
+      max-width: 94vw;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s4-machine {
+      position: relative;
+      line-height: 0;
+    }
+    /* Hero size: the machine is driven by viewport height so it dominates the
+       screen yet stays fully visible on desktop (with room for the unit border,
+       scan label above and progress bar below), and falls back to a width limit
+       on narrow / portrait screens. */
+    .s4-machine-img { display: block; height: min(54vh, 620px); width: auto; max-width: 100%; }
+
+    /* Scanning status label, directly above the machine (no gap). */
+    .s4-scanlabel {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #AED284;
+      text-align: center;
+      margin: 0;
+      transition: opacity 0.2s ease;
+    }
+    /* Progress bar, directly below the machine (no gap), machine width. */
+    .s4-progress {
+      width: 100%;
+      height: 8px;
+      margin: 0;
+      background: #13294B;
+      border: 1px solid #AED284;
+      border-radius: 4px;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .s4-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #AED284;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .s4-machine-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    .s4-reel {
+      position: absolute;
+      overflow: hidden;
+      background: #0D4F4F;
+      border: 3px solid #AED284;
+      border-radius: 8px;
+      /* Wasabi glow pulse on every reel at all times. */
+      animation: s4ReelPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes s4ReelPulse {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.5); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.8); }
+    }
+    /* The reel strip is a vertical column of items, one item tall per window.
+       It scrolls with translateY: a looping spin, then an eased settle onto the
+       final value. Item height is set per reel by positionMachine (--reel-h) so
+       the strip stays aligned with the rendered image at any size. */
+    .s4-reel-strip { display: flex; flex-direction: column; will-change: transform; transform: translateY(0); }
+    .s4-reel-item {
+      height: var(--reel-h, 40px);
+      flex: 0 0 var(--reel-h, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 5%;
+      overflow: hidden;
+      color: var(--white);
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 700;
+      font-size: clamp(8px, 1.5vw, 12px);
+      line-height: 1.1;
+      word-break: keep-all;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    @keyframes reelSpin {
+      from { transform: translateY(0); }
+      to   { transform: translateY(var(--spin-dist, -200px)); }
+    }
+    /* On lock: a prominent wasabi flash that fades back to the idle pulse over
+       0.5s. The .flash rule overrides the idle pulse for its duration; the JS
+       removes .flash afterwards so s4ReelPulse resumes seamlessly (its baseline
+       matches this animation's end frame). */
+    .s4-reel.flash { animation: s4ReelFlash 0.5s ease forwards; }
+    @keyframes s4ReelFlash {
+      0%   { box-shadow: 0 0 24px 10px rgba(174, 210, 132, 1); }
+      100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.5); }
+    }
+
+    /* Masked reels show a wasabi question mark until the user reveals MARV's
+       matching answer. The mark dissolves out and the answer snaps in. */
+    .s4-reel-mask { color: #AED284; }
+    .s4-reel-dissolve { animation: s4ReelDissolve 0.3s ease forwards; }
+    .s4-reel-revealed { animation: s4ReelReveal 0.4s ease forwards; }
+    @keyframes s4ReelDissolve {
+      from { opacity: 1; transform: scale(1); filter: blur(0); }
+      to   { opacity: 0; transform: scale(0.35); filter: blur(4px); }
+    }
+    @keyframes s4ReelReveal {
+      0%   { opacity: 0; transform: scale(0.35); filter: blur(4px); }
+      60%  { opacity: 1; transform: scale(1.12); filter: blur(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    /* Whole-machine wasabi glow flash once all reels lock. */
+    .s4-machine.win-flash .s4-machine-img { animation: s4MachineFlash 0.95s ease; }
+    @keyframes s4MachineFlash {
+      0%, 100% { filter: drop-shadow(0 0 0 rgba(174, 210, 132, 0)); }
+      45%      { filter: drop-shadow(0 0 34px rgba(174, 210, 132, 0.95)); }
+    }
+
+    /* ---- S4-4 verdict scene layout ----
+       A body.s4-verdict class scopes everything below to the verdict scene so
+       the scan stages above are untouched. It force-hides every persistent
+       S4-1 to S4-3 decoration (transition video, lab backdrop, spinning clock)
+       and lays the scene out as two columns - MARV one third on the left, the
+       fruit machine two thirds on the right, level with each other - with a
+       full-width row below for the verdict card (built next) and the button. */
+    body.s4-verdict .s4-transition,
+    body.s4-verdict .s4-lab,
+    body.s4-verdict #clock-overlay { display: none !important; }
+
+    body.s4-verdict .s4-wrap {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-areas:
+        "marv machine"
+        "verdict verdict"
+        "cta cta";
+      align-items: start;
+      column-gap: 32px;
+      row-gap: 12px;
+      max-width: 1180px;
+    }
+    body.s4-verdict #s4-marv {
+      grid-area: marv;
+      margin-top: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    body.s4-verdict #s4-content { grid-area: machine; margin: 0; }
+    body.s4-verdict #s4-verdict-slot { grid-area: verdict; width: 100%; }
+    body.s4-verdict #s4-cta { grid-area: cta; margin-top: 0; }
+    /* Verdict is the densest scene; trim the left column so it clears 800px. */
+    body.s4-verdict .s4-marv-sprite { width: 72px; }
+    body.s4-verdict .s4-marv-bubble { font-size: 18px; line-height: 1.38; padding: 10px 14px; }
+
+    /* Narrow / portrait: stack into one column - MARV, machine, card, button. */
+    body.s4-verdict.device-mobile .s4-wrap {
+      grid-template-columns: 1fr;
+      grid-template-areas: "marv" "machine" "verdict" "cta";
+    }
+
+    /* ---- Glow-card border treatment (stat cards + verdict) - a warm
+       diagnostic-readout look from MARV's lab: wasabi border, glow pulse,
+       and a faint trace running around the edge. ---- */
+    @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    .s4-stat, .s4-vcard {
+      position: relative;
+      border: 2px solid #AED284;
+      border-radius: 16px;
+      box-shadow: 0 0 8px rgba(174, 210, 132, 0.22), inset 0 0 12px rgba(174, 210, 132, 0.06);
+      animation: s4Glow 2.6s ease-in-out infinite;
+    }
+    .s4-stat::before, .s4-vcard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+                  rgba(174, 210, 132, 0) 0deg,
+                  rgba(174, 210, 132, 0) 290deg,
+                  #AED284 335deg,
+                  rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes s4Glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(174, 210, 132, 0.22), inset 0 0 12px rgba(174, 210, 132, 0.06); }
+      50% { box-shadow: 0 0 22px rgba(174, 210, 132, 0.5), inset 0 0 18px rgba(174, 210, 132, 0.12); }
+    }
+    @keyframes s4Trace { to { --s4angle: 360deg; } }
+
+    /* MARV sprite frame + speech bubble - stronger 3px wasabi border, a 2s glow
+       pulse and a brighter, slower (3.5s) circuit trace the eye can follow. */
+    .s4-marv-sprite-frame, .s4-marv-bubble {
+      position: relative;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: s4MarvGlow 2s ease-in-out infinite;
+    }
+    .s4-marv-sprite-frame::before, .s4-marv-bubble::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 3px;
+      background: conic-gradient(from var(--s4angle, 0deg),
+                  rgba(174, 210, 132, 0) 0deg,
+                  rgba(174, 210, 132, 0) 250deg,
+                  rgba(174, 210, 132, 0.7) 300deg,
+                  #AED284 335deg,
+                  rgba(174, 210, 132, 0.7) 350deg,
+                  rgba(174, 210, 132, 0) 360deg);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: s4Trace 3.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes s4MarvGlow {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
+    }
+
+    /* ---- S4-intro stat cards ---- */
+    .s4-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .s4-stat {
+      width: 220px;
+      padding: 22px 20px;
+      text-align: center;
+      background: rgba(6, 14, 26, 0.5);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .s4-stat.is-in { opacity: 1; transform: scale(1); }
+    .s4-stat__icon { font-size: 40px; line-height: 1; color: var(--wasabi); }
+    .s4-stat__h { margin: 12px 0 6px; font-size: 28px; font-weight: 800; color: var(--white); }
+    .s4-stat__sub { font-size: 13px; color: rgba(255, 255, 255, 0.75); line-height: 1.45; }
+
+    /* Pulsing wasabi glow for the Run-the-assessment button */
+    .s4-btn--pulse { animation: s4BtnPulse 1.4s ease-in-out infinite; }
+    @keyframes s4BtnPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(174, 210, 132, 0.55); }
+      50% { box-shadow: 0 0 20px 7px rgba(174, 210, 132, 0.85); }
+    }
 
     /* MARV row */
     .s4-marv {
@@ -180,19 +537,42 @@
       transition: opacity 0.5s ease;
     }
     .s4-marv.is-on { opacity: 1; }
-    .s4-marv-sprite { width: 130px; height: auto; flex: 0 0 auto; }
+    .s4-marv-sprite { width: 150px; height: auto; display: block; }
+    .s4-marv-sprite-frame { flex: 0 0 auto; padding: 8px; background: rgba(6, 14, 26, 0.5); line-height: 0; }
     .s4-marv-bubble {
       background: var(--white);
       color: var(--navy);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px 18px;
       max-width: 560px;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1.5;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
     .s4-marv-bubble.is-on { opacity: 1; }
+    .s4-marv-bubble:empty { display: none; }
+    .s4-marv-bubbles { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+
+    /* Intro bubbles snap in with a brief digital glitch - chromatic flicker and
+       static tears that resolve to clean, matching MARV's high-tech world. */
+    .s4-intro-bubble.is-on { animation: s4Glitch 0.5s linear 1; }
+    @keyframes s4Glitch {
+      0%   { opacity: 0; transform: translateX(-7px) translateZ(0) skewX(6deg); text-shadow: 3px 0 rgba(174, 210, 132, 0.9), -3px 0 rgba(255, 68, 68, 0.7); clip-path: inset(0 0 62% 0); }
+      18%  { opacity: 1; transform: translateX(5px) translateZ(0); text-shadow: -4px 0 rgba(174, 210, 132, 0.9), 4px 0 rgba(255, 68, 68, 0.6); clip-path: inset(48% 0 0 0); }
+      34%  { transform: translateX(-3px) translateZ(0); text-shadow: 2px 0 rgba(174, 210, 132, 0.7); clip-path: inset(0 0 28% 0); }
+      52%  { transform: translateX(2px) translateZ(0); text-shadow: -2px 0 rgba(174, 210, 132, 0.5); clip-path: inset(22% 0 8% 0); }
+      70%  { transform: translateX(-1px) translateZ(0); text-shadow: 1px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0) translateZ(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+    }
+
+    /* Key words carry a pulsing wasabi highlight - navy text stays readable on
+       the white bubble while the highlight glows. */
+    .s4-kw { color: var(--navy); font-weight: 800; padding: 0 4px; border-radius: 4px; animation: s4KwPulse 1.8s ease-in-out infinite; }
+    @keyframes s4KwPulse {
+      0%, 100% { background: rgba(174, 210, 132, 0.28); box-shadow: 0 0 0 rgba(174, 210, 132, 0); }
+      50%      { background: rgba(174, 210, 132, 0.85); box-shadow: 0 0 10px rgba(174, 210, 132, 0.6); }
+    }
 
     /* Buttons */
     .s4-cta { margin-top: 26px; text-align: center; min-height: 56px; }
@@ -212,13 +592,17 @@
     .s4-btn.is-in { opacity: 1; }
     .s4-btn:hover { transform: translateY(-2px); }
     .s4-btn--retry { background: transparent; color: var(--white); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .s4-btn--tryagain { display: block; width: 100%; max-width: 560px; min-height: 60px; margin: 0 auto; }
+    /* Extra separation below the content boxes for the Continue button. */
+    .s4-btn--continue { margin-top: 18px; }
 
     /* Mobile */
-    body.device-mobile .s4-claim-img { width: 280px; }
-    body.device-mobile .s4-card { width: 46%; }
     body.device-mobile .s4-marv { flex-direction: column; }
     body.device-mobile .s4-marv-sprite { width: 100px; }
-    body.device-mobile .s4-verdict-verdict { font-size: 32px; }
+    body.device-mobile .s4-stat { width: 100%; max-width: 280px; }
+    body.device-mobile .s4-machine-img { height: auto; width: 92vw; }
+    body.device-mobile .s4-scanlabel { font-size: 16px; }
+    body.device-mobile .s4-choices { max-width: 100%; }
   </style>
 </head>
 <body>
@@ -227,7 +611,7 @@
        no id="progress-steps", so the shell's main.js never re-renders it. -->
   <header class="progress-bar" aria-label="Journey progress">
     <div class="progress-bar__inner">
-      <span class="label-accent">Magicman</span>
+      <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
       <ol class="progress-steps">
         <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
         <li class="progress-step is-complete"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
@@ -240,11 +624,14 @@
     </div>
   </header>
 
+  <a class="btn btn-ghost stage-back" href="MM-CE-S3-newway.html">Back to Stage 3</a>
+
   <!-- Fullscreen transition video -->
   <div class="s4-transition" id="s4-transition">
-    <video id="s4-video" class="s4-video" playsinline preload="auto">
+    <video id="s4-video" class="s4-video" muted playsinline preload="auto">
       <source src="../assets/video/marv_world_transition.mp4" type="video/mp4">
     </video>
+    <div class="s4-world-overlay" id="s4-world-overlay"><span class="s4-world-overlay__text">Entering MARV's world</span></div>
   </div>
 
   <!-- MARV's lab background -->
@@ -260,9 +647,16 @@
   <main class="s4-wrap">
     <div class="s4-content is-in" id="s4-content"></div>
     <div class="s4-marv" id="s4-marv">
-      <img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV">
-      <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      <div class="s4-marv-sprite-frame">
+        <img class="s4-marv-sprite" id="s4-marv-sprite" src="../assets/marv/marvexcited.png" alt="MARV">
+      </div>
+      <div class="s4-marv-bubbles" id="s4-marv-bubbles">
+        <div class="s4-marv-bubble" id="s4-marv-bubble"></div>
+      </div>
     </div>
+    <!-- Full-width verdict card area, below the two columns. Populated when the
+         reels lock in the next step; empty (and invisible) for now. -->
+    <div class="s4-verdict-slot" id="s4-verdict-slot"></div>
     <div class="s4-cta" id="s4-cta"></div>
   </main>
 
@@ -270,13 +664,24 @@
   <div class="dev-nav" id="dev-nav">
     <div class="dev-nav__panel">
       <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
       <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
       <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
       <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
       <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
-      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+      <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair</a>
+      <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
+      <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
+      <!-- DEV ONLY - skip straight to the start of the fruit machine sequence
+           for review. Remove this button (and jumpToMachine in the script)
+           before launch. -->
+      <button class="dev-nav__btn" type="button" id="s4-dev-jump"
+              style="width: 100%; text-align: left; cursor: pointer; color: #fff; background: rgba(192, 57, 43, 0.22); border-color: var(--reaction-wrong);">DEV ONLY - Jump to fruit machine</button>
     </div>
     <button class="dev-nav__tab" type="button"
             onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
@@ -302,6 +707,11 @@
     var marvRow = document.getElementById('s4-marv');
     var content = document.getElementById('s4-content');
     var cta = document.getElementById('s4-cta');
+    var machineResizeBound = false;
+    // Set once the verdict scene opens. Any in-flight S4-intro beats check this
+    // and bail, so they cannot append bubbles or overwrite content after S4-4
+    // has started (e.g. when the DEV jump button skips the intro mid-sequence).
+    var verdictReached = false;
 
     /* ---- Background clock (ported from the previous Stage 4) ----
        Positioned over the cover-scaled lab background. IMG_W/H are the natural
@@ -340,24 +750,6 @@
       }
     }
 
-    /* ---- Data ---- */
-    /* Generic scan terms only - no material or damage type is ever shown during
-       the flicker. Both scans use these and land on "Match found." */
-    var SCAN_WORDS = ['analysing', 'scanning', 'processing', 'matching', 'calibrating', 'cross-referencing'];
-
-    var MATERIAL_CARDS = [
-      { img: 'material_china.png', label: 'Vitreous china', correct: true },
-      { img: 'material_upvc.png', label: 'uPVC panel', wrong: 'Close - but uPVC has a different surface texture and sheen. Look at the glaze on this surface.' },
-      { img: 'material_timber.png', label: 'Timber', wrong: 'Timber grain is visible even under paint. This surface is smooth and glazed throughout.' },
-      { img: 'material_marble.png', label: 'Marble', wrong: 'Marble has natural veining and a cold feel. This is a manufactured ceramic surface.' }
-    ];
-    var DAMAGE_CARDS = [
-      { img: 'damage_chip.png', label: 'Impact chip', correct: true },
-      { img: 'damage_scratch.png', label: 'Surface scratch', wrong: 'A scratch leaves a shallow linear mark. This damage has lost material entirely - a portion has broken away.' },
-      { img: 'damage_burn.png', label: 'Burn mark', wrong: 'A burn discolours the surface with heat. This damage is structural - the basin wall is gone.' },
-      { img: 'damage_crack.png', label: 'Hairline crack', wrong: 'A hairline crack is a fine line with no material loss. This damage is far more severe.' }
-    ];
-
     /* ---- Helpers ---- */
     function fadeSwap(buildFn, after) {
       content.classList.remove('is-in');
@@ -369,59 +761,11 @@
       }, 380);
     }
 
-    function buildScanScene() {
-      content.innerHTML =
-        '<div class="s4-imgwrap">' +
-          '<img class="s4-claim-img" src="../assets/images/basin-before.png" alt="Damaged vitreous china basin">' +
-          '<div class="s4-scanbox" id="s4-scanbox"><div class="s4-scanline"></div>' +
-          '<div class="s4-scan-text" id="s4-scan-text"></div></div>' +
-        '</div>' +
-        '<div class="s4-cards" id="s4-cards"></div>';
-    }
-
-    function runScan(done) {
-      var el = document.getElementById('s4-scan-text');
-      var box = document.getElementById('s4-scanbox');
-      var i = 0;
-      var timer = setInterval(function () { el.textContent = SCAN_WORDS[i % SCAN_WORDS.length]; i++; }, 70);
-      setTimeout(function () {
-        clearInterval(timer);
-        var delay = 90;
-        (function slow() {
-          el.textContent = SCAN_WORDS[i % SCAN_WORDS.length]; i++;
-          delay += 70;
-          if (delay < 520) { setTimeout(slow, delay); }
-          else { el.textContent = 'Match found.'; if (box) { box.classList.add('s4-stopped'); } done(); }
-        })();
-      }, 3000);
-    }
-
-    function showCards(cards, onAnswer) {
-      var row = document.getElementById('s4-cards');
-      row.innerHTML = '';
-      cards.forEach(function (c) {
-        var card = document.createElement('button');
-        card.type = 'button';
-        card.className = 's4-card';
-        card.innerHTML =
-          '<img class="s4-card-img" src="../assets/images/' + c.img + '" alt="' + c.label + '">' +
-          '<div class="s4-card-label">' + c.label + '</div>';
-        card.addEventListener('click', function () { onAnswer(c, row); });
-        row.appendChild(card);
-      });
-      void row.offsetWidth;
-      row.classList.add('is-in');
-    }
-
-    function setCardsEnabled(row, on) {
-      Array.prototype.forEach.call(row.querySelectorAll('.s4-card'), function (b) { b.disabled = !on; });
-    }
-
-    function showButton(label, retry, onClick) {
+    function showButton(label, retry, onClick, pulse) {
       cta.innerHTML = '';
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 's4-btn' + (retry ? ' s4-btn--retry' : '');
+      b.className = 's4-btn' + (retry ? ' s4-btn--retry' : '') + (pulse ? ' s4-btn--pulse' : '');
       b.textContent = label;
       b.addEventListener('click', onClick);
       cta.appendChild(b);
@@ -429,29 +773,156 @@
       b.classList.add('is-in');
     }
 
-    /* ---- A quiz scene (used for material and damage scans) ---- */
-    function runQuiz(opts) {
-      fadeSwap(buildScanScene, function () {
-        runScan(function () {
-          setMarv('marvconfident', opts.prompt);
-          showCards(opts.cards, function (card, row) {
-            if (card.correct) {
-              setCardsEnabled(row, false);
-              cta.innerHTML = '';
-              setMarv('marvthumbsup', opts.success);
-              setTimeout(opts.next, 2600);
-            } else {
-              setCardsEnabled(row, false);
-              setMarv('marvdisappointed', card.wrong);
-              showButton('Retry', true, function () {
-                cta.innerHTML = '';
-                setMarv('marvconfident', opts.prompt);
-                setCardsEnabled(row, true);
-              });
-            }
-          });
-        });
+    /* ---- Sound design (Web Audio API only, no external files) ----
+       Every sound is created from oscillators / generated noise and only ever
+       fires after the user has clicked (which resumes the AudioContext). */
+    function tone(freq, delay, dur, type, vol) {
+      if (!audioCtx) { return; }
+      var t = audioCtx.currentTime + (delay || 0);
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = type || 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+
+    var spinNoise = null, spinGain = null, spinFilter = null;
+    function startSpinNoise() {
+      if (!audioCtx) { return; }
+      var len = Math.floor(audioCtx.sampleRate * 1.2);
+      var buffer = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < len; i++) { data[i] = Math.random() * 2 - 1; }
+      spinNoise = audioCtx.createBufferSource();
+      spinNoise.buffer = buffer;
+      spinNoise.loop = true;
+      spinFilter = audioCtx.createBiquadFilter();
+      spinFilter.type = 'bandpass';
+      spinFilter.Q.value = 0.8;
+      spinGain = audioCtx.createGain();
+      spinNoise.connect(spinFilter); spinFilter.connect(spinGain); spinGain.connect(audioCtx.destination);
+      var t = audioCtx.currentTime;
+      spinGain.gain.setValueAtTime(0.0001, t);
+      spinGain.gain.exponentialRampToValueAtTime(0.05, t + 0.3);
+      spinFilter.frequency.setValueAtTime(280, t);
+      spinFilter.frequency.linearRampToValueAtTime(1500, t + 4.5); // rising pitch
+      spinNoise.start();
+    }
+    function stopSpinNoise() {
+      if (!audioCtx || !spinNoise) { return; }
+      var t = audioCtx.currentTime;
+      try {
+        spinGain.gain.cancelScheduledValues(t);
+        spinGain.gain.setValueAtTime(spinGain.gain.value, t);
+        spinGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+        spinNoise.stop(t + 0.3);
+      } catch (e) {}
+      spinNoise = null;
+    }
+
+    // Short percussive mechanical clunk for each reel lock.
+    function playClunk() {
+      if (!audioCtx) { return; }
+      var t = audioCtx.currentTime;
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(190, t);
+      o.frequency.exponentialRampToValueAtTime(62, t + 0.09);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.15);
+      var o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
+      o2.type = 'triangle';
+      o2.frequency.setValueAtTime(1500, t);
+      g2.gain.setValueAtTime(0.0001, t);
+      g2.gain.exponentialRampToValueAtTime(0.12, t + 0.003);
+      g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      o2.connect(g2); g2.connect(audioCtx.destination);
+      o2.start(t); o2.stop(t + 0.06);
+    }
+
+    // Brief completion chime once all reels have locked.
+    function playComplete() {
+      tone(659.25, 0.0, 0.5, 'sine', 0.09);
+      tone(987.77, 0.08, 0.5, 'sine', 0.08);
+      tone(1318.51, 0.16, 0.55, 'sine', 0.07);
+    }
+
+    // Warm three-note chord (C E G) for a correct answer.
+    function playCorrect() {
+      tone(261.63, 0.0, 0.7, 'sine', 0.12);
+      tone(329.63, 0.0, 0.7, 'sine', 0.10);
+      tone(392.00, 0.0, 0.7, 'sine', 0.10);
+    }
+
+    // Low double buzz for a wrong answer.
+    function playWrong() {
+      [0, 0.18].forEach(function (d) {
+        if (!audioCtx) { return; }
+        var t = audioCtx.currentTime + d;
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.value = 110;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.14, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + 0.16);
       });
+    }
+
+    // Subtle ascending tone for the verdict card reveal.
+    function playVerdictTone() {
+      if (!audioCtx) { return; }
+      var t = audioCtx.currentTime;
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(330, t);
+      o.frequency.exponentialRampToValueAtTime(660, t + 0.5);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.08, t + 0.1);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.75);
+    }
+
+    /* ---- Phase 2 challenge cards (left column, below MARV) ---- */
+    function clearChoices() {
+      var ex = document.getElementById('s4-choices');
+      if (ex && ex.parentNode) { ex.parentNode.removeChild(ex); }
+    }
+    function showChoices(options, onPick) {
+      clearChoices();
+      var wrap = document.createElement('div');
+      wrap.className = 's4-choices';
+      wrap.id = 's4-choices';
+      options.forEach(function (opt) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 's4-choice';
+        b.innerHTML =
+          '<img class="s4-choice-img" src="' + opt.img + '" alt="' + opt.label + '">' +
+          '<span class="s4-choice-label">' + opt.label + '</span>';
+        b.addEventListener('click', function () { onPick(opt, b, wrap); });
+        wrap.appendChild(b);
+      });
+      marvRow.appendChild(wrap);
+      void wrap.offsetWidth;
+      wrap.classList.add('is-in');
+    }
+    // Brief wasabi (correct) or red (wrong) flash on the selected card.
+    function flashChoice(btn, isWrong) {
+      if (!btn) { return; }
+      var cls = isWrong ? 'flash-wrong' : 'flash';
+      btn.classList.remove('flash', 'flash-wrong');
+      void btn.offsetWidth;
+      btn.classList.add(cls);
+      setTimeout(function () { btn.classList.remove(cls); }, 500);
     }
 
     /* ---- S4-1: MARV's world opens ---- */
@@ -469,9 +940,21 @@
         positionClock();
         marvRow.classList.add('is-on');
         setMarv('marvexcited', 'Right - you have seen the old way. Now let me show you mine.');
-        setTimeout(startS42, 2000);
+        setTimeout(startIntro, 2000);
       }
       if (vid) {
+        // Text overlay: fade in as the transition begins, fade out before it
+        // ends. Adding is-on directly (not on the 'playing' event) so it shows
+        // even when autoplay is blocked and 'playing' never fires.
+        var worldOverlay = document.getElementById('s4-world-overlay');
+        if (worldOverlay) {
+          worldOverlay.classList.add('is-on');
+          // Fade out after a short hold so it reads as a title then clears,
+          // regardless of whether the video is actually playing (timeupdate is
+          // unreliable when autoplay is blocked).
+          setTimeout(function () { worldOverlay.classList.remove('is-on'); }, 3500);
+          vid.addEventListener('ended', function () { worldOverlay.classList.remove('is-on'); });
+        }
         vid.addEventListener('ended', reveal);
         vid.addEventListener('error', reveal);
         unlockAudio();
@@ -483,53 +966,495 @@
       }
     }
 
-    /* ---- S4-2: material scan ---- */
-    function startS42() {
-      runQuiz({
-        cards: MATERIAL_CARDS,
-        prompt: 'I have narrowed it down. But let us see if you can spot it too.',
-        success: 'Vitreous china. Good eye. I have worked with this surface ten thousand times.',
-        next: startS43
+    /* ---- S4-intro: MARV introduces himself ---- */
+    function statCard(icon, h, sub) {
+      return '<div class="s4-stat">' +
+        '<i class="ti ' + icon + ' s4-stat__icon"></i>' +
+        '<div class="s4-stat__h">' + h + '</div>' +
+        '<div class="s4-stat__sub">' + sub + '</div>' +
+        '</div>';
+    }
+
+    // Intro bubbles stack: update the sprite and add a new bubble below the
+    // previous ones without removing any.
+    // Wrap key brand/identity words so they carry the pulsing wasabi highlight.
+    // Operates on our own controlled strings only, longest phrase first so
+    // shorter matches never land inside an already-wrapped phrase.
+    function highlightKeywords(text) {
+      var kws = ['MAterial Repair Validator', 'Magicman', 'MARV'];
+      var out = text;
+      kws.forEach(function (kw) { out = out.split(kw).join('[[KW]]' + kw + '[[/KW]]'); });
+      return out.split('[[KW]]').join('<span class="s4-kw">').split('[[/KW]]').join('</span>');
+    }
+    function introBeat(emotion, text) {
+      var img = document.getElementById('s4-marv-sprite');
+      if (img) { img.src = SPRITES + emotion + '.png'; img.alt = 'MARV looking ' + emotion; }
+      var b = document.createElement('div');
+      b.className = 's4-marv-bubble s4-intro-bubble';
+      b.innerHTML = highlightKeywords(text);
+      document.getElementById('s4-marv-bubbles').appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('is-on');
+    }
+    function startIntro() {
+      if (verdictReached) { return; }
+      introBeat('marvexcited', 'I am MARV. MAterial Repair Validator. Thirty-five years of Magicman craft expertise - built into a single system.');
+      setTimeout(introBeat2, 2000);
+    }
+    function introBeat2() {
+      if (verdictReached) { return; }
+      introBeat('marvconfident', 'Before we look at your claim - let me take thirty seconds to introduce myself properly. Don\'t worry, I work fast. We have time.');
+      setTimeout(introBeat3, 2000);
+    }
+    function introBeat3() {
+      if (verdictReached) { return; }
+      content.innerHTML = '<div class="s4-stats">' +
+        statCard('ti-clock', '35+ Years', 'of Magicman craft intelligence, built in') +
+        statCard('ti-calendar', '24/7', 'available, no capacity limits, no waiting') +
+        statCard('ti-bolt', 'Minutes', 'from photo to viability decision') +
+        '</div>';
+      var cards = content.querySelectorAll('.s4-stat');
+      Array.prototype.forEach.call(cards, function (card, i) {
+        setTimeout(function () { card.classList.add('is-in'); }, i * 500);
+      });
+      // last card revealed at 1000ms, 0.5s entrance, then a 1s pause
+      setTimeout(introBeat4, 1000 + 500 + 1000);
+    }
+    function introBeat4() {
+      if (verdictReached) { return; }
+      introBeat('marvconfident', 'Every decision I make is reviewed by a Magicman expert. When they agree, I learn. When they know better, I learn faster.');
+      setTimeout(introBeat5, 2000);
+    }
+    function introBeat5() {
+      if (verdictReached) { return; }
+      introBeat('marvtriumphant', 'Right. Let us look at that claim.');
+      cta.innerHTML = '';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 's4-btn s4-btn--pulse';
+      b.textContent = 'Run the assessment';
+      b.addEventListener('click', function () {
+        cta.innerHTML = '';
+        runMachineSequence();
+      });
+      cta.appendChild(b);
+      void b.offsetWidth;
+      b.classList.add('is-in');
+    }
+
+    /* ====================================================================
+       Fruit machine sequence (replaces the old S4-2 / S4-3 / S4-4)
+       Phase 1: spin and lock. Phase 2: user challenge. Phase 3: verdict.
+       ==================================================================== */
+
+    /* Each reel cycles through its pool during the spin, then lands on `final`.
+       Positions are percentages of the 608 x 832 source image. */
+    var SPIN_CYCLES = 6;
+    var MACHINE_REEL_TOP = 22.7;     // y = 127 / 559
+    var MACHINE_REEL_HEIGHT = 28.4;  // 159 / 559
+    var MACHINE_REELS = [
+      { left: 12.9, width: 12.0, cycle: ['Wood', 'uPVC', 'Ceramic', 'Vitreous china', 'Marble', 'Granite', 'Laminate', 'Enamel', 'Stainless steel', 'Metal', 'Glass'], final: 'Vitreous china', masked: true },
+      { left: 29.2, width: 10.8, cycle: ['Hairline crack', 'Impact crack', 'Scratch', 'Chip', 'Burn', 'Stain', 'Scuff', 'Gouge', 'Material loss'], final: 'Impact crack', masked: true },
+      { left: 44.6, width: 11.0, cycle: ['Assessing', 'Repair viable', 'Beyond repair', 'Reviewing'], final: 'Repair viable' },
+      { left: 59.5, width: 11.0, cycle: ['Graduate', 'Technician', 'Senior', 'Specialist', 'Master'], final: 'Specialist' },
+      { left: 74.8, width: 11.1, cycle: ['1 hour', '2 hours', 'Half day', 'Full day', '2 days'], final: 'Half day' }
+    ];
+
+    var spinStarted = false;
+
+    /* Size the overlay to the rendered image and set each reel's item height
+       (--reel-h). Reel font size is handled in CSS via clamp(). Runs on load
+       and on every resize, so the reel strips stay aligned at all screen sizes. */
+    function positionMachine() {
+      var img = document.getElementById('s4-machine-img');
+      var overlay = document.getElementById('s4-machine-overlay');
+      if (!img || !overlay) { return; }
+      var w = img.clientWidth, h = img.clientHeight;
+      if (!w || !h) { return; }
+      overlay.style.width = w + 'px';
+      overlay.style.height = h + 'px';
+      Array.prototype.forEach.call(overlay.querySelectorAll('.s4-reel'), function (reel) {
+        var rh = reel.clientHeight;
+        reel.style.setProperty('--reel-h', rh + 'px');
+        // Keep an already-locked reel pinned to its final value across resizes.
+        if (reel.classList.contains('locked')) {
+          var strip = reel.querySelector('.s4-reel-strip');
+          if (strip) {
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateY(' + (-((strip.children.length - 1) * rh)) + 'px)';
+          }
+        }
       });
     }
 
-    /* ---- S4-3: damage scan ---- */
-    function startS43() {
-      runQuiz({
-        cards: DAMAGE_CARDS,
-        prompt: 'I already know what this is. But it might be fun for you to have a go.',
-        success: 'Correct. Severe impact damage. Portion of the basin wall lost. I have seen this before - and I know exactly what it takes to fix it.',
-        next: startS44
-      });
+    function buildMachine() {
+      var reelsHtml = MACHINE_REELS.map(function (r) {
+        var items = '';
+        for (var k = 0; k < SPIN_CYCLES; k++) {
+          r.cycle.forEach(function (v) { items += '<div class="s4-reel-item">' + v + '</div>'; });
+        }
+        items += '<div class="s4-reel-item' + (r.masked ? ' s4-reel-mask' : '') + '">' + (r.masked ? '?' : r.final) + '</div>';
+        return '<div class="s4-reel" data-cycle="' + r.cycle.length + '" style="left:' + r.left + '%;width:' + r.width +
+               '%;top:' + MACHINE_REEL_TOP + '%;height:' + MACHINE_REEL_HEIGHT + '%;">' +
+                 '<div class="s4-reel-strip">' + items + '</div>' +
+               '</div>';
+      }).join('');
+      content.innerHTML =
+        '<div class="s4-unit" id="s4-unit">' +
+          '<div class="s4-scanlabel" id="s4-scanlabel">Scanning: Material type...</div>' +
+          '<div class="s4-machine" id="s4-machine">' +
+            '<img class="s4-machine-img" id="s4-machine-img" src="../assets/images/fruit_machine.png" alt="MARV assessment fruit machine">' +
+            '<div class="s4-machine-overlay" id="s4-machine-overlay">' + reelsHtml + '</div>' +
+          '</div>' +
+          '<div class="s4-progress"><div class="s4-progress-fill" id="s4-progress-fill"></div></div>' +
+        '</div>';
+      var img = document.getElementById('s4-machine-img');
+      if (img) {
+        img.addEventListener('load', positionMachine);
+        if (img.complete) { positionMachine(); }
+      }
+      if (!machineResizeBound) {
+        window.addEventListener('resize', positionMachine);
+        machineResizeBound = true;
+      }
     }
 
-    /* ---- S4-4: the verdict ---- */
-    function startS44() {
-      setMarv('marvconfident', '');
-      fadeSwap(function () {
-        content.innerHTML =
-          '<div class="s4-verdict">' +
-            '<h2 class="s4-verdict-h">MARV Assessment - CLM-2026-047821</h2>' +
-            '<div class="s4-verdict-row"><span>Surface</span><span>Vitreous china pedestal basin</span></div>' +
-            '<div class="s4-verdict-row"><span>Damage</span><span>Severe impact - portion of basin wall lost</span></div>' +
-            '<div class="s4-verdict-verdict">Repair viable.</div>' +
-          '</div>';
-      }, function () {
-        setMarv('marvconfident',
-          'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
+    /* Read the live (animated) translateY of a strip so a lock can carry on
+       smoothly from wherever the spin happens to be. */
+    function currentTranslateY(el) {
+      var s = window.getComputedStyle(el).transform;
+      if (!s || s === 'none') { return 0; }
+      var m = s.match(/matrix3d\((.+)\)/);
+      if (m) { return parseFloat(m[1].split(',')[13]); }
+      m = s.match(/matrix\((.+)\)/);
+      if (m) { return parseFloat(m[1].split(',')[5]); }
+      return 0;
+    }
+
+    function spinReel(reel) {
+      var strip = reel.querySelector('.s4-reel-strip');
+      if (!strip) { return; }
+      var reelH = reel.clientHeight;
+      var cycleLen = parseInt(reel.getAttribute('data-cycle'), 10) || 1;
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateY(0px)';
+      strip.style.setProperty('--spin-dist', (-(cycleLen * reelH)) + 'px');
+      strip.style.filter = 'blur(2.4px)';
+      void strip.offsetWidth;
+      var dur = (0.42 + Math.random() * 0.1).toFixed(3);
+      strip.style.animation = 'reelSpin ' + dur + 's linear infinite';
+    }
+
+    function lockReel(reel, dur) {
+      var strip = reel.querySelector('.s4-reel-strip');
+      if (!strip) { return; }
+      var reelH = reel.clientHeight;
+      var finalIndex = strip.children.length - 1;
+      var y = currentTranslateY(strip);
+      strip.style.animation = 'none';
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateY(' + y + 'px)';
+      void strip.offsetWidth;
+      strip.style.transition = 'transform ' + (dur / 1000) + 's cubic-bezier(0.16, 0.74, 0.2, 1), filter 0.6s ease';
+      strip.style.transform = 'translateY(' + (-(finalIndex * reelH)) + 'px)';
+      strip.style.filter = 'blur(0px)';
+      setTimeout(function () {
+        reel.classList.add('locked', 'flash');
+        playClunk();
+        setTimeout(function () { reel.classList.remove('flash'); }, 500);
+      }, dur);
+    }
+
+    /* Reveal a masked reel: the question mark dissolves and MARV's real answer
+       (which matched the user's pick) locks in with a flash. */
+    function revealReel(index) {
+      var reels = document.querySelectorAll('#s4-machine-overlay .s4-reel');
+      var reel = reels[index];
+      if (!reel) { return; }
+      var strip = reel.querySelector('.s4-reel-strip');
+      if (!strip || !strip.children.length) { return; }
+      var item = strip.children[strip.children.length - 1];
+      item.classList.add('s4-reel-dissolve');
+      setTimeout(function () {
+        item.textContent = MACHINE_REELS[index].final;
+        item.classList.remove('s4-reel-mask', 's4-reel-dissolve');
+        item.classList.add('s4-reel-revealed');
+        reel.classList.add('flash');
+        playClunk();
+        setTimeout(function () { reel.classList.remove('flash'); }, 500);
+      }, 300);
+    }
+
+    /* Scan label + progress bar, synced to the reel lock sequence. */
+    var SCAN_LABELS = [
+      'Scanning: Damage type...',       // after reel 1 locks
+      'Scanning: Repair viability...',  // after reel 2 locks
+      'Scanning: Technician match...',  // after reel 3 locks
+      'Scanning: Duration estimate...', // after reel 4 locks
+      'Scan complete.'                  // after reel 5 locks
+    ];
+    function setScanLabel(text) {
+      var el = document.getElementById('s4-scanlabel');
+      if (!el) { return; }
+      el.style.opacity = '0';
+      setTimeout(function () { el.textContent = text; el.style.opacity = '1'; }, 200);
+    }
+    function setProgress(pct) {
+      var f = document.getElementById('s4-progress-fill');
+      if (f) { f.style.width = pct + '%'; }
+    }
+
+    /* ---- Phase 1: spin and lock ---- */
+    function startSpin() {
+      if (spinStarted) { return; }
+      spinStarted = true;
+      var reels = Array.prototype.slice.call(document.querySelectorAll('#s4-machine-overlay .s4-reel'));
+      if (!reels.length) { return; }
+      startSpinNoise();
+      reels.forEach(spinReel);
+      var spinTime = 2000, gap = 600, lockDur = 900;
+      reels.forEach(function (reel, i) {
+        setTimeout(function () { lockReel(reel, lockDur); }, spinTime + i * gap);
+        // As each reel snaps, advance the scan label and fill the bar 20%. On
+        // the final lock ("Scan complete.") freeze the scan line in place.
         setTimeout(function () {
-          setMarv('marvtriumphant', 'That took me three seconds. Thirty years of experience will do that.');
-          showButton('Continue', false, function () { window.location.href = 'MM-CE-S5-dispatch.html'; });
-        }, 2000);
+          setScanLabel(SCAN_LABELS[i]);
+          setProgress((i + 1) * 20);
+          if (i === reels.length - 1) {
+            var box = document.getElementById('s4-scanbox');
+            if (box) { box.classList.add('is-frozen'); }
+          }
+        }, spinTime + i * gap + lockDur);
+      });
+      var lastSnap = spinTime + (reels.length - 1) * gap + lockDur;
+      setTimeout(stopSpinNoise, lastSnap - 200);
+      setTimeout(function () {
+        var machine = document.getElementById('s4-machine');
+        if (machine) {
+          machine.classList.add('win-flash');
+          setTimeout(function () { machine.classList.remove('win-flash'); }, 1000);
+        }
+        playComplete();
+        setTimeout(phase1Done, 1000);
+      }, lastSnap + 60);
+    }
+
+    function phase1Done() {
+      setMarv('marvconfident', 'I have completed my scan and I have all five answers. But before I reveal them - want to see if you can keep up with me?');
+      showButton('Try me', false, function () { cta.innerHTML = ''; askMaterial(); }, true);
+    }
+
+    /* ---- Phase 2: user challenge ---- */
+    function askMaterial() {
+      setMarv('marvconfident', 'What surface material is this claim about? Pick from these three.');
+      showChoices([
+        { label: 'Vitreous china', img: '../assets/images/material_china.png', correct: true },
+        { label: 'uPVC panel', img: '../assets/images/material_upvc.png', wrong: 'Not quite - uPVC is a polymeric panel, usually found in bathrooms as cladding. This claim is about a ceramic basin. Try again.' },
+        { label: 'Marble', img: '../assets/images/material_marble.png', wrong: 'Good thought, but marble has a veined pattern and is usually a worktop or floor. This is a moulded basin - vitreous china. Try again.' }
+      ], function (opt, btn) {
+        if (opt.correct) {
+          flashChoice(btn, false);
+          playCorrect();
+          setTimeout(function () {
+            clearChoices();
+            setMarv('marvthumbsup', 'Spot on. You know your surfaces.');
+            revealReel(0);
+            setTimeout(askDamage, 1000);
+          }, 500);
+        } else {
+          flashChoice(btn, true);
+          playWrong();
+          setMarv('marvdisappointed', opt.wrong);
+        }
       });
     }
+
+    function askDamage() {
+      setMarv('marvconfident', 'And what type of damage are we looking at?');
+      showChoices([
+        { label: 'Impact crack', img: '../assets/images/damage_crack.png', correct: true },
+        { label: 'Hairline crack', img: '../assets/images/damage_chip.png', wrong: 'Close - a hairline crack is a fine surface fracture with no material missing. This damage has a clear point of impact and material has broken away. Try again.' },
+        { label: 'Scratch', img: '../assets/images/damage_scratch.png', wrong: 'Not this time - a scratch is surface-level damage that has not penetrated the material. This has cracked through with material loss at the impact point. Try again.' }
+      ], function (opt, btn) {
+        if (opt.correct) {
+          flashChoice(btn, false);
+          playCorrect();
+          setTimeout(function () {
+            clearChoices();
+            setMarv('marvtriumphant', 'At this rate you should apply for the Magicman Academy.');
+            revealReel(1);
+            setTimeout(revealVerdict, 1000);
+          }, 500);
+        } else {
+          flashChoice(btn, true);
+          playWrong();
+          setMarv('marvdisappointed', opt.wrong);
+        }
+      });
+    }
+
+    /* ---- Phase 3: verdict reveal ---- */
+    function vitem(label, value) {
+      return '<div class="s4-vitem"><div class="s4-vitem__label">' + label + '</div>' +
+             '<div class="s4-vitem__value">' + value + '</div></div>';
+    }
+
+    function revealVerdict() {
+      setMarv('marvtriumphant', 'That took me three seconds. Thirty years of experience will do that.');
+      var slot = document.getElementById('s4-verdict-slot');
+      if (slot) {
+        slot.innerHTML =
+          '<div class="s4-vcard" id="s4-vcard">' +
+            '<div class="s4-vcard__row">' +
+              vitem('Surface', 'Vitreous china') +
+              vitem('Damage', 'Impact crack with material loss') +
+              vitem('Verdict', 'Repair viable') +
+              vitem('Technician', 'Specialist technician') +
+              vitem('Duration', 'Half day') +
+              vitem('Price', 'Priced against your agreed account terms') +
+            '</div>' +
+          '</div>';
+        var card = document.getElementById('s4-vcard');
+        void card.offsetWidth;
+        playVerdictTone();
+        card.classList.add('is-in');
+      }
+      // After the card has faded in (0.6s) plus a 2 second pause, build the left
+      // column tail: verdict dialogue, confidence stamp, paired confidence boxes,
+      // then the Continue button.
+      setTimeout(function () {
+        setMarv('marvconfident', 'The vast majority of the time I will tell you we can repair it. Thirty years of expertise means we find a way when others cannot. But occasionally a job is beyond repair - and I will tell you that straight away too. Either way, you have your answer on day one.');
+
+        var stamp = document.createElement('div');
+        stamp.className = 's4-stamp';
+        stamp.textContent = 'Magicman Quality Guaranteed';
+        marvRow.appendChild(stamp);
+
+        var conf = document.createElement('div');
+        conf.className = 's4-confidence';
+        conf.innerHTML =
+          '<div class="s4-confidence-box">MARV assesses.</div>' +
+          '<div class="s4-confidence-box">A Magicman Master Technician validates.</div>';
+        marvRow.appendChild(conf);
+
+        var contBtn = document.createElement('button');
+        contBtn.type = 'button';
+        contBtn.className = 's4-btn s4-btn--pulse s4-btn--continue';
+        contBtn.textContent = 'Continue to Stage 5';
+        contBtn.addEventListener('click', function () { window.location.href = 'MM-CE-S5-technician.html'; });
+        marvRow.appendChild(contBtn);
+        void contBtn.offsetWidth;
+        contBtn.classList.add('is-in');
+      }, 600 + 2000);
+    }
+
+    /* ---- Sequence entry - triggered by "Run the assessment" or the DEV jump ---- */
+    function runMachineSequence() {
+      verdictReached = true;   // stop any in-flight S4-intro beats
+      unlockAudio();           // user gesture - all sounds gated behind this
+      spinStarted = false;
+      // Clear intro bubbles, the single bubble, any choices and the verdict slot.
+      Array.prototype.forEach.call(document.querySelectorAll('.s4-intro-bubble'), function (el) {
+        if (el.parentNode) { el.parentNode.removeChild(el); }
+      });
+      if (bubble) { bubble.textContent = ''; bubble.classList.remove('is-on'); }
+      clearChoices();
+      var slot = document.getElementById('s4-verdict-slot');
+      if (slot) { slot.innerHTML = ''; }
+      // Two column verdict layout; force-hide every persistent S4-1 to S4-3
+      // decoration (transition video, lab backdrop, spinning clock).
+      document.body.classList.add('s4-verdict');
+      var vid = document.getElementById('s4-video');
+      if (vid) { try { vid.pause(); } catch (e) {} }
+      marvRow.classList.add('is-on');
+      // Scan box at the top of the left column, above the MARV sprite, with a
+      // continuously moving scan line (frozen once the scan completes).
+      var oldBox = document.getElementById('s4-scanbox');
+      if (oldBox && oldBox.parentNode) { oldBox.parentNode.removeChild(oldBox); }
+      var scanBox = document.createElement('div');
+      scanBox.className = 's4-scanbox';
+      scanBox.id = 's4-scanbox';
+      scanBox.innerHTML =
+        '<img class="s4-scanbox-img" src="../assets/images/basin-before.png" alt="Damaged basin being scanned">' +
+        '<div class="s4-scanline"></div>';
+      marvRow.insertBefore(scanBox, marvRow.firstChild);
+      setMarv('marvfocussed', '');
+      cta.innerHTML = '';
+      fadeSwap(buildMachine, function () {
+        var img = document.getElementById('s4-machine-img');
+        if (img && img.complete && img.naturalWidth) {
+          positionMachine();
+          startSpin();
+        } else {
+          if (img) { img.addEventListener('load', function () { positionMachine(); startSpin(); }); }
+          setTimeout(function () { positionMachine(); startSpin(); }, 1000); // safety net
+        }
+      });
+    }
+
+    /* DEV ONLY - jump straight to the start of the fruit machine sequence,
+       skipping the transition and intro. Remove this function and its button
+       before launch. */
+    function jumpToMachine() {
+      var trans = document.getElementById('s4-transition');
+      if (trans) { trans.style.display = 'none'; }
+      runMachineSequence();
+    }
+    var devJump = document.getElementById('s4-dev-jump');
+    if (devJump) { devJump.addEventListener('click', jumpToMachine); }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', startS41);
     } else {
       startS41();
     }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. Two scenes:
+       MARV's intro (lab + stat cards) and the assessment machine run (spin,
+       questions, verdict). Each replays from the start exactly as on first
+       load, skipping the opening transition video. ---- */
+    var DEV_ORDER = ['intro', 'assessment'];
+    function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+    function devIntro() {
+      verdictReached = false;
+      spinStarted = false;
+      document.body.classList.remove('s4-verdict');
+      var trans = document.getElementById('s4-transition'); if (trans) { trans.classList.add('is-out'); trans.style.display = 'none'; }
+      var lab = document.getElementById('s4-lab'); if (lab) { lab.classList.add('is-on'); }
+      var clock = document.getElementById('clock-overlay'); if (clock) { clock.classList.add('visible'); }
+      positionClock();
+      marvRow.classList.add('is-on');
+      var bub = document.getElementById('s4-marv-bubbles'); if (bub) { bub.innerHTML = ''; }
+      content.innerHTML = '';
+      var vslot = document.getElementById('s4-verdict-slot'); if (vslot) { vslot.innerHTML = ''; }
+      var ch = document.getElementById('s4-choices'); if (ch && ch.parentNode) { ch.parentNode.removeChild(ch); }
+      cta.innerHTML = '';
+      setMarv('marvexcited', 'Right - you have seen the old way. Now let me show you mine.');
+      startIntro();
+    }
+    function devCur() { return verdictReached ? 1 : 0; }
+    function devGo(i) {
+      if (i < 0 || i >= DEV_ORDER.length) { return; }
+      devClearTimers();
+      if (i === 0) { devIntro(); }
+      else { runMachineSequence(); }
+    }
+    window.__devPrevScene = function () { devGo(devCur() - 1); };
+    window.__devNextScene = function () { devGo(devCur() + 1); };
+    window.__devReplayScene = function () { devGo(devCur()); };
   })();
+  </script>
+
+  <script>
+    /* Stop every audio and video on this stage cleanly whenever the user leaves
+       by any method (skip, continue, DEV link, back button). Also covers the
+       back/forward cache case where media could otherwise keep playing. */
+    window.addEventListener('pagehide', function () {
+      var media = document.querySelectorAll('audio, video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].currentTime = 0; } catch (e) {}
+      }
+    });
   </script>
 
 </body>

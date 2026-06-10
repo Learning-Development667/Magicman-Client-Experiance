@@ -33,68 +33,10 @@
     overflow-x: hidden;
   }
 
-  /* ---- PROGRESS BAR ---- */
-  #progress-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: rgba(19,41,75,0.95);
-    backdrop-filter: blur(8px);
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid rgba(174,210,132,0.2);
-  }
-
-  .progress-logo {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--white);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .progress-logo span {
-    color: var(--wasabi);
-  }
-
-  .progress-stages {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .stage-pip {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-    transition: background 0.4s ease;
-  }
-
-  .stage-pip.active {
-    background: var(--wasabi);
-  }
-
-  .stage-pip.done {
-    background: var(--hunter);
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
   /* ---- MAIN WRAPPER ---- */
   #stage-wrapper {
-    padding-top: 52px;
-    min-height: 100vh;
+    padding-top: 0;
+    min-height: calc(100vh - 52px);
     display: flex;
     flex-direction: column;
   }
@@ -727,46 +669,6 @@
     flex-wrap: wrap;
   }
 
-  /* ---- INTRO SCREEN ---- */
-  #scene-intro {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: calc(100vh - 52px);
-  }
-
-  .intro-inner {
-    max-width: 700px;
-    padding: 0 24px;
-  }
-
-  .intro-logo {
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--wasabi);
-    margin-bottom: 24px;
-  }
-
-  .intro-title {
-    font-size: 48px;
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 16px;
-  }
-
-  @media (max-width: 600px) {
-    .intro-title { font-size: 32px; }
-  }
-
-  .intro-sub {
-    font-size: 18px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 40px;
-    line-height: 1.6;
-  }
-
   /* ---- NOTIFICATION BADGE ---- */
   .notification-dot {
     display: inline-block;
@@ -817,9 +719,8 @@
   }
 
   @media (max-width: 480px) {
-    .progress-logo { display: none; }
     .marv-sprite { width: 160px; height: 200px; }
-    .marv-speech { width: 220px; font-size: 13px; }
+    .marv-speech { width: 220px; font-size: 18px; }
   }
 
   /* ---- HANDLER DECISION BUTTONS (STATE 1) ---- */
@@ -1132,7 +1033,7 @@
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: #000;
+    background: #13294B;
     overflow: hidden;
     transition: opacity 0.8s ease;
   }
@@ -1143,46 +1044,8 @@
     pointer-events: none;
   }
 
-  /* Start gate - cinematic and music begin on this click (a user gesture,
-     which satisfies the browser autoplay policy for the audio track). */
-  .kb-start {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px;
-    background: #0d0d0d;
-    transition: opacity 0.6s ease;
-  }
-
-  .kb-start.hide {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .kb-start-title {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 40px;
-    font-weight: 800;
-    color: #FFFFFF;
-    margin-bottom: 10px;
-  }
-
-  .kb-start-sub {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #AED284;
-    margin-bottom: 32px;
-  }
-
-  /* Post-cinematic stages (customer video, then MARV) - full-screen navy
-     layers that fade in and out over the top of the cinematic panels. */
+  /* Post-cinematic MARV reveal - a full-screen navy layer that fades in over
+     the top of the cinematic panels. */
   .kb-stage {
     position: absolute;
     inset: 0;
@@ -1202,27 +1065,6 @@
   .kb-stage.show {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  /* Customer video, held in a rounded navy card */
-  .kb-video-card {
-    width: 92%;
-    max-width: 960px;
-    background: var(--navy);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
-    transition: opacity 0.8s ease;
-  }
-
-  .kb-video-card.kb-faded {
-    opacity: 0;
-  }
-
-  .kb-video {
-    display: block;
-    width: 100%;
-    height: auto;
   }
 
   /* MARV reveal - radial wasabi pulse rings expanding from centre */
@@ -1262,14 +1104,17 @@
     width: 320px;
     max-width: 78vw;
     height: auto;
+    border: 3px solid #AED284;
     border-radius: 16px;
     transform: scale(0.3);
     opacity: 0;
     filter: drop-shadow(0 0 26px rgba(174, 210, 132, 0.85));
   }
 
+  /* Materialise in, then settle into the shared wasabi glow pulse. */
   .kb-marv-stage.show .kb-marv-video {
-    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards;
+    animation: kb-marv-materialise 0.8s ease-out 0.2s forwards,
+               marvGlowPulse 2s ease-in-out 1s infinite;
   }
 
   @keyframes kb-marv-materialise {
@@ -1284,16 +1129,17 @@
     max-width: 580px;
     background: #FFFFFF;
     color: var(--navy);
+    border: 3px solid #AED284;
     border-radius: 16px;
     padding: 18px 26px;
     font-family: 'Open Sans', sans-serif;
     font-size: 21px;
     font-weight: 600;
     line-height: 1.45;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.5s ease, transform 0.5s ease;
+    animation: marvGlowPulse 2s ease-in-out infinite;
   }
 
   .kb-marv-bubble::before {
@@ -1437,7 +1283,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: #0d0d0d;
+    background: #13294B;
     opacity: 0;
     transition: opacity 0.8s ease;
   }
@@ -1489,6 +1335,24 @@
   }
   .test-skip:hover { opacity: 1; }
 
+  /* ---- S4 circuit-trace glow treatment - a rotating wasabi trace over the MARV
+     speech bubble's wasabi border, added via ::after so it does not clash with
+     the bubble's ::before tail. ---- */
+  @property --s4angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  .kb-marv-bubble::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 3px;
+    background: conic-gradient(from var(--s4angle, 0deg),
+      rgba(174, 210, 132, 0) 0deg, rgba(174, 210, 132, 0) 250deg,
+      rgba(174, 210, 132, 0.7) 300deg, #AED284 335deg,
+      rgba(174, 210, 132, 0.7) 350deg, rgba(174, 210, 132, 0) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: s4Trace 3.5s linear infinite; pointer-events: none;
+  }
+  @keyframes s4Trace { to { --s4angle: 360deg; } }
+
 </style>
 </head>
 <body>
@@ -1496,65 +1360,40 @@
 <!-- KEN BURNS OPENING SEQUENCE (built and run by script, then removed) -->
 <div id="kb-overlay" class="kb-overlay" aria-hidden="true">
 
-  <!-- Post-cinematic: invitation to hear from a customer -->
-  <div id="kb-cta" class="kb-stage">
-    <button type="button" id="kb-cta-btn" class="btn-primary">Hear from a customer &nbsp;&rarr;</button>
-  </div>
-
-  <!-- Post-cinematic: the customer video, in a navy card -->
-  <div id="kb-video-stage" class="kb-stage">
-    <div id="kb-video-card" class="kb-video-card">
-      <video id="kb-video" class="kb-video" playsinline preload="auto"
-             src="../assets/video/customer_contractor_conversation.mp4"></video>
-    </div>
-  </div>
-
   <!-- Post-cinematic: wasabi pulse, then MARV's silent welcome video -->
   <div id="kb-marv-stage" class="kb-stage kb-marv-stage">
     <span class="kb-pulse"></span>
     <span class="kb-pulse kb-pulse-delay"></span>
     <video id="kb-marv-video" class="kb-marv-video" muted playsinline preload="auto"
            src="../assets/video/marv_welcome_video.mp4"></video>
-    <div id="kb-marv-bubble" class="kb-marv-bubble">Quite the adventure, she said. I do get that a lot. Ready to see what actually happens next?</div>
+    <div id="kb-marv-bubble" class="kb-marv-bubble">I'm MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me.</div>
     <div id="kb-showme" class="kb-showme">
-      <button type="button" id="continue-btn" class="btn-primary" onclick="goToStage3()">Continue</button>
+      <button type="button" id="continue-btn" class="btn-primary">Next</button>
     </div>
   </div>
 
 </div>
 <audio id="kb-music" src="../assets/audio/ambient_music.mp3" loop preload="auto"></audio>
 
-<!-- PROGRESS BAR -->
-<nav id="progress-bar">
-  <div class="progress-logo">magic<span>man</span></div>
-  <div class="progress-stages">
-    <div class="stage-pip active" id="pip-1" title="Claim"></div>
-    <div class="stage-pip" id="pip-2" title="The Decision Gap"></div>
-    <div class="stage-pip" id="pip-3" title="The New Way"></div>
-    <div class="stage-pip" id="pip-4" title="Assessment"></div>
-    <div class="stage-pip" id="pip-5" title="Dispatch"></div>
-    <div class="stage-pip" id="pip-6" title="Repair"></div>
-    <div class="stage-pip" id="pip-7" title="Outcome"></div>
+<!-- Progress indicator - 7 stages, Stage 1 Claim active. Class only, no
+     id="progress-steps", so the shell's main.js never re-renders it. -->
+<header class="progress-bar" aria-label="Journey progress">
+  <div class="progress-bar__inner">
+    <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
+    <ol class="progress-steps">
+      <li class="progress-step is-active" aria-current="step"><span class="progress-step__dot"></span><span class="progress-step__label">1. Claim</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">2. The Decision Gap</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">3. The New Way</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">4. Assessment</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">5. Dispatch</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">6. Repair</span></li>
+      <li class="progress-step"><span class="progress-step__dot"></span><span class="progress-step__label">7. Outcome</span></li>
+    </ol>
   </div>
-  <div class="progress-label" id="progress-label">Stage 1 of 7</div>
-</nav>
+</header>
 
 <!-- STAGE WRAPPER -->
-<div id="stage-wrapper">
-
-  <!-- SCENE 0: INTRO -->
-  <section id="scene-intro" class="scene active">
-    <div class="intro-inner animate-in">
-      <div class="intro-logo">Magicman | The Repair Journey</div>
-      <h1 class="intro-title">Every claim has a better answer.</h1>
-      <p class="intro-sub">Follow a repair from the moment a FNOL lands on your desk to the moment the job is done. MARV is waiting.</p>
-      <button class="btn-primary" onclick="startJourney()">
-        Start the Journey &nbsp;&rarr;
-      </button>
-    </div>
-  </section>
-
-</div><!-- end stage-wrapper -->
+<div id="stage-wrapper"></div><!-- end stage-wrapper -->
 
 <script>
 // ---- AUDIO ----
@@ -1643,22 +1482,6 @@ function goBack(targetSceneId) {
   showScene(targetSceneId);
 }
 
-function startJourney() {
-  initAudio();
-  playButtonClick();
-  showScene('scene-marv');
-  setTimeout(function () { playMarvBloop(); }, 400);
-  setTimeout(function () {
-    playChime();
-    setMarv('confident', 'Let me show you how this usually goes.', 'correct-reaction');
-    var continuBtn = document.getElementById('continue-btn');
-    if (continuBtn) {
-      continuBtn.classList.remove('btn-hidden');
-      continuBtn.classList.add('btn-visible');
-    }
-  }, 1200);
-}
-
 function activateMarv() {
   initAudio();
   playButtonClick();
@@ -1672,7 +1495,6 @@ function activateMarv() {
     showSiteView('mm-view-home');
     const url = document.getElementById('mm-url');
     if (url) { url.textContent = 'magicman.co.uk'; }
-    showScene('scene-website');
   }, 400);
 }
 
@@ -1708,7 +1530,6 @@ function goToEstimate() {
 function selectClientEnquiry() {
   initAudio();
   playProcessingHum();
-  showScene('scene-transition');
   runTransition();
 }
 
@@ -1797,21 +1618,17 @@ window.addEventListener('load', () => {
   if (!overlay) { return; }
 
   var KB_PANELS = [
-    { img: '../assets/images/scorch_mark_burn.png',       label: 'Private residence, Manchester',
-      report: 'Resident placed a hot pan directly onto an oak worktop. Circular scorch mark, approximately 15cm diameter. Surface charred through to the grain.' },
-    { img: '../assets/images/basin-before.png',           label: 'Student accommodation, Leeds',
+    { img: '../assets/images/basin-before.png',                 label: 'Student accommodation, Leeds',
       report: 'Tenant reported a cracked pedestal basin. A dropped soap dispenser landed in the basin, the impact shattered the side clean off.' },
-    { img: '../assets/images/marble_polished_floor.png', label: 'Four-star hotel, Edinburgh',
-      report: 'Hotel guest dragged a broken wheeled suitcase across a polished marble lobby floor. The scratch track approximately 60cm in length. Surface polish destroyed.' },
-    { img: '../assets/images/tile-before.png',            label: 'Serviced apartment, London',
-      report: 'Contractor caught a tile edge during renovation works. Crack running diagonally across two tiles. Grout line displaced.' },
-    { img: '../assets/images/counter_chip.png',           label: 'Holiday let, Cornwall',
+    { img: '../assets/images/lobby_floor_tile_scratch.png',     label: 'Marble floor tile - Surface scratches',
+      report: 'A hotel guest dragged a broken wheeled suitcase across the marble floor. Deep surface scratches across the tile face. Polished finish cut through.' },
+    { img: '../assets/images/counter_chip.png',                 label: 'Holiday let, Cornwall',
       report: 'Wine bottle dropped onto marble worktop edge during kitchen use. Corner chip approximately 3cm. Hairline crack extending from impact point.' },
-    { img: '../assets/images/marble-before.png',          label: 'Hotel, Birmingham',
-      report: 'Marble surface damage noted on guest check-out inspection. Origin unknown. Scoring across the surface consistent with abrasive contact.' },
-    { img: '../assets/images/door_frame_chip.png',        label: 'New build property, Bristol',
-      report: 'Removal team caught door frame surround whilst manoeuvring furniture. Large paint and timber chip. Raw wood exposed.' },
-    { img: '../assets/images/cabinet-before.png',         label: 'Buy-to-let property, Glasgow',
+    { img: '../assets/images/scorch_wood_new.png',             label: 'Private residence, Manchester',
+      report: 'Resident placed a hot pan directly onto an oak worktop. Circular scorch mark, approximately 15cm diameter. Surface charred through to the grain.' },
+    { img: '../assets/images/window-before.png',                label: 'uPVC window frame - Impact damage and cracking',
+      report: 'A contractor dropped an impact driver from the guttering above. The tool landed directly on the window frame causing severe cracking to the surface profile.' },
+    { img: '../assets/images/cabinet-before.png',               label: 'Buy-to-let property, Glasgow',
       report: 'Bathroom unit door damaged during tenancy. Impact mark and surface delamination to cabinet face. Hinge area affected.' }
   ];
 
@@ -1906,10 +1723,11 @@ window.addEventListener('load', () => {
   }
 
   var current = 0;
+  var montageStopped = false;
   function advance() {
+    if (montageStopped) { return; }
     if (current >= KB_PANELS.length) {
-      // All panels shown - run the title card, then hand off to the
-      // customer-video / MARV sequence (the overlay stays until "Show me").
+      // All panels shown - run the title card, then reveal MARV directly.
       panelEls[panelEls.length - 1].classList.remove('active');
       titleCard.classList.add('show');
       setTimeout(function () {
@@ -1917,7 +1735,7 @@ window.addEventListener('load', () => {
         stopMusic();
       }, 3800);
       setTimeout(function () {
-        showCustomerCta();
+        revealMarv();
       }, 4600);
       return;
     }
@@ -1927,119 +1745,110 @@ window.addEventListener('load', () => {
     setTimeout(advance, hold);
   }
 
-  // --- Post-cinematic: customer video, then MARV's silent welcome video ---
-  var ctaStage   = document.getElementById('kb-cta');
-  var ctaBtn     = document.getElementById('kb-cta-btn');
-  var videoStage = document.getElementById('kb-video-stage');
-  var videoCard  = document.getElementById('kb-video-card');
-  var video      = document.getElementById('kb-video');
+  // --- Post-cinematic: MARV's silent welcome video ---
   var marvStage  = document.getElementById('kb-marv-stage');
   var marvVideo  = document.getElementById('kb-marv-video');
   var marvBubble = document.getElementById('kb-marv-bubble');
   var showMe     = document.getElementById('kb-showme');
-  var showMeBtn  = document.getElementById('kb-showme-btn');
-
-  // Hold on navy and invite the user to hear from a customer.
-  function showCustomerCta() {
-    if (ctaStage) { ctaStage.classList.add('show'); }
-  }
-
-  if (ctaBtn) {
-    ctaBtn.addEventListener('click', function () {
-      // This click is the user gesture that permits the customer video audio.
-      if (ctaStage) { ctaStage.classList.remove('show'); }
-      if (videoStage) { videoStage.classList.add('show'); }
-      if (video) {
-        video.currentTime = 0;
-        var pv = video.play();
-        if (pv && pv.catch) { pv.catch(function () {}); }
-      }
-    });
-  }
-
-  if (video) {
-    video.addEventListener('ended', function () {
-      // Fade the customer clip out to navy over 800ms, then reveal MARV.
-      if (videoCard) { videoCard.classList.add('kb-faded'); }
-      setTimeout(function () {
-        if (videoStage) { videoStage.classList.remove('show'); }
-        revealMarv();
-      }, 800);
-    });
-  }
 
   // The pulse fires, MARV's silent welcome video materialises in the sprite's
-  // place, then the speech bubble and Show me button appear.
-  var marvFinished = false;
-  function finishMarv() {
-    if (marvFinished) { return; }
-    marvFinished = true;
+  // place, then MARV steps through three speech bubble beats. The button
+  // advances one beat per click and becomes "Continue" on the final beat,
+  // which then moves on to the next stage.
+  var marvBeats = [
+    'I\'m MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me.',
+    'That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That\'s not how we do it.',
+    'Six steps. From the moment damage is reported to the moment the job is closed with a warranty. Let me show you the old decision gap.'
+  ];
+  var marvBeatIdx = 0;
+  var marvNextBtn = document.getElementById('continue-btn');
+
+  function showMarvBeat(idx) {
+    marvBeatIdx = idx;
     if (marvBubble) {
-      marvBubble.textContent = 'Let me show you how this usually goes.';
+      marvBubble.textContent = marvBeats[idx];
       marvBubble.classList.add('show');
     }
-    if (showMe) { showMe.classList.add('show'); }
+    if (marvNextBtn) {
+      marvNextBtn.textContent = (idx >= marvBeats.length - 1) ? 'Continue' : 'Next';
+    }
   }
 
+  function advanceMarv() {
+    if (marvBeatIdx < marvBeats.length - 1) {
+      showMarvBeat(marvBeatIdx + 1);
+    } else {
+      goToStage3();
+    }
+  }
+
+  if (marvNextBtn) { marvNextBtn.addEventListener('click', advanceMarv); }
+
   function revealMarv() {
+    // Hard-stop the montage and tear its layers down so MARV is the only thing
+    // showing. Without this, skipping mid-montage can leave a montage panel or
+    // the navy/black title card layered against the reveal.
+    montageStopped = true;
+    panelEls.forEach(function (p) { p.classList.remove('active'); });
+    if (titleCard) { titleCard.classList.remove('show'); }
     if (marvStage) { marvStage.classList.add('show'); }
     if (marvVideo) {
       marvVideo.currentTime = 0;
       // The clip is muted, so it plays without needing a user gesture.
       var pm = marvVideo.play();
       if (pm && pm.catch) { pm.catch(function () {}); }
-      marvVideo.addEventListener('ended', finishMarv);
-      marvVideo.addEventListener('error', finishMarv);
     }
-    // MARV's welcome line shows during the clip; it is swapped when the clip ends.
-    setTimeout(function () { if (marvBubble) { marvBubble.classList.add('show'); } }, 600);
-  }
-
-  if (showMeBtn) {
-    showMeBtn.addEventListener('click', function () {
-      // Go straight to MARV's world; the navy overlay fades out over it.
-      startJourney();
-      overlay.classList.add('kb-fade-out');
-      setTimeout(function () {
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
-        }
-      }, 800);
-    });
-  }
-
-  // --- Start gate ---
-  // The cinematic and the ambient music both begin on this button click.
-  // A click is a user gesture, so the browser permits the audio to play.
-  var startScreen = document.createElement('div');
-  startScreen.className = 'kb-start';
-
-  var startTitle = document.createElement('div');
-  startTitle.className = 'kb-start-title';
-  startTitle.textContent = 'The Repair Journey';
-
-  var startSub = document.createElement('div');
-  startSub.className = 'kb-start-sub';
-  startSub.textContent = 'Sound on for the full experience';
-
-  var beginBtn = document.createElement('button');
-  beginBtn.type = 'button';
-  beginBtn.className = 'btn-primary';
-  beginBtn.innerHTML = 'Begin the journey &nbsp;&rarr;';
-
-  beginBtn.addEventListener('click', function () {
-    startMusic();
-    startScreen.classList.add('hide');
+    // MARV's first beat and the advance button appear during the materialise clip.
     setTimeout(function () {
-      if (startScreen.parentNode) { startScreen.parentNode.removeChild(startScreen); }
+      showMarvBeat(0);
+      if (showMe) { showMe.classList.add('show'); }
     }, 600);
-    advance();
-  });
+  }
 
-  startScreen.appendChild(startTitle);
-  startScreen.appendChild(startSub);
-  startScreen.appendChild(beginBtn);
-  overlay.appendChild(startScreen);
+  // --- Auto-start ---
+  // The montage begins as soon as Stage 1 loads (the user has just entered from
+  // the landing page). The ambient music is attempted immediately and, if the
+  // browser holds it back until a gesture, starts on the first interaction.
+  startMusic();
+  function kbFirstGesture() {
+    if (kbMusic && kbMusic.paused) { startMusic(); }
+    document.removeEventListener('pointerdown', kbFirstGesture);
+    document.removeEventListener('keydown', kbFirstGesture);
+  }
+  document.addEventListener('pointerdown', kbFirstGesture);
+  document.addEventListener('keydown', kbFirstGesture);
+  advance();
+
+  /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. The opening
+     cinematic plays inside this overlay as two stages: the Ken Burns montage
+     and MARV's materialise. Each replays from the start exactly as on first
+     load. ---- */
+  var DEV_ORDER = ['cinematic', 'marv'];
+  function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
+  function devReset() {
+    panelEls.forEach(function (p) { p.classList.remove('active'); });
+    reportEls.forEach(function (r) { r.classList.remove('show'); r.textContent = ''; });
+    if (titleCard) { titleCard.classList.remove('show'); }
+    if (marvStage) { marvStage.classList.remove('show'); }
+    if (marvBubble) { marvBubble.classList.remove('show'); }
+    if (showMe) { showMe.classList.remove('show'); }
+    if (marvVideo) { try { marvVideo.pause(); } catch (e) {} }
+  }
+  function devGo(i) {
+    if (i < 0 || i >= DEV_ORDER.length) { return; }
+    devClearTimers();
+    devReset();
+    var key = DEV_ORDER[i];
+    if (key === 'cinematic') { montageStopped = false; current = 0; advance(); }
+    else if (key === 'marv') { revealMarv(); }
+  }
+  function devCur() {
+    if (marvStage && marvStage.classList.contains('show')) { return 1; }
+    return 0;
+  }
+  window.__devPrevScene = function () { devGo(devCur() - 1); };
+  window.__devNextScene = function () { devGo(devCur() + 1); };
+  window.__devReplayScene = function () { devGo(devCur()); };
 })();
 
 /* =====================================================================
@@ -2129,7 +1938,6 @@ function testSkip() {
   if (!active) { return; }
 
   if (active.id === 'scene-intro' || active.id === 'scene-fnol') {
-    if (active.id === 'scene-intro') { showScene('scene-fnol'); }
     revealFnolButton();
     return;
   }
@@ -2152,17 +1960,35 @@ function testSkip() {
 <div class="dev-nav" id="dev-nav">
   <div class="dev-nav__panel">
     <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+      <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+    </div>
     <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
     <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
     <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
     <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 5 - Dispatch - Coming soon</span>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - Outcome - Coming soon</span>
+    <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
+    <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair</a>
+    <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
+    <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
   </div>
   <button class="dev-nav__tab" type="button"
           onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
 </div>
+
+  <script>
+    /* Stop every audio and video on this stage cleanly whenever the user leaves
+       by any method (skip, continue, DEV link, back button). Also covers the
+       back/forward cache case where media could otherwise keep playing. */
+    window.addEventListener('pagehide', function () {
+      var media = document.querySelectorAll('audio, video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].currentTime = 0; } catch (e) {}
+      }
+    });
+  </script>
 
 </body>
 </html>

@@ -3,35 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magicman Client Experience</title>
+  <title>Magicman | From damage to done</title>
   <meta name="description" content="An interactive showcase of the Magicman surface repair service journey.">
-
-  <!-- The experience starts at Stage 1. The root redirects straight there so
-       the standalone, cinematic stage pages run as intended. -->
-  <link rel="canonical" href="stages/MM-CE-S1-claim.html">
-  <meta http-equiv="refresh" content="0; url=stages/MM-CE-S1-claim.html">
-  <script>window.location.replace('stages/MM-CE-S1-claim.html');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    html, body { height: 100%; margin: 0; }
-    body {
-      background: #13294B;
-      color: #FFFFFF;
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;                /* doors slide off-screen, no scrollbars */
+      background: #13294B;             /* navy revealed behind the doors */
       font-family: 'Open Sans', Arial, sans-serif;
+    }
+
+    /* ----------------------------------------------------------------------
+       Reveal layer - sits behind the doors and is uncovered as they open.
+       ---------------------------------------------------------------------- */
+    .reveal {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      gap: 28px;
       padding: 24px;
+      text-align: center;
     }
-    a { color: #AED284; font-weight: 700; }
+    .reveal-logo {
+      height: 90px;
+      width: auto;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    .reveal-title {
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 48px;
+      line-height: 1.1;
+      margin: 0;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    .reveal-cta {
+      display: inline-block;
+      background: #AED284;
+      color: #13294B;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      opacity: 0;
+      transition: opacity 0.7s ease, transform 0.1s ease;
+    }
+    .reveal-cta:hover { transform: translateY(-2px); }
+
+    /* The reveal content fades in (staggered) once the doors begin opening. */
+    body.is-open .reveal-logo  { opacity: 1; }
+    body.is-open .reveal-title { opacity: 1; transition-delay: 0.2s; }
+    body.is-open .reveal-cta   { opacity: 1; transition-delay: 0.4s; animation: marvGlowPulse 2s ease-in-out infinite; }
+
+    /* Shared wasabi glow pulse, matching the MARV sprites in the stage files. */
+    @keyframes marvGlowPulse {
+      0%, 100% { box-shadow: 0 0 8px 3px rgba(174, 210, 132, 0.4); }
+      50%      { box-shadow: 0 0 16px 6px rgba(174, 210, 132, 0.7); }
+    }
+
+    /* ----------------------------------------------------------------------
+       Sliding doors - two full-height panels meeting at the centre, no gap.
+       Left = damaged surface, right = repaired surface. They slide apart
+       after a hold, revealing the navy landing content behind.
+       ---------------------------------------------------------------------- */
+    .door {
+      position: fixed;
+      top: 0;
+      width: 50vw;
+      height: 100%;
+      z-index: 10;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: transform 1s ease-in-out;
+    }
+    .door--left  { left: 0;  background-image: url('assets/images/counter_chip.png'); }
+    .door--right { left: 50vw; background-image: url('assets/images/counter_chip_after.png'); }
+
+    body.is-open .door--left  { transform: translateX(-100%); }
+    body.is-open .door--right { transform: translateX(100%); }
   </style>
 </head>
 <body>
-  <p>
-    Starting the Magicman repair journey...
-    <br>
-    If you are not redirected, <a href="stages/MM-CE-S1-claim.html">enter here</a>.
-  </p>
+
+  <!-- Behind the doors: navy background with the centred landing content. -->
+  <main class="reveal">
+    <img class="reveal-logo" src="assets/images/magicman-white.png" alt="Magicman">
+    <h1 class="reveal-title">From damage to done</h1>
+    <a class="reveal-cta" href="stages/MM-CE-S1-claim.html">Enter the experience</a>
+  </main>
+
+  <!-- Sliding doors: damaged surface (left) and repaired surface (right). -->
+  <div class="door door--left"></div>
+  <div class="door door--right"></div>
+
+  <script>
+    /* On load, hold the closed doors for 1.5s, then slide them apart and fade
+       the landing content in. */
+    window.addEventListener('load', function () {
+      setTimeout(function () { document.body.classList.add('is-open'); }, 1500);
+    });
+
+    /* Entering the experience requests native fullscreen. The request is made
+       directly inside the click handler to satisfy the browser user-gesture
+       requirement, then navigation to Stage 1 follows. */
+    var enterCta = document.querySelector('.reveal-cta');
+    if (enterCta) {
+      enterCta.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = enterCta.getAttribute('href');
+        var root = document.documentElement;
+        var request = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen;
+        function go() { window.location.href = target; }
+        if (request) {
+          try {
+            var result = request.call(root);
+            if (result && result.then) { result.then(go, go); } else { go(); }
+          } catch (err) { go(); }
+        } else {
+          go();
+        }
+      });
+    }
+  </script>
+
 </body>
 </html>
