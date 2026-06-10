@@ -103,7 +103,7 @@
     /* The viewport carries the 3D perspective and clips the off-stage cards. */
     .s6-carousel-viewport {
       position: relative;
-      height: 540px;
+      height: 575px;
       perspective: 1400px;
       overflow: hidden;
     }
@@ -140,15 +140,15 @@
        squares stay aligned across the three visible cards. The list is hidden
        instantly on the flanking cards (visibility), and its items animate in
        line by line on the active card. */
-    .s6-cab-list { list-style: none; margin: 12px 0 0; padding: 0 6px; height: 188px; text-align: left; }
+    .s6-cab-list { list-style: none; margin: 12px 0 0; padding: 0 6px; height: 210px; text-align: left; }
     .s6-cab:not(.is-active) .s6-cab-list { visibility: hidden; }
     .s6-cab-list li {
       position: relative;
       color: #FFFFFF;
-      font-size: 12.5px;
+      font-size: 15px;
       line-height: 1.35;
-      padding: 0 0 0 16px;
-      margin-bottom: 2px;
+      padding: 0 0 0 18px;
+      margin-bottom: 3px;
       opacity: 0;
       transform: translateX(-8px);
       transition: opacity 0.3s ease, transform 0.3s ease;
