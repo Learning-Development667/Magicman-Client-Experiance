@@ -61,7 +61,10 @@
       will-change: transform;
       transform: translateZ(0);
     }
-    .s4-world-overlay.is-on { opacity: 1; animation: s4GlitchOverlay 0.8s linear 1; }
+    .s4-world-overlay.is-on { opacity: 1; }
+    /* Only the text glitches - not the full-screen navy container. */
+    .s4-world-overlay__text { display: inline-block; }
+    .s4-world-overlay.is-on .s4-world-overlay__text { animation: s4GlitchOverlay 0.8s linear 1; }
     /* Dramatic glitch entrance for the transition overlay - wide chromatic
        split, deep clip-path tears, strong x-jitter, resolving to clean white.
        translateZ(0) per keyframe keeps it on its own layer above the video. */
@@ -628,7 +631,7 @@
     <video id="s4-video" class="s4-video" playsinline preload="auto">
       <source src="../assets/video/marv_world_transition.mp4" type="video/mp4">
     </video>
-    <div class="s4-world-overlay" id="s4-world-overlay">Entering MARV's world</div>
+    <div class="s4-world-overlay" id="s4-world-overlay"><span class="s4-world-overlay__text">Entering MARV's world</span></div>
   </div>
 
   <!-- MARV's lab background -->
