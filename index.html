@@ -115,6 +115,28 @@
     window.addEventListener('load', function () {
       setTimeout(function () { document.body.classList.add('is-open'); }, 1500);
     });
+
+    /* Entering the experience requests native fullscreen. The request is made
+       directly inside the click handler to satisfy the browser user-gesture
+       requirement, then navigation to Stage 1 follows. */
+    var enterCta = document.querySelector('.reveal-cta');
+    if (enterCta) {
+      enterCta.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = enterCta.getAttribute('href');
+        var root = document.documentElement;
+        var request = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen;
+        function go() { window.location.href = target; }
+        if (request) {
+          try {
+            var result = request.call(root);
+            if (result && result.then) { result.then(go, go); } else { go(); }
+          } catch (err) { go(); }
+        } else {
+          go();
+        }
+      });
+    }
   </script>
 
 </body>
