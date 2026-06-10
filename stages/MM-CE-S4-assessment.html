@@ -542,12 +542,12 @@
        static tears that resolve to clean, matching MARV's high-tech world. */
     .s4-intro-bubble.is-on { animation: s4Glitch 0.5s linear 1; }
     @keyframes s4Glitch {
-      0%   { opacity: 0; transform: translateX(-7px) skewX(6deg); text-shadow: 3px 0 rgba(174, 210, 132, 0.9), -3px 0 rgba(255, 68, 68, 0.7); clip-path: inset(0 0 62% 0); }
-      18%  { opacity: 1; transform: translateX(5px); text-shadow: -4px 0 rgba(174, 210, 132, 0.9), 4px 0 rgba(255, 68, 68, 0.6); clip-path: inset(48% 0 0 0); }
-      34%  { transform: translateX(-3px); text-shadow: 2px 0 rgba(174, 210, 132, 0.7); clip-path: inset(0 0 28% 0); }
-      52%  { transform: translateX(2px); text-shadow: -2px 0 rgba(174, 210, 132, 0.5); clip-path: inset(22% 0 8% 0); }
-      70%  { transform: translateX(-1px); text-shadow: 1px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
-      100% { opacity: 1; transform: translateX(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+      0%   { opacity: 0; transform: translateX(-7px) translateZ(0) skewX(6deg); text-shadow: 3px 0 rgba(174, 210, 132, 0.9), -3px 0 rgba(255, 68, 68, 0.7); clip-path: inset(0 0 62% 0); }
+      18%  { opacity: 1; transform: translateX(5px) translateZ(0); text-shadow: -4px 0 rgba(174, 210, 132, 0.9), 4px 0 rgba(255, 68, 68, 0.6); clip-path: inset(48% 0 0 0); }
+      34%  { transform: translateX(-3px) translateZ(0); text-shadow: 2px 0 rgba(174, 210, 132, 0.7); clip-path: inset(0 0 28% 0); }
+      52%  { transform: translateX(2px) translateZ(0); text-shadow: -2px 0 rgba(174, 210, 132, 0.5); clip-path: inset(22% 0 8% 0); }
+      70%  { transform: translateX(-1px) translateZ(0); text-shadow: 1px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0) translateZ(0); text-shadow: none; clip-path: inset(0 0 0 0); }
     }
 
     /* Key words carry a pulsing wasabi highlight - navy text stays readable on
