@@ -669,46 +669,6 @@
     flex-wrap: wrap;
   }
 
-  /* ---- INTRO SCREEN ---- */
-  #scene-intro {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: calc(100vh - 52px);
-  }
-
-  .intro-inner {
-    max-width: 700px;
-    padding: 0 24px;
-  }
-
-  .intro-logo {
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--wasabi);
-    margin-bottom: 24px;
-  }
-
-  .intro-title {
-    font-size: 48px;
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 16px;
-  }
-
-  @media (max-width: 600px) {
-    .intro-title { font-size: 32px; }
-  }
-
-  .intro-sub {
-    font-size: 18px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 40px;
-    line-height: 1.6;
-  }
-
   /* ---- NOTIFICATION BADGE ---- */
   .notification-dot {
     display: inline-block;
@@ -1084,46 +1044,8 @@
     pointer-events: none;
   }
 
-  /* Start gate - cinematic and music begin on this click (a user gesture,
-     which satisfies the browser autoplay policy for the audio track). */
-  .kb-start {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px;
-    background: #0d0d0d;
-    transition: opacity 0.6s ease;
-  }
-
-  .kb-start.hide {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .kb-start-title {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 40px;
-    font-weight: 800;
-    color: #FFFFFF;
-    margin-bottom: 10px;
-  }
-
-  .kb-start-sub {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #AED284;
-    margin-bottom: 32px;
-  }
-
-  /* Post-cinematic stages (customer video, then MARV) - full-screen navy
-     layers that fade in and out over the top of the cinematic panels. */
+  /* Post-cinematic MARV reveal - a full-screen navy layer that fades in over
+     the top of the cinematic panels. */
   .kb-stage {
     position: absolute;
     inset: 0;
@@ -1143,27 +1065,6 @@
   .kb-stage.show {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  /* Customer video, held in a rounded navy card */
-  .kb-video-card {
-    width: 92%;
-    max-width: 960px;
-    background: var(--navy);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
-    transition: opacity 0.8s ease;
-  }
-
-  .kb-video-card.kb-faded {
-    opacity: 0;
-  }
-
-  .kb-video {
-    display: block;
-    width: 100%;
-    height: auto;
   }
 
   /* MARV reveal - radial wasabi pulse rings expanding from centre */
@@ -1459,26 +1360,13 @@
 <!-- KEN BURNS OPENING SEQUENCE (built and run by script, then removed) -->
 <div id="kb-overlay" class="kb-overlay" aria-hidden="true">
 
-  <!-- Post-cinematic: invitation to hear from a customer -->
-  <div id="kb-cta" class="kb-stage">
-    <button type="button" id="kb-cta-btn" class="btn-primary">Hear from a customer &nbsp;&rarr;</button>
-  </div>
-
-  <!-- Post-cinematic: the customer video, in a navy card -->
-  <div id="kb-video-stage" class="kb-stage">
-    <div id="kb-video-card" class="kb-video-card">
-      <video id="kb-video" class="kb-video" playsinline preload="auto"
-             src="../assets/video/customer_contractor_conversation.mp4"></video>
-    </div>
-  </div>
-
   <!-- Post-cinematic: wasabi pulse, then MARV's silent welcome video -->
   <div id="kb-marv-stage" class="kb-stage kb-marv-stage">
     <span class="kb-pulse"></span>
     <span class="kb-pulse kb-pulse-delay"></span>
     <video id="kb-marv-video" class="kb-marv-video" muted playsinline preload="auto"
            src="../assets/video/marv_welcome_video.mp4"></video>
-    <div id="kb-marv-bubble" class="kb-marv-bubble">That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That's not how we do it.</div>
+    <div id="kb-marv-bubble" class="kb-marv-bubble">I'm MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me.</div>
     <div id="kb-showme" class="kb-showme">
       <button type="button" id="continue-btn" class="btn-primary">Next</button>
     </div>
@@ -1505,21 +1393,7 @@
 </header>
 
 <!-- STAGE WRAPPER -->
-<div id="stage-wrapper">
-
-  <!-- SCENE 0: INTRO -->
-  <section id="scene-intro" class="scene active">
-    <div class="intro-inner animate-in">
-      <div class="intro-logo">Magicman | The Repair Journey</div>
-      <h1 class="intro-title">Every claim has a better answer.</h1>
-      <p class="intro-sub">Follow a repair from the moment a FNOL lands on your desk to the moment the job is done. MARV is waiting.</p>
-      <button class="btn-primary" onclick="startJourney()">
-        Start the Journey &nbsp;&rarr;
-      </button>
-    </div>
-  </section>
-
-</div><!-- end stage-wrapper -->
+<div id="stage-wrapper"></div><!-- end stage-wrapper -->
 
 <script>
 // ---- AUDIO ----
@@ -1606,22 +1480,6 @@ function goBack(targetSceneId) {
   initAudio();
   playButtonClick();
   showScene(targetSceneId);
-}
-
-function startJourney() {
-  initAudio();
-  playButtonClick();
-  showScene('scene-marv');
-  setTimeout(function () { playMarvBloop(); }, 400);
-  setTimeout(function () {
-    playChime();
-    setMarv('confident', 'Let me show you how this usually goes.', 'correct-reaction');
-    var continuBtn = document.getElementById('continue-btn');
-    if (continuBtn) {
-      continuBtn.classList.remove('btn-hidden');
-      continuBtn.classList.add('btn-visible');
-    }
-  }, 1200);
 }
 
 function activateMarv() {
@@ -1867,8 +1725,7 @@ window.addEventListener('load', () => {
   var current = 0;
   function advance() {
     if (current >= KB_PANELS.length) {
-      // All panels shown - run the title card, then hand off to the
-      // customer-video / MARV sequence (the overlay stays until "Show me").
+      // All panels shown - run the title card, then reveal MARV directly.
       panelEls[panelEls.length - 1].classList.remove('active');
       titleCard.classList.add('show');
       setTimeout(function () {
@@ -1876,7 +1733,7 @@ window.addEventListener('load', () => {
         stopMusic();
       }, 3800);
       setTimeout(function () {
-        showCustomerCta();
+        revealMarv();
       }, 4600);
       return;
     }
@@ -1886,55 +1743,20 @@ window.addEventListener('load', () => {
     setTimeout(advance, hold);
   }
 
-  // --- Post-cinematic: customer video, then MARV's silent welcome video ---
-  var ctaStage   = document.getElementById('kb-cta');
-  var ctaBtn     = document.getElementById('kb-cta-btn');
-  var videoStage = document.getElementById('kb-video-stage');
-  var videoCard  = document.getElementById('kb-video-card');
-  var video      = document.getElementById('kb-video');
+  // --- Post-cinematic: MARV's silent welcome video ---
   var marvStage  = document.getElementById('kb-marv-stage');
   var marvVideo  = document.getElementById('kb-marv-video');
   var marvBubble = document.getElementById('kb-marv-bubble');
   var showMe     = document.getElementById('kb-showme');
-  var showMeBtn  = document.getElementById('kb-showme-btn');
-
-  // Hold on navy and invite the user to hear from a customer.
-  function showCustomerCta() {
-    if (ctaStage) { ctaStage.classList.add('show'); }
-  }
-
-  if (ctaBtn) {
-    ctaBtn.addEventListener('click', function () {
-      // This click is the user gesture that permits the customer video audio.
-      if (ctaStage) { ctaStage.classList.remove('show'); }
-      if (videoStage) { videoStage.classList.add('show'); }
-      if (video) {
-        video.currentTime = 0;
-        var pv = video.play();
-        if (pv && pv.catch) { pv.catch(function () {}); }
-      }
-    });
-  }
-
-  if (video) {
-    video.addEventListener('ended', function () {
-      // Fade the customer clip out to navy over 800ms, then reveal MARV.
-      if (videoCard) { videoCard.classList.add('kb-faded'); }
-      setTimeout(function () {
-        if (videoStage) { videoStage.classList.remove('show'); }
-        revealMarv();
-      }, 800);
-    });
-  }
 
   // The pulse fires, MARV's silent welcome video materialises in the sprite's
   // place, then MARV steps through three speech bubble beats. The button
   // advances one beat per click and becomes "Continue" on the final beat,
   // which then moves on to the next stage.
   var marvBeats = [
+    'I\'m MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me.',
     'That claim you just submitted? In the old world it would join a queue of emails, phone calls and missing details. Nobody quite sure what happens next. That\'s not how we do it.',
-    'Six steps. From the moment damage is reported to the moment the job is closed with a warranty. I\'ll show you every one.',
-    'I\'m MARV - MAterial Repair Validator. Welcome to my world. Every repair request that comes to Magicman comes through me. Let me show you what happens next.'
+    'Six steps. From the moment damage is reported to the moment the job is closed with a warranty. Let me show you the old decision gap.'
   ];
   var marvBeatIdx = 0;
   var marvNextBtn = document.getElementById('continue-btn');
@@ -1975,70 +1797,33 @@ window.addEventListener('load', () => {
     }, 600);
   }
 
-  if (showMeBtn) {
-    showMeBtn.addEventListener('click', function () {
-      // Go straight to MARV's world; the navy overlay fades out over it.
-      startJourney();
-      overlay.classList.add('kb-fade-out');
-      setTimeout(function () {
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
-        }
-      }, 800);
-    });
+  // --- Auto-start ---
+  // The montage begins as soon as Stage 1 loads (the user has just entered from
+  // the landing page). The ambient music is attempted immediately and, if the
+  // browser holds it back until a gesture, starts on the first interaction.
+  startMusic();
+  function kbFirstGesture() {
+    if (kbMusic && kbMusic.paused) { startMusic(); }
+    document.removeEventListener('pointerdown', kbFirstGesture);
+    document.removeEventListener('keydown', kbFirstGesture);
   }
-
-  // --- Start gate ---
-  // The cinematic and the ambient music both begin on this button click.
-  // A click is a user gesture, so the browser permits the audio to play.
-  var startScreen = document.createElement('div');
-  startScreen.className = 'kb-start';
-
-  var startTitle = document.createElement('div');
-  startTitle.className = 'kb-start-title';
-  startTitle.textContent = 'The Repair Journey';
-
-  var startSub = document.createElement('div');
-  startSub.className = 'kb-start-sub';
-  startSub.textContent = 'Sound on for the full experience';
-
-  var beginBtn = document.createElement('button');
-  beginBtn.type = 'button';
-  beginBtn.className = 'btn-primary';
-  beginBtn.innerHTML = 'Begin the journey &nbsp;&rarr;';
-
-  beginBtn.addEventListener('click', function () {
-    startMusic();
-    startScreen.classList.add('hide');
-    setTimeout(function () {
-      if (startScreen.parentNode) { startScreen.parentNode.removeChild(startScreen); }
-    }, 600);
-    advance();
-  });
-
-  startScreen.appendChild(startTitle);
-  startScreen.appendChild(startSub);
-  startScreen.appendChild(beginBtn);
-  overlay.appendChild(startScreen);
+  document.addEventListener('pointerdown', kbFirstGesture);
+  document.addEventListener('keydown', kbFirstGesture);
+  advance();
 
   /* ---- DEV scene stepper (Prev/Next/Replay) for the dev panel. The opening
-     cinematic plays inside this overlay as four stages: the Ken Burns montage,
-     the customer invite, the customer video and MARV's materialise. Each
-     replays from the start exactly as on first load. ---- */
-  var DEV_ORDER = ['cinematic', 'cta', 'video', 'marv'];
+     cinematic plays inside this overlay as two stages: the Ken Burns montage
+     and MARV's materialise. Each replays from the start exactly as on first
+     load. ---- */
+  var DEV_ORDER = ['cinematic', 'marv'];
   function devClearTimers() { var m = setTimeout(function () {}, 0); for (var i = 0; i <= m; i++) { clearTimeout(i); } }
   function devReset() {
-    if (startScreen && startScreen.parentNode) { startScreen.parentNode.removeChild(startScreen); }
     panelEls.forEach(function (p) { p.classList.remove('active'); });
     reportEls.forEach(function (r) { r.classList.remove('show'); r.textContent = ''; });
     if (titleCard) { titleCard.classList.remove('show'); }
-    if (ctaStage) { ctaStage.classList.remove('show'); }
-    if (videoStage) { videoStage.classList.remove('show'); }
-    if (videoCard) { videoCard.classList.remove('kb-faded'); }
     if (marvStage) { marvStage.classList.remove('show'); }
     if (marvBubble) { marvBubble.classList.remove('show'); }
     if (showMe) { showMe.classList.remove('show'); }
-    if (video) { try { video.pause(); } catch (e) {} }
     if (marvVideo) { try { marvVideo.pause(); } catch (e) {} }
   }
   function devGo(i) {
@@ -2047,16 +1832,10 @@ window.addEventListener('load', () => {
     devReset();
     var key = DEV_ORDER[i];
     if (key === 'cinematic') { current = 0; advance(); }
-    else if (key === 'cta') { showCustomerCta(); }
-    else if (key === 'video') {
-      if (videoStage) { videoStage.classList.add('show'); }
-      if (video) { video.currentTime = 0; var pv = video.play(); if (pv && pv.catch) { pv.catch(function () {}); } }
-    } else if (key === 'marv') { revealMarv(); }
+    else if (key === 'marv') { revealMarv(); }
   }
   function devCur() {
-    if (marvStage && marvStage.classList.contains('show')) { return 3; }
-    if (videoStage && videoStage.classList.contains('show')) { return 2; }
-    if (ctaStage && ctaStage.classList.contains('show')) { return 1; }
+    if (marvStage && marvStage.classList.contains('show')) { return 1; }
     return 0;
   }
   window.__devPrevScene = function () { devGo(devCur() - 1); };
