@@ -199,6 +199,19 @@ a {
   box-shadow: none;
 }
 
+/* Persistent user-facing Back control. Fixed just below the sticky progress
+   bar, top left. z-index sits above stage content but below full-screen
+   transitions (e.g. the S4 intro video at z-index 1000), so it stays hidden
+   during a transition and visible during the stage itself. */
+.stage-back {
+  position: fixed;
+  top: 72px;
+  left: 16px;
+  z-index: 40;
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
 /* --------------------------------------------------------------------------
    7. Progress indicator
    -------------------------------------------------------------------------- */
