@@ -134,7 +134,8 @@
     }
     .s6-cab.is-active .s6-cab-media { box-shadow: 0 0 18px rgba(174, 210, 132, 0.55); }
     .s6-cab-ph { color: #AED284; font-weight: 700; font-size: 15px; line-height: 1.3; text-align: center; padding: 8px; }
-    .s6-cab-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .s6-cab-video,
+    .s6-cab-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     /* Fixed-height list area so every card is the same height and the media
        squares stay aligned across the three visible cards. The list is hidden
        instantly on the flanking cards (visibility), and its items animate in
@@ -270,6 +271,20 @@
       text-align: left;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
+    /* Styled title card at the top of each game card - navy panel, wasabi
+       border, MARV sprite centred with the title below. No external image. */
+    .s6-game-hero {
+      background: #13294B;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .s6-game-hero-sprite { height: 130px; width: auto; display: block; }
+    .s6-game-hero-title { color: #AED284; font-weight: 800; font-size: 22px; line-height: 1.2; text-align: center; }
     .s6-game-card h3 { color: #AED284; font-weight: 800; font-size: 22px; margin: 0; }
     .s6-game-card p { color: #FFFFFF; font-weight: 400; font-size: 15px; line-height: 1.55; margin: 0; flex: 1 1 auto; }
     .s6-game-card .btn { align-self: flex-start; }
@@ -393,23 +408,24 @@
       <h1 class="s6-headline">Try it yourself.</h1>
       <div class="s6-games">
         <div class="s6-game-card">
-          <h3>Surface Rescue</h3>
+          <div class="s6-game-hero">
+            <img class="s6-game-hero-sprite" src="../assets/marv/marvfocussed.png" alt="MARV looking focussed">
+            <span class="s6-game-hero-title">Surface Rescue</span>
+          </div>
           <p>You are a Magicman technician. Five damaged surfaces, a watching customer, and four stages of preparation on every job. Get it right and rescue the surface. Let the customer satisfaction drop to zero and the job is over.</p>
           <a class="btn btn-primary" href="../docs/surface_rescue_mini_game.html" target="_blank" rel="noopener">Launch Surface Rescue</a>
         </div>
         <div class="s6-game-card">
-          <h3>MARV's Colour Lab</h3>
+          <div class="s6-game-hero">
+            <img class="s6-game-hero-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
+            <span class="s6-game-hero-title">MARV's Colour Lab</span>
+          </div>
           <p>Colour matching is one of the most skilled parts of any repair. Mix your paints, match the target patch, and see if you can hit the mark. Four difficulty levels - from trainee to master technician.</p>
           <a class="btn btn-primary" href="https://learning-development667.github.io/marvs-colour-lab/" target="_blank" rel="noopener">Launch Colour Lab</a>
         </div>
       </div>
       <p class="s6-games-note">Both challenges open in a new tab - your place here is saved.</p>
       <button type="button" id="s6-cta-5" class="btn btn-primary s6-pulse">See the outcome</button>
-    </section>
-
-    <!-- SCENE 6 - MARV CLOSES STAGE 6 (brief beat, then auto-navigates to Stage 7) -->
-    <section class="s6-scene" id="s6-scene-6">
-      <a id="s6-cta-6" class="btn btn-primary s6-pulse" href="MM-CE-S7-outcome.html">See the outcome</a>
     </section>
 
   </main>
@@ -472,12 +488,13 @@
       2: ['marvconfident',      'Thirty years of craft across every surface type.'],
       3: ['marvfocussed',       'Watch a full acrylic bath repair from start to finish.'],
       4: ['marvtriumphant',     'Every surface. Every time.'],
-      5: ['marvexcited',        "Think you've got what it takes? Two challenges from the MARV training academy."],
-      6: ['marvcongratulatory', 'That is what thirty years of craft looks like. Every technician. Every surface. Every time.']
+      5: ['marvexcited',        "Think you've got what it takes? Two challenges from the MARV training academy."]
     };
+    /* The closing MARV line, played inline on Scene 5 before navigating away. */
+    var CLOSING_LINE = 'That is what thirty years of craft looks like. Every technician. Every surface. Every time.';
 
     /* ---- Scene system ---- */
-    var TOTAL = 6;
+    var TOTAL = 5;
     var current = 1;
     function sceneEl(n) { return document.getElementById('s6-scene-' + n); }
     function goScene(n) {
@@ -521,12 +538,18 @@
         items: ['Laminate and Formica worktops', 'Solid wood and timber counters', 'Granite, marble and quartz', 'Corian and solid surface', 'Chips, burns and scratches', 'Water damage and swelling', 'Joins, edges and upstands'] }
     ];
 
-    /* Capability videos: the card only ever creates a <video> for a file that
-       actually exists, so no missing asset is requested and the console stays
-       clean. When a capability video is uploaded to ../assets/video/, add its
-       filename below (e.g. 'capability-bathroom.mp4': true) and that card will
-       play its muted, looping clip whenever it is the active centre card. */
-    var CAP_VIDEOS_AVAILABLE = {};
+    /* Capability media manifest. A card only ever requests a file that actually
+       exists, so no missing asset is fetched and the console stays clean. When a
+       file is uploaded to ../assets/video/, register it here (keyed by the
+       card's capability-<name>.mp4) and that card swaps its placeholder:
+         video (muted, looped): 'capability-bathroom.mp4': true
+                            or:  'capability-bathroom.mp4': { type: 'video' }
+         static image:          'capability-spraying.mp4': { type: 'image', file: 'capability-spraying.jpg' }
+       Kept empty until the files exist. The spraying card is set to use a static
+       JPG: uncomment its line the moment capability-spraying.jpg is uploaded. */
+    var CAP_VIDEOS_AVAILABLE = {
+      // 'capability-spraying.mp4': { type: 'image', file: 'capability-spraying.jpg' }
+    };
 
     var capViewport = document.getElementById('s6-carousel-viewport');
     var capCards = [];
@@ -548,12 +571,22 @@
         var media = document.createElement('div');
         media.className = 's6-cab-media';
         var video = null;
-        if (CAP_VIDEOS_AVAILABLE[cap.file]) {
+        var entry = CAP_VIDEOS_AVAILABLE[cap.file];
+        var isImage = (entry && typeof entry === 'object' && entry.type === 'image');
+        if (isImage) {
+          // Static image filling the card (e.g. the spraying card's JPG).
+          var img = document.createElement('img');
+          img.className = 's6-cab-img';
+          img.src = '../assets/video/' + (entry.file || cap.file);
+          img.alt = cap.name;
+          media.appendChild(img);
+        } else if (entry) {
+          // Video: muted, looped, played only while this is the active card.
           video = document.createElement('video');
           video.className = 's6-cab-video';
           video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'metadata';
           var src = document.createElement('source');
-          src.src = '../assets/video/' + cap.file; src.type = 'video/mp4';
+          src.src = '../assets/video/' + ((typeof entry === 'object' && entry.file) || cap.file); src.type = 'video/mp4';
           video.appendChild(src);
           media.appendChild(video);
         } else {
@@ -727,12 +760,15 @@
       });
     }
 
-    /* ---- Scene 6: closing beat, then auto-navigate to Stage 7 ---- */
+    /* ---- Closing: a brief inline MARV moment on Scene 5, then navigate to
+       Stage 7 (no separate scene, no extra button click). ---- */
     var OUTCOME_URL = 'MM-CE-S7-outcome.html';
-    var outcomeTimer = null;
-    function scheduleOutcome() {
-      if (outcomeTimer) { return; }
-      outcomeTimer = setTimeout(function () { window.location.href = OUTCOME_URL; }, 1500);
+    var closingTimer = null;
+    function closeStage() {
+      if (closingTimer) { return; }
+      setMarv('marvcongratulatory', CLOSING_LINE);
+      if (stage) { stage.scrollTop = 0; }   // bring MARV into view for the beat
+      closingTimer = setTimeout(function () { window.location.href = OUTCOME_URL; }, 2000);
     }
 
     /* ---- Advance buttons ---- */
@@ -741,10 +777,7 @@
     on('s6-cta-2', function () { goScene(3); });
     on('s6-cta-3', function () { goScene(4); });
     on('s6-cta-4', function () { goScene(5); });
-    on('s6-cta-5', function () { goScene(6); scheduleOutcome(); });
-    // s6-cta-6 is a plain link to Stage 7 - no handler needed. It shares the
-    // same target as the pending auto-navigate timer, so a click just gets
-    // there sooner.
+    on('s6-cta-5', closeStage);
 
     /* ---- Carousel navigation: arrows + keyboard (only while on Scene 2) ---- */
     on('s6-cap-prev', function () { setCapActive(capActive - 1); });
@@ -769,7 +802,7 @@
 
     /* ---- DEV scene stepper (Prev/Next/Replay). Stepping to scene 6 shows the
        closing beat without auto-navigating, so the flow can be inspected. ---- */
-    function devGo(n) { if (outcomeTimer) { clearTimeout(outcomeTimer); outcomeTimer = null; } goScene(n); }
+    function devGo(n) { if (closingTimer) { clearTimeout(closingTimer); closingTimer = null; } goScene(n); }
     window.__devPrevScene = function () { devGo(current - 1); };
     window.__devNextScene = function () { devGo(current + 1); };
     window.__devReplayScene = function () { devGo(current); };
