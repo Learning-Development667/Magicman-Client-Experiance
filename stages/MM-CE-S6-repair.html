@@ -287,6 +287,11 @@
 </head>
 <body>
 
+  <!-- Established ambient track, shared across the experience. Never autoplays:
+       it is started (at a low volume) only when the user advances to Scene 3,
+       which is reached by a click. preload="none" so it does not fetch early. -->
+  <audio id="s6-music" src="../assets/audio/ambient_music.mp3" loop preload="none"></audio>
+
   <!-- Progress indicator - 7 stages, Stage 6 Repair active. Class only,
        no id="progress-steps", so the shell's main.js never re-renders it.
        Matches Stage 5 exactly, with the active tab moved to step 6. -->
@@ -335,9 +340,9 @@
     <section class="s6-scene" id="s6-scene-3">
       <h1 class="s6-headline">Repair, renew, restore.</h1>
       <div class="s6-bath-stage">
-        <video class="s6-bath-video" id="s6-bath-video" playsinline preload="metadata">
-          <source src="../assets/video/bath_repair_full.mp4" type="video/mp4">
-        </video>
+        <!-- No src here: the file is only attached when the user advances to
+             this scene (see enterBath), so nothing loads in the background. -->
+        <video class="s6-bath-video" id="s6-bath-video" playsinline preload="none"></video>
         <button type="button" class="s6-bath-play" id="s6-bath-play" aria-label="Play the bath repair video">
           <span class="s6-bath-play__circle"><span class="s6-bath-play__tri"></span></span>
         </button>
@@ -485,7 +490,7 @@
       var m = MARV[n];
       if (m) { setMarv(m[0], m[1]); }
       if (n === 2) { setCapActive(0); }   // open on Bathroom, the first card
-      if (n === 3) { resetBath(); }
+      if (n === 3) { enterBath(); }
       if (stage) { stage.scrollTop = 0; }
     }
 
@@ -641,10 +646,45 @@
       animateList(capCards[capActive]);
     }
 
+    /* ---- Ambient audio (the track established across the experience). Started
+       only when the user reaches Scene 3 (a click-gated moment), kept low, and
+       never restarted if it is already playing. ---- */
+    var music = document.getElementById('s6-music');
+    var BATH_SRC = '../assets/video/bath_repair_full.mp4';
+    var AMBIENT_VOLUME = 0.2;
+    var audioCtx = null;
+    function resumeAudioCtx() {
+      // Resume a suspended AudioContext if one exists. Only created inside a
+      // user gesture, so this never triggers an autoplay-policy warning.
+      try {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) { audioCtx = new AC(); }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+      } catch (e) {}
+    }
+    function startAmbient() {
+      if (!music) { return; }
+      music.volume = AMBIENT_VOLUME;               // always keep it at the gentle level
+      if (music.paused) {                          // do not restart if already playing
+        var p = music.play();
+        if (p && p.catch) { p.catch(function () {}); }
+      }
+    }
+
     /* ---- Scene 3: gated bath repair video ---- */
     var bathVideo = document.getElementById('s6-bath-video');
     var bathPlay = document.getElementById('s6-bath-play');
     var bathStarted = false;
+    /* Called when the user advances into Scene 3. This is the only point the
+       video src is attached (so it never loads in the background) and the
+       moment the ambient track is started. */
+    function enterBath() {
+      if (bathVideo && !bathVideo.getAttribute('src')) { bathVideo.src = BATH_SRC; }
+      resetBath();
+      startAmbient();
+    }
     function resetBath() {
       bathStarted = false;
       if (bathVideo) { try { bathVideo.pause(); bathVideo.currentTime = 0; } catch (e) {} bathVideo.removeAttribute('controls'); }
@@ -654,6 +694,8 @@
       if (bathStarted || !bathVideo) { return; }
       bathStarted = true;
       if (bathPlay) { bathPlay.style.display = 'none'; }
+      resumeAudioCtx();                                 // resume audio if the browser suspended it
+      startAmbient();                                   // belt and braces if it was blocked earlier
       bathVideo.setAttribute('controls', 'controls');   // standard controls once playing
       bathVideo.muted = false;
       var p = bathVideo.play();
