@@ -98,7 +98,7 @@
     /* Click-to-progress buttons carry the wasabi glow pulse. */
     .s6-pulse { animation: marvGlowPulse 2s ease-in-out infinite; margin-top: 4px; }
 
-    /* ---- SCENE 2 - CAPABILITY SHOWCASE (2 x 5 grid of portrait cards) ---- */
+    /* ---- SCENE 2 - CAPABILITY SHOWCASE (2 x 5 grid of square cards) ---- */
     .s6-cap-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -113,7 +113,7 @@
     .s6-cap-card.show { opacity: 1; transform: translateY(0); }
     .s6-cap-media {
       position: relative;
-      aspect-ratio: 9 / 16;          /* portrait, matching the 9:16 source videos */
+      aspect-ratio: 1 / 1;           /* square, matching the 1:1 source videos */
       background: #13294B;
       border: 3px solid #AED284;
       border-radius: 12px;
