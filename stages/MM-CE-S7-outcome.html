@@ -132,6 +132,10 @@
     }
     .s7-cred-card h3 { color: #13294B; font-weight: 800; font-size: 18px; line-height: 1.3; margin: 0 0 12px; }
     .s7-cred-card p { color: #333333; font-weight: 400; font-size: 14px; line-height: 1.55; margin: 0; }
+    /* Proceed button - the user must click it to continue (no auto-advance). It
+       pulses with the shared wasabi glow and fades in once the cards have landed. */
+    .s7-cred-cta { display: block; margin: 32px auto 0; opacity: 0; transition: opacity 0.5s ease; animation: marvGlowPulse 2s ease-in-out infinite; }
+    .s7-cred-cta.show { opacity: 1; }
 
     /* ---- SCENE 4 - MARV CLOSING ---- */
     .s7-marv-line { color: #FFFFFF; font-weight: 800; font-size: 48px; line-height: 1.15; margin: 0 0 26px; }
@@ -171,16 +175,17 @@
     .s7-tv-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
     .s7-tv {
       position: relative;
-      width: min(760px, 84vw);
+      width: min(1100px, 92vw);
       aspect-ratio: 1920 / 1080;
     }
     .s7-tv-video {
       position: absolute;
-      /* The screen cut-out of old_tv.png (a 1920x1080 frame), as percentages. */
-      left: 13%;
-      top: 11.5%;
-      width: 58%;
-      height: 75%;
+      /* The screen cut-out of old_tv.png (a 1920x1080 frame), as percentages.
+         Sized to fill the screen aperture so there is no gap at the bottom. */
+      left: 12.5%;
+      top: 10.5%;
+      width: 59.5%;
+      height: 80%;
       object-fit: cover;
       background: #000000;
       border-radius: 6px;
@@ -195,10 +200,10 @@
     }
     .s7-tv-hint {
       position: absolute;
-      left: 13%;
-      top: 11.5%;
-      width: 58%;
-      height: 75%;
+      left: 12.5%;
+      top: 10.5%;
+      width: 59.5%;
+      height: 80%;
       z-index: 3;
       display: flex;
       align-items: center;
@@ -395,6 +400,7 @@
             <p>Every job closed with a Magicman guarantee. If it is not right, we make it right.</p>
           </div>
         </div>
+        <button type="button" id="s7-cred-cta" class="btn btn-primary s7-cred-cta">What makes a Magicman?</button>
       </div>
     </section>
 
@@ -493,9 +499,10 @@
       } catch (e) {}
     }
 
-    /* ---- Ambient music for the Ken Burns montage. Started by the Begin click
-       (never autoplays), loops, then fades out when the montage ends. Same
-       treatment as Stage 1. ---- */
+    /* ---- Ambient music for the Ken Burns montage. Attempted when the montage
+       scene opens; the browser gates playback behind the first user interaction
+       (also covered by onFirstGesture). Loops, then fades out when the montage
+       ends. Same treatment as Stage 1. ---- */
     var music = document.getElementById('s7-music');
     if (music) { music.volume = 0.3; }
     var musicFade = null;
@@ -546,6 +553,10 @@
     var CAPTION_DELAY = 1000;    // caption fades in 1s after the panel appears
     function startKenBurns() {
       showScene('kb');
+      // The montage is the audio scene: attempt the ambient music here. The
+      // browser gates playback behind the first user interaction, which
+      // onFirstGesture also handles, so it starts as soon as the user interacts.
+      startMusic();
       var panels = scenes.kb.querySelectorAll('[data-kb]');
       function showPanel(i) {
         panels.forEach(function (p, idx) {
@@ -573,8 +584,12 @@
       cards.forEach(function (card, i) {
         setTimeout(function () { card.classList.add('show'); }, 300 + i * 500);
       });
-      // last card visible ~300 + 3*500 + 500 anim, then a 2 second pause.
-      setTimeout(startMarv, 300 + cards.length * 500 + 2000);
+      // Once the cards have landed, reveal the proceed button. The user clicks
+      // it to continue to the MARV scene - no auto-advance.
+      var credCta = document.getElementById('s7-cred-cta');
+      if (credCta) {
+        setTimeout(function () { credCta.classList.add('show'); }, 300 + cards.length * 500 + 200);
+      }
     }
 
     /* ---- Scene 4: MARV closing ---- */
@@ -675,6 +690,10 @@
     document.addEventListener('click', onFirstGesture);
     document.addEventListener('keydown', onFirstGesture);
 
+    // The "What makes a Magicman?" button on the credentials scene proceeds to MARV.
+    var credCtaBtn = document.getElementById('s7-cred-cta');
+    if (credCtaBtn) { credCtaBtn.addEventListener('click', startMarv); }
+
     // The "See how far we've come" button on the MARV scene proceeds to the advert.
     var marvCta = document.getElementById('s7-marv-cta');
     if (marvCta) { marvCta.addEventListener('click', startYellowPages); }
@@ -712,6 +731,11 @@
       var cards = scenes.cred.querySelectorAll('[data-cred]');
       cards.forEach(function (c) { c.classList.remove('show'); });
       cards.forEach(function (card, i) { setTimeout(function () { card.classList.add('show'); }, 300 + i * 500); });
+      var credCta = document.getElementById('s7-cred-cta');
+      if (credCta) {
+        credCta.classList.remove('show');
+        setTimeout(function () { credCta.classList.add('show'); }, 300 + cards.length * 500 + 200);
+      }
     }
     function devGo(i) {
       if (i < 0 || i >= DEV_ORDER.length) { return; }
