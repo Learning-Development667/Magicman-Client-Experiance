@@ -1033,10 +1033,10 @@
 
   /* View 2: Client Enquiry box (right-hand option in the estimate form) */
   .mm-overlay--client {
-    top: 57%;
-    left: 66.5%;
-    width: 20%;
-    height: 8%;
+    top: 57.3%;
+    left: 67%;
+    width: 17.6%;
+    height: 6.8%;
   }
 
   /* Animated pointer drawing attention to the Client Enquiry card */
@@ -1063,10 +1063,13 @@
 
   #scene-fnol {
     background: #1A1A1A;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 
   #scene-fnol .scene-inner {
     position: relative;
+    max-width: 1340px;
   }
 
   /* =========================================================
@@ -1436,16 +1439,24 @@
 
   /* ---- SCENE 3 - COMPARISON AND MARV ---- */
   #scene-comparison .scene-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 160px); }
-  .compare-wrap { display: flex; gap: 32px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
-  .compare-card { background: #0e1f38; border: 2px solid #888888; border-radius: 14px; padding: 40px 48px; text-align: center; min-width: 240px; opacity: 0; transform: scale(0.9); transition: opacity 0.6s ease, transform 0.6s ease; }
+  /* The one-day resolution is the hero; the old way sits alongside as a small,
+     de-emphasised contrast so the difference in speed is felt, not just read. */
+  .compare-wrap { display: flex; gap: 48px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .compare-card { background: #0e1f38; border-radius: 16px; text-align: center; opacity: 0; transform: scale(0.9); transition: opacity 0.6s ease, transform 0.6s ease; }
   .compare-card.landed { opacity: 1; transform: scale(1); }
-  .compare-card--old { border-color: #FF4444; }
-  .compare-card--new { border-color: #AED284; }
-  .compare-num { font-size: 96px; font-weight: 800; line-height: 1; }
-  .compare-card--old .compare-num { color: #FF4444; }
-  .compare-card--new .compare-num { color: #AED284; }
-  .compare-label { margin-top: 10px; font-size: 20px; font-weight: 700; color: #ffffff; }
-  .compare-sub { margin-top: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+
+  /* HERO - MARV's one-day resolution: large, wasabi, unmissable. */
+  .compare-card--new { border: 3px solid #AED284; padding: 52px 72px; background: rgba(174, 210, 132, 0.08); }
+  .compare-card--new.landed { animation: wasabiGlow 2.4s ease-in-out infinite; }
+  .compare-card--new .compare-num { font-size: clamp(140px, 20vw, 224px); font-weight: 800; line-height: 0.9; color: #AED284; text-shadow: 0 0 34px rgba(174, 210, 132, 0.55); }
+  .compare-card--new .compare-label { margin-top: 8px; font-size: 30px; font-weight: 800; color: #AED284; }
+  .compare-card--new .compare-sub { margin-top: 10px; font-size: 17px; font-weight: 600; color: #FFFFFF; }
+
+  /* CONTRAST - the old way, small and muted. */
+  .compare-card--old { border: 2px solid rgba(255, 68, 68, 0.55); padding: 26px 34px; }
+  .compare-card--old .compare-num { font-size: 66px; font-weight: 800; line-height: 1; color: #FF6B6B; }
+  .compare-card--old .compare-label { margin-top: 8px; font-size: 16px; font-weight: 700; color: rgba(255, 255, 255, 0.7); }
+  .compare-card--old .compare-sub { margin-top: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.45); }
   .s3-marv { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .s3-marv.show { opacity: 1; transform: translateY(0); }
   .s3-marv-sprite { width: 120px; height: auto; border: 3px solid #AED284; border-radius: 16px; animation: marvGlowPulse 2s ease-in-out infinite; }
@@ -1484,7 +1495,7 @@
   /* Fit the desktop simulations within a 1280x800 (F11) viewport. zoom scales
      the frame, screenshots and the percentage-positioned click overlays together
      so the simulation stays aligned, just smaller. Tuned by measurement. */
-  #scene-fnol .desktop-sim { zoom: 0.85; }
+  #scene-fnol .desktop-sim { zoom: 0.95; }
   /* The website simulation fills the full content width so it reads like a real
      webpage rather than a small screenshot. The images keep their aspect ratio
      (width 100%, height auto) and the percentage-positioned click overlays scale
@@ -1707,15 +1718,15 @@
   <section id="scene-comparison" class="scene">
     <div class="scene-inner">
       <div class="compare-wrap">
-        <div class="compare-card compare-card--old">
-          <div class="compare-num">14</div>
-          <div class="compare-label">Days. The old way.</div>
-          <div class="compare-sub">Four people. No resolution.</div>
-        </div>
         <div class="compare-card compare-card--new">
           <div class="compare-num">1</div>
           <div class="compare-label">Day. With Magicman.</div>
           <div class="compare-sub">One assessment. Instant answer.</div>
+        </div>
+        <div class="compare-card compare-card--old">
+          <div class="compare-num">14</div>
+          <div class="compare-label">Days. The old way.</div>
+          <div class="compare-sub">Four people. No resolution.</div>
         </div>
       </div>
       <div class="s3-marv" id="s3-marv">
