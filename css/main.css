@@ -220,6 +220,15 @@ a {
   gap: 12px;
 }
 
+/* Magicman logo - sits where the text pill used to, on the left of the bar,
+   sized to fit the bar height without overflow. */
+.progress-bar__logo {
+  height: 30px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
+}
+
 .progress-steps {
   display: flex;
   flex: 1;
@@ -263,6 +272,9 @@ a {
 
 .progress-step.is-active .progress-step__dot {
   background-color: var(--wasabi);
+  /* Wasabi glow pulse, the same marvGlowPulse effect used on MARV sprites,
+     so the current stage draws the eye. */
+  animation: marvGlowPulse 2s ease-in-out infinite;
 }
 
 .progress-step.is-complete {
