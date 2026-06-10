@@ -264,27 +264,16 @@
       background: #13294B;
       border: 3px solid #AED284;
       border-radius: 16px;
-      padding: 26px;
+      overflow: hidden;          /* clips the header image to the rounded top corners */
       display: flex;
       flex-direction: column;
-      gap: 14px;
       text-align: left;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
-    /* Styled title card at the top of each game card - navy panel, wasabi
-       border, MARV sprite centred with the title below. No external image. */
-    .s6-game-hero {
-      background: #13294B;
-      border: 3px solid #AED284;
-      border-radius: 12px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .s6-game-hero-sprite { height: 130px; width: auto; display: block; }
-    .s6-game-hero-title { color: #AED284; font-weight: 800; font-size: 22px; line-height: 1.2; text-align: center; }
+    /* Full-width header image: fixed height, cover-cropped, top corners follow
+       the card radius (via the card's overflow: hidden). */
+    .s6-game-img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .s6-game-body { padding: 26px; display: flex; flex-direction: column; gap: 14px; flex: 1 1 auto; }
     .s6-game-card h3 { color: #AED284; font-weight: 800; font-size: 22px; margin: 0; }
     .s6-game-card p { color: #FFFFFF; font-weight: 400; font-size: 15px; line-height: 1.55; margin: 0; flex: 1 1 auto; }
     .s6-game-card .btn { align-self: flex-start; }
@@ -408,20 +397,20 @@
       <h1 class="s6-headline">Try it yourself.</h1>
       <div class="s6-games">
         <div class="s6-game-card">
-          <div class="s6-game-hero">
-            <img class="s6-game-hero-sprite" src="../assets/marv/marvfocussed.png" alt="MARV looking focussed">
-            <span class="s6-game-hero-title">Surface Rescue</span>
+          <img class="s6-game-img" src="../assets/images/marvs_surface_rescue_image.png" alt="Surface Rescue">
+          <div class="s6-game-body">
+            <h3>Surface Rescue</h3>
+            <p>You are a Magicman technician. Five damaged surfaces, a watching customer, and four stages of preparation on every job. Get it right and rescue the surface. Let the customer satisfaction drop to zero and the job is over.</p>
+            <a class="btn btn-primary" href="../docs/surface_rescue_mini_game.html" target="_blank" rel="noopener">Launch Surface Rescue</a>
           </div>
-          <p>You are a Magicman technician. Five damaged surfaces, a watching customer, and four stages of preparation on every job. Get it right and rescue the surface. Let the customer satisfaction drop to zero and the job is over.</p>
-          <a class="btn btn-primary" href="../docs/surface_rescue_mini_game.html" target="_blank" rel="noopener">Launch Surface Rescue</a>
         </div>
         <div class="s6-game-card">
-          <div class="s6-game-hero">
-            <img class="s6-game-hero-sprite" src="../assets/marv/marvexcited.png" alt="MARV looking excited">
-            <span class="s6-game-hero-title">MARV's Colour Lab</span>
+          <img class="s6-game-img" src="../assets/images/marv_colour_image.png" alt="MARV's Colour Lab">
+          <div class="s6-game-body">
+            <h3>MARV's Colour Lab</h3>
+            <p>Colour matching is one of the most skilled parts of any repair. Mix your paints, match the target patch, and see if you can hit the mark. Four difficulty levels - from trainee to master technician.</p>
+            <a class="btn btn-primary" href="https://learning-development667.github.io/marvs-colour-lab/" target="_blank" rel="noopener">Launch Colour Lab</a>
           </div>
-          <p>Colour matching is one of the most skilled parts of any repair. Mix your paints, match the target patch, and see if you can hit the mark. Four difficulty levels - from trainee to master technician.</p>
-          <a class="btn btn-primary" href="https://learning-development667.github.io/marvs-colour-lab/" target="_blank" rel="noopener">Launch Colour Lab</a>
         </div>
       </div>
       <p class="s6-games-note">Both challenges open in a new tab - your place here is saved.</p>
