@@ -483,7 +483,7 @@
       <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
       <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
       <!-- Back navigation to Stage 6. Stage 6 does not exist in the repo yet. -->
-      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - Repair (back)</a>
+      <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair (back)</a>
       <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 7 - The Outcome (current)</span>
       <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
     </div>
@@ -769,6 +769,16 @@
     window.__devNextScene = function () { devGo(devCur() + 1); };
     window.__devReplayScene = function () { devGo(devCur()); };
   })();
+  </script>
+
+  <script>
+    /* Stop the ambient track cleanly whenever the user leaves this stage
+       (button, skip, or DEV panel link). Also covers the back/forward cache
+       case where the audio could otherwise keep playing after navigation. */
+    window.addEventListener('pagehide', function () {
+      var m = document.getElementById('s7-music');
+      if (m) { try { m.pause(); m.currentTime = 0; } catch (e) {} }
+    });
   </script>
 
 </body>

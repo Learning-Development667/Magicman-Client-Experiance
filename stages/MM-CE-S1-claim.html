@@ -1970,13 +1970,23 @@ function testSkip() {
     <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
     <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
     <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5</a>
-    <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair - Coming soon</span>
+    <a class="dev-nav__btn" href="MM-CE-S6-repair.html">Stage 6 - The Repair</a>
     <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
     <a class="dev-nav__btn" href="../assets/video/customer_contractor_conversation.mp4" target="_blank" rel="noopener">Colossyan customer video (demo only)</a>
   </div>
   <button class="dev-nav__tab" type="button"
           onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
 </div>
+
+  <script>
+    /* Stop the ambient track cleanly whenever the user leaves this stage
+       (button, skip, or DEV panel link). Also covers the back/forward cache
+       case where the audio could otherwise keep playing after navigation. */
+    window.addEventListener('pagehide', function () {
+      var m = document.getElementById('kb-music');
+      if (m) { try { m.pause(); m.currentTime = 0; } catch (e) {} }
+    });
+  </script>
 
 </body>
 </html>
