@@ -400,7 +400,7 @@
             <p>Every job closed with a Magicman guarantee. If it is not right, we make it right.</p>
           </div>
         </div>
-        <button type="button" id="s7-cred-cta" class="btn btn-primary s7-cred-cta">See where it all began</button>
+        <button type="button" id="s7-cred-cta" class="btn btn-primary s7-cred-cta">A little nostalgia</button>
       </div>
     </section>
 
@@ -690,9 +690,10 @@
     document.addEventListener('click', onFirstGesture);
     document.addEventListener('keydown', onFirstGesture);
 
-    // The "See where it all began" button on the credentials scene proceeds to MARV.
+    // The "A little nostalgia" button on the credentials scene goes straight to
+    // the YP advert (the MARV scene is no longer in the forward flow).
     var credCtaBtn = document.getElementById('s7-cred-cta');
-    if (credCtaBtn) { credCtaBtn.addEventListener('click', startMarv); }
+    if (credCtaBtn) { credCtaBtn.addEventListener('click', startYellowPages); }
 
     // The "See how far we've come" button on the MARV scene proceeds to the advert.
     var marvCta = document.getElementById('s7-marv-cta');
