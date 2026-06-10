@@ -924,10 +924,12 @@
         setTimeout(startIntro, 2000);
       }
       if (vid) {
-        // Text overlay: fade in when the video starts, fade out before it ends.
+        // Text overlay: fade in as the transition begins, fade out before it
+        // ends. Adding is-on directly (not on the 'playing' event) so it shows
+        // even when autoplay is blocked and 'playing' never fires.
         var worldOverlay = document.getElementById('s4-world-overlay');
         if (worldOverlay) {
-          vid.addEventListener('playing', function () { worldOverlay.classList.add('is-on'); });
+          worldOverlay.classList.add('is-on');
           vid.addEventListener('timeupdate', function () {
             if (vid.duration && vid.currentTime >= vid.duration - 1.2) {
               worldOverlay.classList.remove('is-on');

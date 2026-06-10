@@ -649,10 +649,12 @@
       closingVideo.addEventListener('ended', finish);
       // If the file is missing or playback is blocked, still end on navy.
       closingVideo.addEventListener('error', function () { setTimeout(finish, 600); });
-      // Text overlay: fade in when the video starts, fade out before it ends.
+      // Text overlay: fade in as the closing sequence begins, fade out before
+      // the video ends. Adding is-on directly (not on the 'playing' event) so it
+      // shows even when autoplay is blocked and 'playing' never fires.
       var worldOverlay = document.getElementById('s7-world-overlay');
       if (worldOverlay) {
-        closingVideo.addEventListener('playing', function () { worldOverlay.classList.add('is-on'); });
+        worldOverlay.classList.add('is-on');
         closingVideo.addEventListener('timeupdate', function () {
           if (closingVideo.duration && closingVideo.currentTime >= closingVideo.duration - 1.2) {
             worldOverlay.classList.remove('is-on');
