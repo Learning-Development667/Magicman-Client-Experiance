@@ -3,55 +3,241 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magicman | The Repair Journey - Stage 6 Repair</title>
+  <title>Magicman | The Repair Journey - Stage 6 The Repair</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
-  <!-- Shared shell stylesheet. Loaded before this stage's own <style> so the
-       stage's bespoke styles win the cascade. -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <!-- Shared shell stylesheet + device detection, loaded before this stage's own
+       <style> so the stage's bespoke styles win the cascade. -->
   <link rel="stylesheet" href="../css/main.css">
   <script src="../js/main.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
-      background: var(--navy);
-      color: var(--white);
-      overflow-x: hidden;
-      font-family: 'Open Sans', sans-serif;
-      margin: 0;
+      background: #13294B;
+      color: #FFFFFF;
+      overflow: hidden;            /* the stage scrolls internally, the page does not */
     }
-
-    /* Placeholder layout - MARV centred, text and skip button stacked below. */
-    .placeholder {
-      min-height: calc(100vh - 60px);
+    body {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    /* The stage fills the height left under the sticky progress bar and scrolls
+       internally when a scene's content is taller than the viewport. */
+    .s6-stage {
+      flex: 1 1 auto;
+      width: 100%;
+      overflow-y: auto;
+      background: #13294B;
+      padding: 20px 24px 48px;
+    }
+
+    /* MARV - persistent guide at the top of the stage, driven by setMarv() on
+       every scene change. Slides in from the left and types its line out. */
+    .s6-marv {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 28px;
-      padding: 40px 24px;
+      gap: 22px;
+      max-width: 900px;
+      margin: 0 auto 22px;
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    .s6-marv.is-in { animation: s6MarvIn 0.5s ease forwards; }
+    @keyframes s6MarvIn { to { opacity: 1; transform: translateX(0); } }
+    .s6-marv-frame { display: inline-block; line-height: 0; border-radius: 16px; flex-shrink: 0; }
+    .s6-marv-sprite {
+      height: 150px;
+      width: auto;
+      display: block;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s6-marv-bubble {
+      position: relative;
+      background: #13294B;
+      color: #FFFFFF;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 18px;          /* speech bubble text held at the 18px minimum */
+      line-height: 1.5;
+      min-height: 1.5em;
+      text-align: left;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s6-marv-bubble::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      bottom: 22px;
+      border-width: 8px 12px 8px 0;
+      border-style: solid;
+      border-color: transparent #13294B transparent transparent;
+    }
+
+    /* ---- Scenes - shown one at a time, fading in on advance ---- */
+    .s6-scene {
+      display: none;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
       text-align: center;
     }
+    .s6-scene.active { display: flex; animation: s6Fade 0.6s ease both; }
+    @keyframes s6Fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* MARV sprite reuses the shared .marv-sprite circuit-trace glow border. */
-    .placeholder .marv-sprite {
-      width: 200px;
-      height: 250px;
+    .s6-headline { color: #FFFFFF; font-weight: 800; font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0; }
+
+    /* Click-to-progress buttons carry the wasabi glow pulse. */
+    .s6-pulse { animation: marvGlowPulse 2s ease-in-out infinite; margin-top: 4px; }
+
+    /* ---- SCENE 2 - CAPABILITY SHOWCASE (2 x 5 grid of portrait cards) ---- */
+    .s6-cap-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      width: 100%;
+    }
+    .s6-cap-card {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .s6-cap-card.show { opacity: 1; transform: translateY(0); }
+    .s6-cap-media {
+      position: relative;
+      aspect-ratio: 9 / 16;          /* portrait, matching the 9:16 source videos */
+      background: #13294B;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .s6-cap-ph { color: #AED284; font-weight: 700; font-size: 14px; line-height: 1.3; text-align: center; padding: 8px; }
+    .s6-cap-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .s6-cap-label { margin-top: 8px; color: #FFFFFF; font-size: 13px; font-weight: 600; text-align: center; }
+
+    /* ---- SCENE 3 - BATH REPAIR VIDEO ---- */
+    .s6-bath-stage {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      aspect-ratio: 16 / 9;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000000;
+    }
+    .s6-bath-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000000; }
+    .s6-bath-play {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(19, 41, 75, 0.55);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .s6-bath-play__circle {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: #AED284;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: marvGlowPulse 2s ease-in-out infinite;
+    }
+    .s6-bath-play__tri {
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 15px 0 15px 25px;
+      border-color: transparent transparent transparent #13294B;
+      margin-left: 6px;
     }
 
-    .placeholder__text {
-      color: var(--wasabi);
-      font-size: 28px;
-      font-weight: 700;
-      margin: 0;
+    /* ---- SCENE 4 - BEFORE / AFTER SLIDERS ---- */
+    .s6-sliders { display: flex; gap: 18px; width: 100%; }
+    .s6-slider-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .s6-slider {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border: 3px solid #AED284;
+      border-radius: 12px;
+      overflow: hidden;
+      touch-action: none;          /* let the handle own the drag gesture on touch */
+      cursor: ew-resize;
+      background: #13294B;
     }
+    .s6-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .s6-slider .s6-after { z-index: 1; }
+    /* The "before" image sits on top, clipped to the left of the handle. */
+    .s6-slider .s6-before { z-index: 2; clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
+    .s6-slider-handle {
+      position: absolute; top: 0; bottom: 0; left: var(--pos, 50%);
+      width: 3px; background: #AED284; z-index: 4; transform: translateX(-50%); pointer-events: none;
+    }
+    .s6-slider-handle::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #AED284; transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+    }
+    .s6-sl-tag {
+      position: absolute; top: 8px; z-index: 3;
+      font-size: 11px; font-weight: 700; color: #FFFFFF;
+      background: rgba(19, 41, 75, 0.7); padding: 3px 8px; border-radius: 6px;
+    }
+    .s6-sl-before { left: 8px; }
+    .s6-sl-after { right: 8px; }
+    .s6-slider-name { color: #AED284; font-weight: 700; font-size: 15px; }
+
+    /* ---- SCENE 5 - OPTIONAL GAMES ---- */
+    .s6-games { display: flex; gap: 22px; width: 100%; }
+    .s6-game-card {
+      flex: 1 1 0; min-width: 0;
+      background: #13294B;
+      border: 3px solid #AED284;
+      border-radius: 16px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    .s6-game-card h3 { color: #AED284; font-weight: 800; font-size: 22px; margin: 0; }
+    .s6-game-card p { color: #FFFFFF; font-weight: 400; font-size: 15px; line-height: 1.55; margin: 0; flex: 1 1 auto; }
+    .s6-game-card .btn { align-self: flex-start; }
+    .s6-games-note { color: rgba(255, 255, 255, 0.6); font-size: 13px; text-align: center; margin: 0; }
+
+    /* ---- Mobile - grids and rows stack to a single column ---- */
+    body.device-mobile .s6-cap-grid { grid-template-columns: 1fr; }
+    body.device-mobile .s6-sliders,
+    body.device-mobile .s6-games { flex-direction: column; }
+    body.device-mobile .s6-marv { flex-direction: column; text-align: center; }
+    body.device-mobile .s6-marv-bubble { text-align: center; }
+    body.device-mobile .s6-marv-bubble::before { display: none; }
   </style>
 </head>
 <body>
 
   <!-- Progress indicator - 7 stages, Stage 6 Repair active. Class only,
-       no id="progress-steps", so the shell's main.js never re-renders it. -->
+       no id="progress-steps", so the shell's main.js never re-renders it.
+       Matches Stage 5 exactly, with the active tab moved to step 6. -->
   <header class="progress-bar" aria-label="Journey progress">
     <div class="progress-bar__inner">
       <img class="progress-bar__logo" src="../assets/images/magicman-white.png" alt="Magicman">
@@ -69,11 +255,320 @@
 
   <a class="btn btn-ghost stage-back" href="MM-CE-S5-technician.html">Back to Stage 5</a>
 
-  <main class="placeholder">
-    <img class="marv-sprite" src="../assets/marv/marvthinking.png" alt="MARV looking thoughtful">
-    <p class="placeholder__text">In development</p>
-    <a class="btn btn-primary" href="MM-CE-S7-outcome.html">Skip</a>
+  <main class="s6-stage" id="s6-stage">
+
+    <!-- Persistent MARV, updated on every scene change via setMarv(). -->
+    <div class="s6-marv" id="s6-marv">
+      <span class="s6-marv-frame"><img class="s6-marv-sprite" id="s6-marv-sprite" src="../assets/marv/marvfocussed.png" alt="MARV looking focussed"></span>
+      <div class="s6-marv-bubble default" id="s6-marv-bubble"></div>
+    </div>
+
+    <!-- SCENE 1 - MARV SETS THE SCENE -->
+    <section class="s6-scene active" id="s6-scene-1">
+      <button type="button" id="s6-cta-1" class="btn btn-primary s6-pulse">See what we repair</button>
+    </section>
+
+    <!-- SCENE 2 - CAPABILITY SHOWCASE -->
+    <section class="s6-scene" id="s6-scene-2">
+      <h1 class="s6-headline">Whatever the surface - we have it covered.</h1>
+      <div class="s6-cap-grid">
+        <div class="s6-cap-card" data-video="capability-bathroom.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Bathroom</div></div><div class="s6-cap-label">Bathroom</div></div>
+        <div class="s6-cap-card" data-video="capability-kitchen.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Kitchen</div></div><div class="s6-cap-label">Kitchen</div></div>
+        <div class="s6-cap-card" data-video="capability-flooring.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Flooring</div></div><div class="s6-cap-label">Flooring</div></div>
+        <div class="s6-cap-card" data-video="capability-window.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Windows</div></div><div class="s6-cap-label">Windows</div></div>
+        <div class="s6-cap-card" data-video="capability-door.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Doors</div></div><div class="s6-cap-label">Doors</div></div>
+        <div class="s6-cap-card" data-video="capability-furniture.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Furniture</div></div><div class="s6-cap-label">Furniture</div></div>
+        <div class="s6-cap-card" data-video="capability-stone.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Stone and Marble</div></div><div class="s6-cap-label">Stone and Marble</div></div>
+        <div class="s6-cap-card" data-video="capability-cladding.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Wall Cladding and IPS</div></div><div class="s6-cap-label">Wall Cladding and IPS</div></div>
+        <div class="s6-cap-card" data-video="capability-spraying.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Spraying and Recolouring</div></div><div class="s6-cap-label">Spraying and Recolouring</div></div>
+        <div class="s6-cap-card" data-video="capability-worktop.mp4"><div class="s6-cap-media"><div class="s6-cap-ph">Worktops and Counters</div></div><div class="s6-cap-label">Worktops and Counters</div></div>
+      </div>
+      <button type="button" id="s6-cta-2" class="btn btn-primary s6-pulse">Watch the repair</button>
+    </section>
+
+    <!-- SCENE 3 - THE BATH REPAIR VIDEO -->
+    <section class="s6-scene" id="s6-scene-3">
+      <h1 class="s6-headline">Repair, renew, restore.</h1>
+      <div class="s6-bath-stage">
+        <video class="s6-bath-video" id="s6-bath-video" playsinline preload="metadata">
+          <source src="../assets/video/bath_repair_full.mp4" type="video/mp4">
+        </video>
+        <button type="button" class="s6-bath-play" id="s6-bath-play" aria-label="Play the bath repair video">
+          <span class="s6-bath-play__circle"><span class="s6-bath-play__tri"></span></span>
+        </button>
+      </div>
+      <button type="button" id="s6-cta-3" class="btn btn-primary s6-pulse">Continue</button>
+    </section>
+
+    <!-- SCENE 4 - BEFORE AND AFTER SLIDERS -->
+    <section class="s6-scene" id="s6-scene-4">
+      <h1 class="s6-headline">The results speak for themselves.</h1>
+      <div class="s6-sliders">
+        <div class="s6-slider-col">
+          <div class="s6-slider" style="--pos: 50%;">
+            <img class="s6-after" src="../assets/images/marble-after.png" alt="Marble surface after repair">
+            <img class="s6-before" src="../assets/images/marble-before.png" alt="Marble surface before repair">
+            <span class="s6-sl-tag s6-sl-before">Before</span>
+            <span class="s6-sl-tag s6-sl-after">After</span>
+            <span class="s6-slider-handle"></span>
+          </div>
+          <span class="s6-slider-name">Marble</span>
+        </div>
+        <div class="s6-slider-col">
+          <div class="s6-slider" style="--pos: 50%;">
+            <img class="s6-after" src="../assets/images/tile-after.png" alt="Tile surface after repair">
+            <img class="s6-before" src="../assets/images/tile-before.png" alt="Tile surface before repair">
+            <span class="s6-sl-tag s6-sl-before">Before</span>
+            <span class="s6-sl-tag s6-sl-after">After</span>
+            <span class="s6-slider-handle"></span>
+          </div>
+          <span class="s6-slider-name">Tile</span>
+        </div>
+        <div class="s6-slider-col">
+          <div class="s6-slider" style="--pos: 50%;">
+            <img class="s6-after" src="../assets/images/windowafter.png" alt="Window frame after repair">
+            <img class="s6-before" src="../assets/images/window-before.png" alt="Window frame before repair">
+            <span class="s6-sl-tag s6-sl-before">Before</span>
+            <span class="s6-sl-tag s6-sl-after">After</span>
+            <span class="s6-slider-handle"></span>
+          </div>
+          <span class="s6-slider-name">Window</span>
+        </div>
+      </div>
+      <button type="button" id="s6-cta-4" class="btn btn-primary s6-pulse">Want to go deeper?</button>
+    </section>
+
+    <!-- SCENE 5 - OPTIONAL GAMES -->
+    <section class="s6-scene" id="s6-scene-5">
+      <h1 class="s6-headline">Try it yourself.</h1>
+      <div class="s6-games">
+        <div class="s6-game-card">
+          <h3>Surface Rescue</h3>
+          <p>You are a Magicman technician. Five damaged surfaces, a watching customer, and four stages of preparation on every job. Get it right and rescue the surface. Let the customer satisfaction drop to zero and the job is over.</p>
+          <a class="btn btn-primary" href="../docs/surface_rescue_mini_game" target="_blank" rel="noopener">Launch Surface Rescue</a>
+        </div>
+        <div class="s6-game-card">
+          <h3>MARV's Colour Lab</h3>
+          <p>Colour matching is one of the most skilled parts of any repair. Mix your paints, match the target patch, and see if you can hit the mark. Four difficulty levels - from trainee to master technician.</p>
+          <a class="btn btn-primary" href="https://learning-development667.github.io/marvs-colour-lab/" target="_blank" rel="noopener">Launch Colour Lab</a>
+        </div>
+      </div>
+      <p class="s6-games-note">Both challenges open in a new tab - your place here is saved.</p>
+      <button type="button" id="s6-cta-5" class="btn btn-primary s6-pulse">See the outcome</button>
+    </section>
+
+    <!-- SCENE 6 - MARV CLOSES STAGE 6 (brief beat, then auto-navigates to Stage 7) -->
+    <section class="s6-scene" id="s6-scene-6">
+      <a id="s6-cta-6" class="btn btn-primary s6-pulse" href="MM-CE-S7-outcome.html">See the outcome</a>
+    </section>
+
   </main>
+
+  <!-- DEVELOPER NAVIGATION - REMOVE BEFORE LAUNCH -->
+  <div class="dev-nav" id="dev-nav">
+    <div class="dev-nav__panel">
+      <h4 class="dev-nav__title">Developer Navigation - Remove Before Launch</h4>
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devPrevScene()">Prev Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devNextScene()">Next Scene</button>
+        <button class="dev-nav__btn" type="button" style="flex: 1; margin: 0; cursor: pointer; font-family: inherit; text-align: center;" onclick="__devReplayScene()">Replay Scene</button>
+      </div>
+      <a class="dev-nav__btn" href="MM-CE-S1-claim.html">Stage 1 - The Problem Lands</a>
+      <a class="dev-nav__btn" href="MM-CE-S2-gap.html">Stage 2 - The Decision Gap</a>
+      <a class="dev-nav__btn" href="MM-CE-S3-newway.html">Stage 3 - The New Way</a>
+      <a class="dev-nav__btn" href="MM-CE-S4-assessment.html">Stage 4 - Assessment</a>
+      <a class="dev-nav__btn" href="MM-CE-S5-technician.html">Stage 5 - Dispatch (back)</a>
+      <span class="dev-nav__btn" style="opacity: 0.4; cursor: default; pointer-events: none;">Stage 6 - Repair (current)</span>
+      <a class="dev-nav__btn" href="MM-CE-S7-outcome.html">Stage 7 - The Outcome</a>
+    </div>
+    <button class="dev-nav__tab" type="button"
+            onclick="document.getElementById('dev-nav').classList.toggle('is-open')">DEV</button>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SPRITES = '../assets/marv/';
+    var stage = document.getElementById('s6-stage');
+    var sprite = document.getElementById('s6-marv-sprite');
+    var bubble = document.getElementById('s6-marv-bubble');
+    var marvEl = document.getElementById('s6-marv');
+
+    /* ---- MARV state, the canonical pattern. Sets the sprite, replays the
+       slide-in from the left, and types the line out character by character
+       (28ms/char, matching the established stage typewriter). ---- */
+    var typeTimer = null;
+    function typeText(el, text) {
+      if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+      var n = 0;
+      el.textContent = '';
+      (function tick() {
+        n++;
+        el.textContent = text.slice(0, n);
+        if (n < text.length) { typeTimer = setTimeout(tick, 28); }
+      })();
+    }
+    function setMarv(emotion, text, style) {
+      if (sprite) { sprite.src = SPRITES + emotion + '.png'; sprite.alt = 'MARV looking ' + emotion; }
+      if (bubble) { bubble.className = 's6-marv-bubble ' + (style || 'default'); }
+      if (marvEl) { marvEl.classList.remove('is-in'); void marvEl.offsetWidth; marvEl.classList.add('is-in'); }
+      if (bubble) { typeText(bubble, text); }
+    }
+
+    /* MARV line per scene. */
+    var MARV = {
+      1: ['marvfocussed',       'The technician is on site. Every repair follows the same proven process. Let me show you what Magicman does.'],
+      2: ['marvconfident',      'Thirty years of craft across every surface type.'],
+      3: ['marvfocussed',       'Watch a full acrylic bath repair from start to finish.'],
+      4: ['marvtriumphant',     'Every surface. Every time.'],
+      5: ['marvexcited',        "Think you've got what it takes? Two challenges from the MARV training academy."],
+      6: ['marvcongratulatory', 'That is what thirty years of craft looks like. Every technician. Every surface. Every time.']
+    };
+
+    /* ---- Scene system ---- */
+    var TOTAL = 6;
+    var current = 1;
+    function sceneEl(n) { return document.getElementById('s6-scene-' + n); }
+    function goScene(n) {
+      if (n < 1 || n > TOTAL) { return; }
+      for (var i = 1; i <= TOTAL; i++) {
+        var el = sceneEl(i);
+        if (el) { el.classList.toggle('active', i === n); }
+      }
+      current = n;
+      var m = MARV[n];
+      if (m) { setMarv(m[0], m[1]); }
+      if (n === 2) { staggerCaps(); }
+      if (n === 3) { resetBath(); }
+      if (stage) { stage.scrollTop = 0; }
+    }
+
+    /* ---- Scene 2: capability cards stagger in (50ms between each) ---- */
+    function staggerCaps() {
+      var cards = document.querySelectorAll('.s6-cap-card');
+      cards.forEach(function (c) { c.classList.remove('show'); });
+      cards.forEach(function (c, i) { setTimeout(function () { c.classList.add('show'); }, i * 50); });
+    }
+
+    /* ---- Capability video swap. The placeholder is only ever replaced for a
+       file that actually exists, so no missing asset is requested and the
+       console stays clean. When a capability video is uploaded to
+       ../assets/video/, add its filename below (e.g.
+       'capability-bathroom.mp4': true) and that card will play the muted,
+       looping clip on hover (desktop) or tap (mobile). ---- */
+    var CAP_VIDEOS_AVAILABLE = {};
+    function initCapVideos() {
+      var cards = document.querySelectorAll('.s6-cap-card');
+      var isMobile = document.body.classList.contains('device-mobile');
+      cards.forEach(function (card) {
+        var file = card.getAttribute('data-video');
+        if (!file || !CAP_VIDEOS_AVAILABLE[file]) { return; }
+        var media = card.querySelector('.s6-cap-media');
+        var ph = card.querySelector('.s6-cap-ph');
+        var v = document.createElement('video');
+        v.className = 's6-cap-video';
+        v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+        var s = document.createElement('source');
+        s.src = '../assets/video/' + file; s.type = 'video/mp4';
+        v.appendChild(s);
+        media.appendChild(v);
+        if (ph) { ph.style.display = 'none'; }
+        if (isMobile) {
+          card.addEventListener('click', function () {
+            if (v.paused) { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } }
+            else { v.pause(); }
+          });
+        } else {
+          card.addEventListener('mouseenter', function () { var p = v.play(); if (p && p.catch) { p.catch(function () {}); } });
+          card.addEventListener('mouseleave', function () { v.pause(); v.currentTime = 0; });
+        }
+      });
+    }
+
+    /* ---- Scene 3: gated bath repair video ---- */
+    var bathVideo = document.getElementById('s6-bath-video');
+    var bathPlay = document.getElementById('s6-bath-play');
+    var bathStarted = false;
+    function resetBath() {
+      bathStarted = false;
+      if (bathVideo) { try { bathVideo.pause(); bathVideo.currentTime = 0; } catch (e) {} bathVideo.removeAttribute('controls'); }
+      if (bathPlay) { bathPlay.style.display = ''; }
+    }
+    function playBath() {
+      if (bathStarted || !bathVideo) { return; }
+      bathStarted = true;
+      if (bathPlay) { bathPlay.style.display = 'none'; }
+      bathVideo.setAttribute('controls', 'controls');   // standard controls once playing
+      bathVideo.muted = false;
+      var p = bathVideo.play();
+      if (p && p.catch) { p.catch(function () {
+        // If playback with sound is blocked, fall back to the overlay.
+        bathStarted = false;
+        bathVideo.removeAttribute('controls');
+        if (bathPlay) { bathPlay.style.display = ''; }
+      }); }
+    }
+    if (bathPlay) { bathPlay.addEventListener('click', playBath); }
+    if (bathVideo) { bathVideo.addEventListener('ended', function () { goScene(4); }); }
+
+    /* ---- Scene 4: before / after sliders (mouse + touch via pointer events) ---- */
+    function initSliders() {
+      var sliders = document.querySelectorAll('.s6-slider');
+      sliders.forEach(function (sl) {
+        var dragging = false;
+        function setPos(clientX) {
+          var r = sl.getBoundingClientRect();
+          var p = (clientX - r.left) / r.width * 100;
+          p = Math.max(0, Math.min(100, p));
+          sl.style.setProperty('--pos', p + '%');
+        }
+        sl.addEventListener('pointerdown', function (e) { dragging = true; try { sl.setPointerCapture(e.pointerId); } catch (err) {} setPos(e.clientX); });
+        sl.addEventListener('pointermove', function (e) { if (dragging) { setPos(e.clientX); } });
+        sl.addEventListener('pointerup', function () { dragging = false; });
+        sl.addEventListener('pointercancel', function () { dragging = false; });
+      });
+    }
+
+    /* ---- Scene 6: closing beat, then auto-navigate to Stage 7 ---- */
+    var OUTCOME_URL = 'MM-CE-S7-outcome.html';
+    var outcomeTimer = null;
+    function scheduleOutcome() {
+      if (outcomeTimer) { return; }
+      outcomeTimer = setTimeout(function () { window.location.href = OUTCOME_URL; }, 1500);
+    }
+
+    /* ---- Advance buttons ---- */
+    function on(id, fn) { var el = document.getElementById(id); if (el) { el.addEventListener('click', fn); } }
+    on('s6-cta-1', function () { goScene(2); });
+    on('s6-cta-2', function () { goScene(3); });
+    on('s6-cta-3', function () { goScene(4); });
+    on('s6-cta-4', function () { goScene(5); });
+    on('s6-cta-5', function () { goScene(6); scheduleOutcome(); });
+    // s6-cta-6 is a plain link to Stage 7 - no handler needed. It shares the
+    // same target as the pending auto-navigate timer, so a click just gets
+    // there sooner.
+
+    /* ---- Go ---- */
+    function start() {
+      initSliders();
+      initCapVideos();
+      goScene(1);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+
+    /* ---- DEV scene stepper (Prev/Next/Replay). Stepping to scene 6 shows the
+       closing beat without auto-navigating, so the flow can be inspected. ---- */
+    function devGo(n) { if (outcomeTimer) { clearTimeout(outcomeTimer); outcomeTimer = null; } goScene(n); }
+    window.__devPrevScene = function () { devGo(current - 1); };
+    window.__devNextScene = function () { devGo(current + 1); };
+    window.__devReplayScene = function () { devGo(current); };
+  })();
+  </script>
 
 </body>
 </html>
