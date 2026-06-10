@@ -539,6 +539,8 @@
     .s4-btn:hover { transform: translateY(-2px); }
     .s4-btn--retry { background: transparent; color: var(--white); border: 1px solid rgba(255, 255, 255, 0.5); }
     .s4-btn--tryagain { display: block; width: 100%; max-width: 560px; min-height: 60px; margin: 0 auto; }
+    /* Extra separation below the content boxes for the Continue button. */
+    .s4-btn--continue { margin-top: 18px; }
 
     /* Mobile */
     body.device-mobile .s4-marv { flex-direction: column; }
@@ -705,11 +707,11 @@
       }, 380);
     }
 
-    function showButton(label, retry, onClick) {
+    function showButton(label, retry, onClick, pulse) {
       cta.innerHTML = '';
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 's4-btn' + (retry ? ' s4-btn--retry' : '');
+      b.className = 's4-btn' + (retry ? ' s4-btn--retry' : '') + (pulse ? ' s4-btn--pulse' : '');
       b.textContent = label;
       b.addEventListener('click', onClick);
       cta.appendChild(b);
@@ -1155,7 +1157,7 @@
 
     function phase1Done() {
       setMarv('marvconfident', 'I have completed my scan and I have all five answers. But before I reveal them - want to see if you can keep up with me?');
-      showButton('Try me', false, function () { cta.innerHTML = ''; askMaterial(); });
+      showButton('Try me', false, function () { cta.innerHTML = ''; askMaterial(); }, true);
     }
 
     /* ---- Phase 2: user challenge ---- */
@@ -1251,7 +1253,7 @@
 
         var contBtn = document.createElement('button');
         contBtn.type = 'button';
-        contBtn.className = 's4-btn';
+        contBtn.className = 's4-btn s4-btn--pulse s4-btn--continue';
         contBtn.textContent = 'Continue to Stage 5';
         contBtn.addEventListener('click', function () { window.location.href = 'MM-CE-S5-technician.html'; });
         marvRow.appendChild(contBtn);

@@ -357,15 +357,15 @@
     color: var(--dark);
     border: none;
     border-radius: 8px;
-    padding: 12px 24px;
-    font-size: 14px;
+    padding: 14px 32px;
+    font-size: 16px;
     font-weight: 800;
     cursor: pointer;
     white-space: nowrap;
     font-family: 'Open Sans', sans-serif;
     transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
     box-shadow: 0 0 0 0 rgba(174,210,132,0.4);
-    animation: ctaPulse 1.4s ease-in-out infinite;
+    animation: marvGlowPulse 2s ease-in-out infinite;
   }
 
   .ask-marv-btn:hover {
@@ -625,6 +625,10 @@
   .btn-primary:active {
     transform: translateY(0);
   }
+
+  /* Wasabi glow pulse for action buttons that require a click to progress, so
+     they draw the eye. Same marvGlowPulse used on MARV sprites. */
+  .btn-pulse { animation: marvGlowPulse 2s ease-in-out infinite; }
 
   .btn-hidden {
     opacity: 0;
@@ -1748,7 +1752,7 @@
         <div class="s3-marv-bubble">One account. Every site. Every job. All in one place.</div>
       </div>
       <div class="s3-acc-continue" id="s3-acc-continue">
-        <button class="btn-primary" onclick="goToOnboard()">And getting set up?</button>
+        <button class="btn-primary btn-pulse" onclick="goToOnboard()">And getting set up?</button>
       </div>
     </div>
   </section>
@@ -1769,7 +1773,7 @@
       <div class="s3-onb-marv" id="s3-onb-marv">
         <span class="s4-frame"><img class="s3-marv-sprite" src="../assets/marv/marvconfident.png" alt="MARV looking confident"></span>
         <div class="s3-marv-bubble">Want to see how I do it?</div>
-        <button class="btn-primary" id="s3-show-me-final" onclick="goToAssessment()">Show me</button>
+        <button class="btn-primary btn-pulse" id="s3-show-me-final" onclick="goToAssessment()">Show me</button>
       </div>
     </div>
   </section>
