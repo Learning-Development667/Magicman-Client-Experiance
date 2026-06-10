@@ -57,6 +57,9 @@
       opacity: 0;
       transition: opacity 0.8s ease;
       pointer-events: none;
+      /* Own compositing layer so the text stays above the playing video. */
+      will-change: transform;
+      transform: translateZ(0);
     }
     .s4-world-overlay.is-on { opacity: 1; animation: s4Glitch 0.5s linear 1; }
 
