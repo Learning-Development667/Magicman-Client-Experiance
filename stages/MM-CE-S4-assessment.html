@@ -61,7 +61,20 @@
       will-change: transform;
       transform: translateZ(0);
     }
-    .s4-world-overlay.is-on { opacity: 1; animation: s4Glitch 0.5s linear 1; }
+    .s4-world-overlay.is-on { opacity: 1; animation: s4GlitchOverlay 0.8s linear 1; }
+    /* Dramatic glitch entrance for the transition overlay - wide chromatic
+       split, deep clip-path tears, strong x-jitter, resolving to clean white.
+       translateZ(0) per keyframe keeps it on its own layer above the video. */
+    @keyframes s4GlitchOverlay {
+      0%   { opacity: 0; transform: translateX(-22px) translateZ(0) skewX(12deg); text-shadow: 11px 0 rgba(174, 210, 132, 0.95), -11px 0 rgba(255, 68, 68, 0.9); clip-path: inset(0 0 72% 0); }
+      12%  { opacity: 1; transform: translateX(18px) translateZ(0) skewX(-8deg); text-shadow: -14px 0 rgba(174, 210, 132, 0.95), 14px 0 rgba(255, 68, 68, 0.85); clip-path: inset(60% 0 0 0); }
+      24%  { transform: translateX(-16px) translateZ(0); text-shadow: 12px 0 rgba(174, 210, 132, 0.9), -12px 0 rgba(255, 68, 68, 0.8); clip-path: inset(0 0 48% 0); }
+      38%  { transform: translateX(14px) translateZ(0) skewX(5deg); text-shadow: -10px 0 rgba(174, 210, 132, 0.85), 10px 0 rgba(255, 68, 68, 0.7); clip-path: inset(38% 0 26% 0); }
+      52%  { transform: translateX(-10px) translateZ(0); text-shadow: 8px 0 rgba(174, 210, 132, 0.8), -8px 0 rgba(255, 68, 68, 0.6); clip-path: inset(0 0 20% 0); }
+      66%  { transform: translateX(7px) translateZ(0) skewX(-3deg); text-shadow: -5px 0 rgba(174, 210, 132, 0.6), 5px 0 rgba(255, 68, 68, 0.4); clip-path: inset(14% 0 8% 0); }
+      82%  { transform: translateX(-3px) translateZ(0); text-shadow: 3px 0 rgba(174, 210, 132, 0.4); clip-path: inset(0 0 0 0); }
+      100% { opacity: 1; transform: translateX(0) translateZ(0); text-shadow: none; clip-path: inset(0 0 0 0); }
+    }
 
     /* MARV's lab background, revealed when the transition ends */
     .s4-lab {
