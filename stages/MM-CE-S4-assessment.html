@@ -58,7 +58,7 @@
       transition: opacity 0.8s ease;
       pointer-events: none;
     }
-    .s4-world-overlay.is-on { opacity: 1; }
+    .s4-world-overlay.is-on { opacity: 1; animation: s4Glitch 0.5s linear 1; }
 
     /* MARV's lab background, revealed when the transition ends */
     .s4-lab {
@@ -930,11 +930,10 @@
         var worldOverlay = document.getElementById('s4-world-overlay');
         if (worldOverlay) {
           worldOverlay.classList.add('is-on');
-          vid.addEventListener('timeupdate', function () {
-            if (vid.duration && vid.currentTime >= vid.duration - 1.2) {
-              worldOverlay.classList.remove('is-on');
-            }
-          });
+          // Fade out after a short hold so it reads as a title then clears,
+          // regardless of whether the video is actually playing (timeupdate is
+          // unreliable when autoplay is blocked).
+          setTimeout(function () { worldOverlay.classList.remove('is-on'); }, 3500);
           vid.addEventListener('ended', function () { worldOverlay.classList.remove('is-on'); });
         }
         vid.addEventListener('ended', reveal);
