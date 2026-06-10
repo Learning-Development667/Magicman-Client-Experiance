@@ -524,31 +524,36 @@
         items: ['Hardwood and engineered timber', 'Laminate and luxury vinyl', 'Ceramic and porcelain tiles', 'Stone and marble flooring', 'Parquet and block wood', 'Vinyl and safety flooring', 'Threshold strips and edging'] },
       { file: 'capability-window.mp4', name: 'Windows', title: 'Window repairs',
         items: ['uPVC frames and sills', 'Timber window frames', 'Double glazed units', 'Glass scratches and chips', 'Window handles and fittings', 'Casement and sash frames', 'Bay and bow window frames'] },
-      { file: 'capability-door.mp4', name: 'Doors', title: 'Door repairs',
+      { file: 'capability-doors.mp4', name: 'Doors', title: 'Door repairs',
         items: ['uPVC and composite doors', 'Timber and fire doors', 'Door frames and architraves', 'Glass panels and sidelights', 'Door handles and furniture', 'Garage and roller doors', 'Bi-fold and sliding doors'] },
       { file: 'capability-furniture.mp4', name: 'Furniture', title: 'Furniture repairs',
         items: ['Timber and veneer furniture', 'Upholstered chairs and sofas', 'Cabinet and wardrobe doors', 'Beds and headboards', 'Desks and tables', 'Lacquered and painted surfaces', 'Hotel and hospitality furniture'] },
-      { file: 'capability-stone.mp4', name: 'Stone and Marble', title: 'Stone and marble repairs',
+      { file: 'capability-marble.mp4', name: 'Stone and Marble', title: 'Stone and marble repairs',
         items: ['Marble worktops and vanities', 'Granite and quartz surfaces', 'Natural stone flooring', 'Limestone and travertine', 'Chips, cracks and scratches', 'Staining and discolouration', 'Exterior stone and masonry'] },
-      { file: 'capability-cladding.mp4', name: 'Wall Cladding and IPS', title: 'Wall cladding and IPS repairs',
+      { file: 'capability-ips.mp4', name: 'Wall Cladding and IPS', title: 'Wall cladding and IPS repairs',
         items: ['IPS and duct panelling', 'Laminate wall cladding', 'Wet wall and shower panels', 'uPVC and PVC cladding', 'Aluminium composite panels', 'Scratches, chips and impact damage', 'Colour fading and discolouration'] },
       { file: 'capability-spraying.mp4', name: 'Spraying and Recolouring', title: 'Spraying and recolouring',
         items: ['Kitchen unit respraying', 'Door and frame recolouring', 'uPVC colour changes', 'Radiator and pipework respraying', 'Furniture recolouring', 'Colour matching to any RAL or BS shade', 'In-situ spraying - no removal needed'] },
-      { file: 'capability-worktop.mp4', name: 'Worktops and Counters', title: 'Worktops and counters',
+      { file: 'capability-worktops.mp4', name: 'Worktops and Counters', title: 'Worktops and counters',
         items: ['Laminate and Formica worktops', 'Solid wood and timber counters', 'Granite, marble and quartz', 'Corian and solid surface', 'Chips, burns and scratches', 'Water damage and swelling', 'Joins, edges and upstands'] }
     ];
 
     /* Capability media manifest. A card only ever requests a file that actually
-       exists, so no missing asset is fetched and the console stays clean. When a
-       file is uploaded to ../assets/video/, register it here (keyed by the
-       card's capability-<name>.mp4) and that card swaps its placeholder:
-         video (muted, looped): 'capability-bathroom.mp4': true
-                            or:  'capability-bathroom.mp4': { type: 'video' }
-         static image:          'capability-spraying.mp4': { type: 'image', file: 'capability-spraying.jpg' }
-       Kept empty until the files exist. The spraying card is set to use a static
-       JPG: uncomment its line the moment capability-spraying.jpg is uploaded. */
+       exists, so no missing asset is fetched and the console stays clean. Keys
+       are the card's file (see CAPS). Each value is either a video (true or
+       { type: 'video' }) or a static image ({ type: 'image', file: '...jpg' }).
+       All ten capability videos are uploaded to ../assets/video/. */
     var CAP_VIDEOS_AVAILABLE = {
-      // 'capability-spraying.mp4': { type: 'image', file: 'capability-spraying.jpg' }
+      'capability-bathroom.mp4': true,
+      'capability-kitchen.mp4': true,
+      'capability-flooring.mp4': true,
+      'capability-window.mp4': true,
+      'capability-doors.mp4': true,
+      'capability-furniture.mp4': true,
+      'capability-marble.mp4': true,
+      'capability-ips.mp4': true,
+      'capability-spraying.mp4': true,
+      'capability-worktops.mp4': true
     };
 
     var capViewport = document.getElementById('s6-carousel-viewport');
