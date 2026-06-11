@@ -732,7 +732,13 @@
     function on(id, fn) { var el = document.getElementById(id); if (el) { el.addEventListener('click', fn); } }
     on('s6-cta-1', function () { goScene(2); });
     on('s6-cta-2', function () { goScene(3); });
-    on('s6-cta-3', function () { goScene(4); });
+    on('s6-cta-3', function () {
+      // Skipping the bath video: stop its audio and the ambient track cleanly
+      // before advancing, so neither carries over into Scene 4.
+      if (bathVideo) { try { bathVideo.pause(); bathVideo.currentTime = 0; } catch (e) {} }
+      if (music) { try { music.pause(); music.currentTime = 0; } catch (e) {} }
+      goScene(4);
+    });
     on('s6-cta-4', function () { goScene(5); });
     on('s6-cta-5', closeStage);
 

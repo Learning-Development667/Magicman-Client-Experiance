@@ -566,9 +566,9 @@
     var CAPTION_DELAY = 1000;    // caption fades in 1s after the panel appears
     function startKenBurns() {
       showScene('kb');
-      // The montage is the audio scene: attempt the ambient music here. The
-      // browser gates playback behind the first user interaction, which
-      // onFirstGesture also handles, so it starts as soon as the user interacts.
+      // The montage is the audio scene. Music starts at this exact moment and
+      // nowhere else (no on-load or first-gesture attempt), so it can never
+      // begin before the Ken Burns animation does.
       startMusic();
       var panels = scenes.kb.querySelectorAll('[data-kb]');
       function showPanel(i) {
@@ -692,13 +692,11 @@
       }, 3500);
     }
 
-    /* ---- First user gesture: unlock audio, start the gated montage music,
-       and (if waiting) start the advert ---- */
+    /* ---- First user gesture: unlock audio and (if waiting) start the advert.
+       The ambient music is deliberately NOT started here - it is gated strictly
+       to the Ken Burns start (see startKenBurns), so it never begins early. ---- */
     function onFirstGesture() {
       unlockAudio();
-      // Ambient music is gated behind the first interaction. Only start it while
-      // the Ken Burns montage (or its title lead-in) is still running.
-      if (!montageMusicDone && music && music.paused) { startMusic(); }
       if (current === 'yp' && !ypStarted) { playYellowPages(); }
     }
     document.addEventListener('click', onFirstGesture);
